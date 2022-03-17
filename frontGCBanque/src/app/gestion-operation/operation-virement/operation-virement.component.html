@@ -1,0 +1,55 @@
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-sm-6">
+
+      <div class="card card-primary">
+        <div class="card-header">
+          <h3 class="card-title">Virement Bancaire</h3>
+        </div>
+        <form #retForm="ngForm" (ngSubmit)="virement(retForm)">
+
+          <div class="card-body">
+            <div class="form-group">
+              <label for="montant">Montant en euro</label>
+
+              <input type="number" ngModel name="montant" class="form-control" id="montant"
+                placeholder="Enter montant à retier">
+            </div>
+            <div class="form-group">
+              <label for="rib1">RIB CompteRetrait </label>
+
+              <input type="text" ngModel name="rib1" class="form-control" id="rib1" placeholder="RIB Emetteur">
+
+            </div>
+            <div class="form-group">
+              <label for="rib2">RIB CompteVersement</label>
+
+              <input type="text" ngModel name="rib2" class="form-control" id="rib2" placeholder="RIB Recepteur">
+
+            </div>
+
+            <!-- <div class="form-group">
+              <br>
+              <label for="dateoperation">
+                Date de l'operation
+              </label>
+             <br>
+             <br>
+              <p-calendar ngModel name="dateoperation" dateFormat="yy-mm-dd"></p-calendar>
+            </div> -->
+
+
+          </div>
+
+
+
+
+          <div class="card-footer">
+            <button type="submit" class="btn btn-danger">Valider la transaction</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <p-toast [style]="{marginTop: '80px'}"></p-toast>

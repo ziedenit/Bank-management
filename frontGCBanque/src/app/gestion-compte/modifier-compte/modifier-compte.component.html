@@ -1,0 +1,103 @@
+
+
+
+
+
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-sm-6">
+      <br>
+      <div class="card card-primary">
+        <div class="card-header">
+          <h3 class="card-title">Modifier Compte</h3>
+        </div>
+
+
+  <form class="form-group" [formGroup]="cptForm" (ngSubmit)="updateCompte()">
+
+    <div class="row">
+      <div class="col-sm-1 col-sm-offset-2"></div>
+      <div class="col-sm-4 col-sm-offset-2">
+        <div class="form-group">
+          <label for="type">
+            <br>
+            Type de compte &nbsp;&nbsp;
+          </label>
+          <p-dropdown [options]="typecompte" formControlName="type" placeholder="Choix type de compte"  required ></p-dropdown>
+        </div>
+      </div>
+
+      <div class="col-sm-4 col-sm-offset-2">
+        <div class="form-group">
+          <label for="utilisateur">
+            <br>
+            Utilisateur du compte &nbsp;&nbsp;
+          </label>
+          <p-dropdown [options]="utilisateurs" formControlName="utilisateur"    optionLabel="nom" placeholder="Choix utilisateur compte">
+            <ng-template let-user pTemplate="item">
+
+              <div>{{user.value.nom}} {{user.value.prenom}}</div>
+          </ng-template>
+          <ng-template let-user pTemplate="selectedItem">
+
+            <div>{{user.value.nom}} {{user.value.prenom}}</div>
+        </ng-template>
+
+
+          </p-dropdown>
+        </div>
+      </div>
+    </div>
+
+      <div class="row">
+        <div class="col-sm-1 col-sm-offset-2"></div>
+        <div class="col-sm-4 col-sm-offset-2">
+          <div class="form-group">
+            <label for="rib">
+              Rib
+            </label>
+            <input type="text" formControlName="rib" id="rib" class="form-control" placeholder="RIB client">
+          </div>
+        </div>
+        <div class="col-sm-4 col-sm-offset-2">
+          <div class="form-group">
+            <label for="datecreation">
+              Date de creation
+            </label>
+            <input type="date" formControlName="datecreation" id="datecreation" class="form-control" >
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-sm-1 col-sm-offset-2"></div>
+        <div class="col-sm-4 col-sm-offset-2">
+          <div class="form-group">
+            <label for="numerocarte">
+              Numerocarte associé
+            </label>
+            <input type="number" formControlName="numerocarte" id="numerocarte" class="form-control" placeholder="Numéro de la carte">
+          </div>
+        </div>
+      </div>
+
+
+
+
+
+
+
+
+      <div class="row">
+        <div class="col-sm-5 col-sm-offset-2"></div>
+        <div class="col-sm-4 col-sm-offset-2"><button class="btn btn-primary" type="submit"> Modifier</button></div>
+      </div>
+  <br>
+
+
+  </form>
+
+
+        </div>
+      </div>

@@ -1,0 +1,133 @@
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-sm-6">
+      <br>
+      <div class="card card-primary">
+        <div class="card-header">
+          <h3 class="card-title">Modifier utilisateur</h3>
+        </div>
+
+
+  <form class="form-group" [formGroup]="userForm" (ngSubmit)="updateUser()">
+
+    <div class="row" >
+    <div class="col-sm-2 col-sm-offset-2"></div>
+
+    <div class="col-sm-4 col-sm-offset-2">
+      <div class="form-group">
+        <br>
+        <label for="nom">
+          Nom
+        </label>
+        <input type="text" formControlName="nom" id="NomPrenom" class="form-control">
+      </div>
+    </div>
+    <div class="col-sm-4 col-sm-offset-2">
+      <div class="form-group">
+        <br>
+        <label for="prenom">
+          Prenom
+        </label>
+        <input type="text" formControlName="prenom" id="NomPrenom" class="form-control">
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-2 col-sm-offset-2"></div>
+    <div class="col-sm-4 col-sm-offset-2">
+      <div class="form-group">
+        <label for="cin">
+          CIN
+        </label>
+        <input type="text" formControlName="cin" id="cin" class="form-control">
+      </div>
+    </div>
+    <div class="col-sm-4 col-sm-offset-2">
+      <div class="form-group">
+        <label for="Adresse">
+          Adresse
+        </label>
+        <input type="text" formControlName="adresse" id="Adresse" class="form-control">
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-2 col-sm-offset-2"></div>
+    <div class="col-sm-4 col-sm-offset-2">
+      <div class="form-group">
+        <label for="Age">
+          Age
+        </label>
+        <input type="number" formControlName="age" id="age" class="form-control">
+      </div>
+    </div>
+    <div class="col-sm-4 col-sm-offset-2">
+      <div class="form-group">
+        <label for="revenue">
+          Revenue
+        </label>
+        <input type="number" formControlName="revenue" id="Revenue"  class="form-control">
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-2 col-sm-offset-2"></div>
+    <div class="col-sm-4 col-sm-offset-2">
+      <div class="form-group">
+        <label for="login">
+          Login
+        </label>
+        <input type="text" formControlName="login"  id="Login" class="form-control">
+      </div>
+    </div>
+
+    <div class="col-sm-4 col-sm-offset-2">
+      <div class="form-group">
+        <label for="motdepasse">
+          Mot de passe
+        </label>
+        <input type="password" formControlName="motdepasse" id="Mot de passe" class="form-control">
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-2 col-sm-offset-2"></div>
+  <div class="col-sm-4 col-sm-offset-2">
+
+    <div class="form-group">
+      <label for="datenaissance">
+        Date de naissance
+      </label>
+    <p-calendar formControlName="datenaissance"  dateFormat="yy-mm-dd" ></p-calendar>
+    </div>
+  </div>
+
+<div class="col-sm-4 col-sm-offset-2">
+  <div class="form-group">
+    <label for="type">
+     Privilège utilisateur
+    </label>
+    <input type="text" formControlName="type" id="type" class="form-control">
+  </div>
+</div>
+</div>
+<div class="row">
+  <div class="col-sm-2 col-sm-offset-2"></div>
+<div class="col-sm-4 col-sm-offset-2">
+  <div class="form-group">
+    <label for=" adressemail">
+     Email
+    </label>
+    <input type="text" formControlName="adressemail" id="adressemail" class="form-control">
+  </div>
+</div>
+</div>
+  <div class="row">
+    <div class="col-sm-5 col-sm-offset-2"></div>
+
+    <div class="col-sm-4 col-sm-offset-2"><button class="btn btn-primary" type="submit" > Modifier</button></div>
+  </div>
+
+
+
+</form>

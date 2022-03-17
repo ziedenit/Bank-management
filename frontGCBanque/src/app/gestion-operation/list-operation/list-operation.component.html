@@ -1,0 +1,93 @@
+<div class="card-header">
+  <marquee>
+    <h3>Interface dediée au opérations bancaires </h3>
+  </marquee>
+</div>
+<br>
+<div class="row">
+  <div class="col-sm-5">
+    <button class="btn btn-danger" routerLink="/operation/retrait">Retrait</button>
+    &nbsp;
+    <button class="btn btn-primary" routerLink="/operation/versement">Versement</button>
+    &nbsp;
+    <button class="btn btn-success" routerLink="/operation/virement">Virement</button>
+  </div>
+
+  <div class="col-sm-2">
+
+    <input type="date" [(ngModel)]="datecreation" id="date" class="form-control" placeholder="Date">
+
+  </div>
+  <div class="col-sm-3">
+    <button class="btn btn-success" (click)="rechercherOpByDate()">Recherche operation</button>
+    &nbsp;
+    <button class="btn btn-secondary" (click)="restorelistOp()">Restorer Liste </button>
+  </div>
+
+
+</div>
+
+<br>
+
+
+
+
+
+<div id="content" #content>
+  <div class="card-header">
+    <h4 class="card-title">Liste des opérations bancaires </h4>
+  </div>
+
+<!--
+ <p-table  [paginator]="true" [rows]="4" [value]="operations" [autoLayout]="true"
+  [responsive]="true"> -->
+<!--   this is a way to input a paginator when showing table of operation -->
+   <p-table  [paginator]="true" [rows]="4"   [value]="operations" [autoLayout]="true"
+  [resizableColumns]="true"  [responsive]="true">
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Date </th>
+        <th>Montant</th>
+        <th>Opération</th>
+
+        <th>Rib compte</th>
+        <th>Propriètaire compte</th>
+
+        <!-- <th  class="trait"  colspan="2">Traitement</th> -->
+
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-oper>
+      <tr>
+        <td>{{oper.dateoperation| date: 'yyyy-MM-dd'}}</td>
+        <td>{{oper.montant}} euro</td>
+        <td>{{oper.typeOperation}}</td>
+
+        <td>{{oper.cpt.rib}}</td>
+        <td>{{oper.cpt.utilisateur.nom}} {{oper.cpt.utilisateur.prenom}}</td>
+
+
+        <!-- <td>
+        <button class="btn btn-danger btn-sm"><i class="fas fa-user-times" (click)="deleteUser(user.idutilisateur)"></i></button>
+       -->
+        <!--  <td> <button class="btn btn-danger" (click)="deleteUser(user.idutilisateur)">Delete</button> </td> -->
+        <!--  &nbsp;&nbsp;
+        <button class="btn btn-primary btn-sm"> <i class="far fa-edit fa-1x" [routerLink]="['/user/modif', user.idutilisateur]"></i></button>
+      </td> -->
+
+
+
+        <!--     <td> <button class="btn btn-secondary" [routerLink]="['/user/modif', user.idutilisateur]">Update</button> </td> -->
+      </tr>
+
+    </ng-template>
+  </p-table>
+</div>
+<br>
+<a href="list-operation.component.html" target="_blank" class="btn btn-default"><i class="fas fa-print"></i> Print</a>
+<div class="row">
+  <div class="col-sm-5"></div>
+  <div class="col-sm-3">
+    <button class="btn btn-outline-dark" (click)="downloadPDF()"> <i class="fas fa-download"></i>Télecharger Historique </button>
+  </div>
+</div>

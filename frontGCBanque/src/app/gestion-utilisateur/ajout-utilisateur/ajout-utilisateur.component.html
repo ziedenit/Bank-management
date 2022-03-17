@@ -1,0 +1,286 @@
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-sm-6">
+      <br>
+      <div class="card card-primary">
+        <div class="card-header">
+          <h3 class="card-title">Ajout nouveau utilisateur banque</h3>
+        </div>
+        <form #userForm="ngForm" (ngSubmit)="onFormSubmit(userForm)">
+
+          <div class="row">
+            <div class="col-sm-1 col-sm-offset-2"></div>
+            <div class="col-sm-4 col-sm-offset-2">
+              <div class="form-group">
+                <label for="nom">
+                  <br>
+                  Nom
+                </label>
+                <input type="text" ngModel name="nom" id="nom" class="form-control" placeholder="nom utilisateur">
+              </div>
+            </div>
+
+            <div class="col-sm-4 col-sm-offset-2">
+              <div class="form-group">
+                <label for="prenom">
+                  <br>
+                  Prenom
+                </label>
+                <input type="text" ngModel name="prenom" id="prenom" class="form-control" placeholder="prenom utilisateur">
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-sm-1 col-sm-offset-2"></div>
+            <div class="col-sm-4 col-sm-offset-2">
+              <div class="form-group">
+                <label for="cin">
+                  CIN
+                </label>
+                <input type="text" ngModel name="cin" id="cin" class="form-control" placeholder="CIN utilisateur">
+              </div>
+            </div>
+            <div class="col-sm-4 col-sm-offset-2">
+              <div class="form-group">
+                <label for="Adresse">
+                 Adresse
+                </label>
+                <input type="text" ngModel name="adresse" id="adresse" class="form-control" placeholder="Adresse utilisateur">
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-sm-1 col-sm-offset-2"></div>
+            <div class="col-sm-4 col-sm-offset-2">
+              <div class="form-group">
+                <label for="age">
+                  Age
+                </label>
+                <input type="number" ngModel name="age" id="age" class="form-control"
+                  placeholder="Age utilisateur">
+              </div>
+            </div>
+            <div class="col-sm-4 col-sm-offset-2">
+              <div class="form-group">
+                <label for="Revenue">
+                 Revenue
+                </label>
+                <input type="number" ngModel name="revenue" id="revenue" class="form-control" placeholder=" Revenue utilisateur">
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-1 col-sm-offset-2"></div>
+            <div class="col-sm-4 col-sm-offset-2">
+              <div class="form-group">
+                <label for="login">
+                  Login
+                </label>
+                <input type="text" ngModel name="login" id="login" class="form-control"
+                  placeholder="login utilisateur">
+              </div>
+            </div>
+            <div class="col-sm-4 col-sm-offset-2">
+              <div class="form-group">
+                <label for="motdepasse">
+                 Mot de passe
+                </label>
+                <input type="text" ngModel name="motdepasse" id="motdepasse" class="form-control" placeholder=" mot de passe utilisateur">
+              </div>
+            </div>
+          </div>
+        
+
+          <div class="row">
+            <div class="col-sm-1 col-sm-offset-2"></div>
+            <div class="col-sm-4 col-sm-offset-2">
+              <div class="form-group">
+                <label for="type">
+                  Type de compte &nbsp;&nbsp;
+                </label>
+                <p-dropdown [options]="typeM" placeholder="Choix type de compte" [(ngModel)]="selectedtype" required  [ngModelOptions]="{standalone: true}"></p-dropdown>
+              </div>
+            </div>
+            <div class="col-sm-4 col-sm-offset-2">
+              <div class="form-group">
+                <label for="adressemail">
+                 Adresse mail
+                </label>
+                <input type="text" ngModel name="adressemail" id="adressemail" class="form-control" placeholder=" email utilisateur">
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-1 col-sm-offset-2"></div>
+            <div class="col-sm-4 col-sm-offset-2">
+              <div class="form-group">
+                <label for="Privilège">
+                    Date de naissance
+                </label>
+                <p-calendar ngModel name="datenaissance" dateFormat="yy-mm-dd" placeholder=" date de naissance"></p-calendar>
+              </div>
+            </div>
+          </div>
+
+
+
+          <div class="row">
+            <div class="col-sm-5 col-sm-offset-2"></div>
+            <div class="col-sm-4 col-sm-offset-2"><button class="btn btn-primary" type="submit"> Ajouter</button></div>
+          </div>
+          <br>
+
+
+        </form>
+
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+
+    <!-- <form #userForm="ngForm"  (ngSubmit)="onFormSubmit(userForm)"> -->
+
+
+
+
+    <!-- <div class="card-header">
+  <h3 class="card-title">Ajout nouveau utilisateur</h3>
+</div>
+
+
+<br>
+ <form #userForm="ngForm"  (ngSubmit)="onFormSubmit(userForm)">
+ <form #userForm="ngForm" (ngSubmit)="onFormSubmit(userForm)"> -->
+    <!--   <div class="row">
+    <div class="col-sm-2 col-sm-offset-2"></div>
+
+    <div class="col-sm-4 col-sm-offset-2">
+      <div class="form-group">
+        <label for="nom">
+          Nom
+        </label>
+        <input type="text" ngModel name="nom" id="NomPrenom" class="form-control" placeholder="Nom">
+      </div>
+    </div>
+    <div class="col-sm-4 col-sm-offset-2">
+      <div class="form-group">
+        <label for="prenom">
+          Prenom
+        </label>
+        <input type="text" ngModel name="prenom" id="NomPrenom" class="form-control" placeholder="Prenom">
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-2 col-sm-offset-2"></div>
+    <div class="col-sm-4 col-sm-offset-2">
+      <div class="form-group">
+        <label for="cin">
+          CIN
+        </label>
+        <input type="text" ngModel name="cin" id="CIN" class="form-control" placeholder="CIN">
+      </div>
+    </div>
+    <div class="col-sm-4 col-sm-offset-2">
+      <div class="form-group">
+        <label for="Adresse">
+          Adresse
+        </label>
+        <input type="text" ngModel name="adresse" id="Adresse" class="form-control"  placeholder="Adresse">
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-2 col-sm-offset-2"></div>
+    <div class="col-sm-4 col-sm-offset-2">
+      <div class="form-group">
+        <label for="Age">
+          Age
+        </label>
+        <input type="number" ngModel name="age" id="age" class="form-control" placeholder="Age">
+      </div>
+    </div>
+    <div class="col-sm-4 col-sm-offset-2">
+      <div class="form-group">
+        <label for="revenue">
+          Revenue
+        </label>
+        <input type="text" ngModel name="revenue" id="Revenue" class="form-control" placeholder="Revenue">
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-2 col-sm-offset-2"></div>
+    <div class="col-sm-4 col-sm-offset-2">
+      <div class="form-group">
+        <label for="login">
+          Login
+        </label>
+        <input type="text" ngModel name="login" id="Login" class="form-control" placeholder="Login">
+      </div>
+    </div>
+
+    <div class="col-sm-4 col-sm-offset-2">
+      <div class="form-group">
+        <label for="motdepasse">
+          Mot de passe
+        </label>
+        <input type="password" ngModel name="motdepasse" id="Mot de passe" class="form-control" placeholder="motdepasse">
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-2 col-sm-offset-2"></div>
+    <div class="col-sm-4 col-sm-offset-2">
+      <div class="form-group">
+        <label for="type">
+          Privilège
+        </label>
+        <input type="text" ngModel name="type" id="TYPE" class="form-control" placeholder="Privilège">
+      </div>
+    </div>
+
+
+
+
+
+ <div class="col-sm-2 col-sm-offset-2"></div>
+    <div class="col-sm-4 col-sm-offset-4">
+      <div class="form-group">
+        <label for="datenaissance">
+          Adresse mail
+        </label>
+        <input type="text" ngModel name="adressemail" id="adressemail" class="form-control" placeholder="adressemail">
+      </div>
+
+
+    </div>
+  </div>
+    <div class="row">
+      <div class="col-sm-2 col-sm-offset-2"></div>
+      <div class="col-sm-3 col-sm-offset-2">
+        <div class="form-group">
+          <label for="datenaissance">
+            Date de naissance
+          </label>
+          <p-calendar ngModel name="datenaissance" dateFormat="yy-mm-dd" ></p-calendar>
+        </div>
+
+      </div>
+    </div>
+
+
+  <div class="row">
+    <div class="col-sm-5 col-sm-offset-2"></div>
+    <div class="col-sm-4 col-sm-offset-2"><button class="btn btn-primary" type="submit"> Ajouter</button></div>
+  </div>
+
+
+
+</form> -->

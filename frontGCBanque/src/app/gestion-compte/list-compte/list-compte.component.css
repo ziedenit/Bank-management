@@ -1,0 +1,34 @@
+.card-header {
+  background-color: rgb(14, 106, 243);
+
+  padding: .75rem 1.25rem;
+  position: relative;
+  border-top-left-radius: .25rem;
+  border-top-right-radius: .25rem;
+}
+.card-title {
+  margin-bottom: .5rem;
+  padding-left: 35%;
+  padding-right: 10;
+
+
+
+
+}
+
+h1
+{
+  text-emphasis-position: initial;
+  color:white;
+}
+h3 {
+ color:white;
+ text-align: center;
+}
+
+td {
+  text-align: center;
+}
+th {
+  text-align: center;
+}

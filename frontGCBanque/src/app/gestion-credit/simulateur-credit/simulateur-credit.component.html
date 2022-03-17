@@ -1,0 +1,252 @@
+<!-- <form class="form-group" [formGroup]="creditForm" (ngSubmit)="mensualite(creditForm)">
+
+  <div class="card-header" >
+    <div class="col-sm-4 col-sm-offset-2"></div>
+    <div class="col-sm-6 col-sm-offset-4">
+      <div class="form-group">
+        <label class='required' for="montant">
+          Montant en euro
+        </label>
+        <input type="number" formControlName="montant" id="montant" class="form-control">
+      </div>
+    </div>
+
+
+
+    <div class="col-sm-4 col-sm-offset-2"></div>
+    <div class="col-sm-6 col-sm-offset-4">
+      <div class="form-group">
+        <label class='required' for="duree">
+          Duree en mois
+        </label>
+        <input type="number" formControlName="duree" id="duree" class="form-control">
+      </div>
+    </div>
+    <div class="col-sm-4 col-sm-offset-2"></div>
+    <div class="col-sm-6 col-sm-offset-4">
+      <div class="form-group">
+        <label class='required' for="mensualite">
+          Mensualite
+        </label>
+        <input type="number" formControlName="mensualite" id="mensualite" class="form-control">
+      </div>
+    </div>
+
+    <div class="col-sm-4 col-sm-offset-2"></div>
+    <div class="col-sm-4 col-sm-offset-2"><button class="btn btn-primary" type="submit">Simuler</button></div>
+
+  </div>
+</form> -->
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-sm-6">
+
+      <div class="card card-primary">
+        <div class="card-header">
+          <h3 class="card-title">Simulateur de credit</h3>
+        </div>
+
+        <form role="form" class="form-group" [formGroup]="creditForm" (ngSubmit)="mensualite(creditForm)">
+          <div class="card-body">
+            <div class="form-group">
+              <label for="montant">Montant en euro</label>
+
+              <input type="number" formControlName="montant" class="form-control" id="montant"
+                placeholder="Enter montant de crédit">
+            </div>
+            <div class="form-group">
+              <label for="duree">Duree de remboursement en mois</label>
+
+              <input type="number" formControlName="duree" class="form-control" id="duree" placeholder="nombre de mois">
+            </div>
+            <div class="form-group">
+              <label for="mensualite">Mensualité</label>
+
+              <input type="number" formControlName="mensualite" class="form-control" id="mensualite"
+                placeholder="mensualité">
+            </div>
+
+
+
+
+            <!-- /.card-body -->
+
+
+            <div class="card-footer">
+              <button type="submit" class="btn btn-primary">Simuler</button>
+            </div>
+
+          </div>
+
+        </form>
+      </div>
+    </div>
+    <div class="col-sm-6">
+
+      <div class="card card-primary">
+        <div class="card-header">
+          <h4 class="card-title">Deposer une demande de crédit</h4>
+        </div>
+
+        <form role="form" class="form-group" [formGroup]="creditForm" (ngSubmit)="mensualite(creditForm)">
+          <div class="card-body">
+
+              <div class="form-group">
+                <label for="nom">Nom et Prenom du Client</label>
+
+                <input type="number" formControlName="duree" class="form-control" id="nom" placeholder="Introduire votre nom et prénom ">
+              </div>
+              <div class="form-group">
+              <label for="montant">RIB Compte</label>
+
+              <input type="number" formControlName="rib" class="form-control" id="rib"
+                placeholder="Introduire le RIB relatif a votre compte">
+            </div>
+
+            <div class="form-group">
+              <label for="cin">CIN  Client</label>
+
+              <input type="text" formControlName="cin" class="form-control" id="mensualite"
+                placeholder="Introduire votre numero de carte identité nationale">
+            </div>
+
+            <div class="form-group">
+              <label for="revenue">Revenue Client</label>
+
+              <input type="number" formControlName="revenue" class="form-control" id="revenue"
+                placeholder="Votre Revenue par mois">
+            </div>
+            <div class="form-group">
+              <label for="age">Age Client</label>
+
+              <input type="number" formControlName="age" class="form-control" id="age"
+                placeholder="Votre age">
+            </div>
+            <div class="form-group">
+              <label for="dureeremboursement">Duree de remboursement souhaitée</label>
+
+              <input type="number" formControlName="dureeremboursement" class="form-control" id="dureeremboursement"
+                placeholder="Nombre de mois">
+            </div>
+
+
+
+            <div class="form-group">
+              <label for="pret">Montant de credit souhaité</label>
+
+              <input type="number" formControlName="pret" class="form-control" id="pret"
+                placeholder="montant">
+            </div>
+
+            <!-- /.card-body -->
+
+
+            <div class="card-footer">
+              <button type="submit" class="btn btn-success">Envoyer la demande</button>
+            </div>
+
+          </div>
+
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+        <!-- <h4 class="m-0 text-dark">Déposer une demande de credit <h5>(Espace reservé que pour les clients de la banque)</h5></h4>
+<br>
+
+<form #userForm="ngForm"  (ngSubmit)="onFormSubmit(userForm)"> -->
+        <!-- <form #demandeForm="ngForm" (ngSubmit)="demandecredit(demandeForm)">
+  <div class="row">
+    <div class="col-sm-2 col-sm-offset-2"></div>
+
+    <div class="col-sm-4 col-sm-offset-2">
+      <div class="form-group">
+        <label class='required' for="nom">
+          Nom
+        </label>
+        <input type="text" ngModel name="nom" id="NomPrenom" class="form-control">
+      </div>
+    </div>
+    <div class="col-sm-4 col-sm-offset-2">
+      <div class="form-group">
+        <label class='required' for="prenom">
+          Prenom
+        </label>
+        <input type="text" ngModel name="prenom" id="NomPrenom" class="form-control">
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-2 col-sm-offset-2"></div>
+    <div class="col-sm-4 col-sm-offset-2">
+      <div class="form-group">
+        <label class='required' for="cin">
+          CIN
+        </label>
+        <input type="text" ngModel name="cin" id="CIN" class="form-control">
+      </div>
+    </div>
+    <div class="col-sm-4 col-sm-offset-2">
+      <div class="form-group">
+        <label class='required' for="Adresse">
+
+          Revenue
+        </label>
+        <input type="text" ngModel name="adresse" id="Adresse" class="form-control">
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-2 col-sm-offset-2"></div>
+    <div class="col-sm-4 col-sm-offset-2">
+      <div class="form-group">
+        <label class='required' for="Age">
+          Age
+        </label>
+        <input type="number" ngModel name="age" id="age" class="form-control">
+      </div>
+    </div>
+    <div class="col-sm-4 col-sm-offset-2">
+      <div class="form-group">
+        <label class='required' for="Montant">
+          Montant souhaité
+        </label>
+        <input type="text" ngModel name="montant" id="Montant" class="form-control">
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-2 col-sm-offset-2"></div>
+    <div class="col-sm-4 col-sm-offset-2">
+      <p>
+
+        <label class='required' for="typecredit">Type de credit ?</label><br />
+        <select name="typecredit" id="typecredit">
+          <option value="france">Habitat</option>
+          <option value="espagne">Achat voiture</option>
+
+        </select>
+      </p>
+
+    </div>
+    <div class="col-sm-4 col-sm-offset-2">
+      <div class="form-group">
+        <label class='required' for="dureeremboursement">
+          Duree de remboursement souhaitée
+        </label>
+        <input type="text" ngModel name="dureeremboursement" id="dureeremboursement"  class="form-control">
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-sm-5 col-sm-offset-2"></div>
+    <div class="col-sm-4 col-sm-offset-2"><button class="btn btn-primary" type="submit">Apply</button></div>
+  </div>
+
+
+
+</form>
+ -->
