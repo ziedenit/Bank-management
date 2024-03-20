@@ -1,8 +1,8 @@
 <div class="container-fluid">
   <div class="row">
     <div class="col-md-12">
-      <div [class.DpeAdem]="elemenDPE == false">
-        <div [hidden]="!depExist">
+      <div [class.DpeAdem]="elemenDPE == true">
+        <div [hidden]="depExist">
           <div class="DPE-Bloc" [ngStyle]="{'border-bottom': !elemenDPE ? '1px solid #d1d3fc' : ''}">
             <img *ngIf="hiddenDPE==false" src="../../../assets/icons/arrow-up.svg" alt="image flèche haut" (click)="hideDataDPE()" />
             <img *ngIf="hiddenDPE==true" src="../../../assets/icons/arrow-down.svg" alt="image flèche haut" (click)="showDataDPE()" />
@@ -13,8 +13,7 @@
               <div class="row">
                 <div class="col-md-4">
                   <label for="numeroNomRue" class="champs">Adresse du bien </label>
-                </div>
-                <div class="col-md-8">
+                  &nbsp;
                   <input type="text" id="numeroNomRue" placeholder="Adresse" formControlName="numeroNomRue" name="numeroNomRue" class="InputCommunDpeAdresseRue">
                   <div class="listeAdress" *ngIf="showAdressResults==true">
                     <ul>
@@ -25,6 +24,14 @@
                       </li>
                     </ul>
                   </div>
+                </div>
+                <div class="col-md-4">
+                
+                  <input type="text" id="codePostal" placeholder="Code postal" formControlName="codePostal" name="codePostal" class="InputCommunDpeAdresseCodePostal">
+                </div>
+                <div class="col-md-4">
+        
+                  <input type="text" id="ville" placeholder="Ville" formControlName="ville" name="ville" class="InputCommunDpeAdresseVille">
                 </div>
               </div>
               <!-- Autres champs et éléments de formulaire ici -->
