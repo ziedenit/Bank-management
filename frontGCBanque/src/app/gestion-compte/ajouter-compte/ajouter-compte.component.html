@@ -13,6 +13,8 @@
               <div class="row">
                 <div class="col-md-4">
                   <label for="numeroNomRue" class="champs">Adresse du bien </label>
+                </div>
+                <div class="col-md-8">
                   <input type="text" id="numeroNomRue" placeholder="Adresse" formControlName="numeroNomRue" name="numeroNomRue" class="InputCommunDpeAdresseRue">
                   <div class="listeAdress" *ngIf="showAdressResults==true">
                     <ul>
@@ -23,14 +25,6 @@
                       </li>
                     </ul>
                   </div>
-                </div>
-                <div class="col-md-4">
-                  <label for="codePostal" class="champs">Code postal</label>
-                  <input type="text" id="codePostal" placeholder="Code postal" formControlName="codePostal" name="codePostal" class="InputCommunDpeAdresseCodePostal">
-                </div>
-                <div class="col-md-4">
-                  <label for="ville" class="champs">Ville</label>
-                  <input type="text" id="ville" placeholder="Ville" formControlName="ville" name="ville" class="InputCommunDpeAdresseVille">
                 </div>
               </div>
               <!-- Autres champs et éléments de formulaire ici -->
