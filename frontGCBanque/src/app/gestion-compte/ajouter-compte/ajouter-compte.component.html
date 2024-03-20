@@ -1,355 +1,54 @@
-<h2 class ="Titre-01"> Acquisition des données et des justificatifs</h2>
-
-<!---------------------------------------bloc clients Particuliers---------------------------------------------------------->
-<div  *ngIf="clientParticulier==true" >
-<div class="container-fluid mb-4">
-  <div class="row">
-    <div class="col-12">
-      <div  class="nav" >
-        <img  *ngIf="hiddenClient==false" src="../../../assets/icons/arrow-up.svg"  (click)="hideDataClient()" /> 
-         <img *ngIf="hiddenClient==true" src="../../../assets/icons/arrow-down.svg"   (click)="showDataClient()"/>  &nbsp;
-        Client ({{idRepers.length }}) 
-       </div>
-    </div>
-  </div>
-  <div class="row" *ngIf="elementClient">
-    <div class="col-12">
-      <ul class="list-group">
-        <li class="list-group-item" *ngFor="let client of clientDataList">
-          <div class="row">
-            <div class="col">
-              {{ client.usual_last_name }} {{ client.first_name }}
-            </div>
-            <div class="col">
-              Né(e) le {{ client.birth_date }}
-            </div>
-          </div>
-        </li>
-      </ul>
-    </div>
-  </div>
-  <div class="row">
-    <div class="col-12">
-      <!-- Affichage du message d'erreur -->
-      <div *ngIf="errors.length > 0">
-        <div class="error-message">
-          <ul class="list-group">
-            <li class="list-group-item" *ngFor="let error of errors">
-              <div class="row">
-                <div class="col">
-                  {{ error.message }}
-                </div>
-                <div class="col">
-                  idReper: {{ error.idReper }}
-                </div>
-              </div>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-</div>
-<div  *ngIf="clientParticulier==false" >
-<div class="container-fluid mb-4">
-  <div class="row">
-    <div class="col-12">
-      <div  class="nav" >
-        <img  *ngIf="hiddenClient==false" src="../../../assets/icons/arrow-up.svg"  (click)="hideDataClient()" /> 
-         <img *ngIf="hiddenClient==true" src="../../../assets/icons/arrow-down.svg"   (click)="showDataClient()"/>  &nbsp;
-        Client ({{idRepers.length }}) 
-       </div>
-    </div>
-  </div>
-  <div class="row" *ngIf="elementClient">
-    <div class="col-12">
-      <ul class="list-group">
-        <li class="list-group-item" *ngFor="let client of entrepriseData">
-          <div class="row">
-            <div class="col">
-              {{client.legal_name}}
-            </div>
-            <div class="col">
-              Siren: {{client.siren}} 
-            </div>
-          </div>
-        </li>
-      </ul>
-    </div>
-  </div>
-  <div class="row">
-    <div class="col-12">
-      <!-- Affichage du message d'erreur -->
-      <div *ngIf="errors.length > 0">
-        <div class="error-message">
-          <ul class="list-group">
-            <li class="list-group-item" *ngFor="let error of errors">
-              <div class="row">
-                <div class="col">
-                  {{ error.message }}
-                </div>
-                <div class="col">
-                  idReper: {{ error.idReper }}
-                </div>
-              </div>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-</div>
-
-<div class="container-fluid mb-4">
-  <div class="row">
-    <div class="col-md-12">
-      <div class="nav">
-        <img *ngIf="hiddenBien==false" src="../../../assets/icons/arrow-up.svg" alt="image flèche haut" (click)="hideDataBien()" />
-        <img *ngIf="hiddenBien==true" src="../../../assets/icons/arrow-down.svg" alt="image flèche haut" (click)="showDataBien()" /> &nbsp;
-        Liste des biens ({{ biens.length }})
-      </div>
-
-      <ul class="list-group" *ngIf="elementBien == true">
-        <li class="list-group-item" *ngFor="let bien of biens; let i = index">
-          <div class="row">
-            <div class="col-md-6">
-              <input type="checkbox" (change)="setCheckedBien(bien, i, $event)" />
-              &nbsp;{{ bien.typeBatiment }}
-            </div>
-            <div class="col-md-6">
-              {{ bien.adresseComplete }}
-            </div>
-          </div>
-        </li>
-      </ul>
-    </div>
-  </div>
-</div>
-
-
-
-
-
-
-<div class="container-fluid mb-4">
-  <div class="row">
-    <div class="col-12">
-      <div class="card border-0">
-        <div class="card-body">
-          <div class="blockSize">
-          
-        
-          <!-- Flèche pour ouvrir et fermer le formulaire -->
-          <h3 class="d-inline-block font-weight-bold">Object Financement</h3>
-        <span class="float-right" >
-            <img *ngIf="hiddenObjetfinancement==false" src="../../../assets/icons/arrow-up.svg" alt="Fleche haut" (click)="hideDataObjetFinancement()">
-            <img *ngIf="hiddenObjetfinancement==true" src="../../../assets/icons/arrow-down.svg" alt="Fleche bas" (click)="showDataObjetFinancement()">
-          </span> 
-         <div *ngIf="elementObjetfinancement == true"> 
-            <!-- Votre formulaire ici -->
-            <div class="row">
-              <div class="col-lg-6">
-                <!-- Colonne 1 -->
-                <div class="form-group ">
-                  <label for="input1">Object financé</label>
-                  <input type="text" class="form-control form-control-sm" id="input1" placeholder="Renovation ou aquisition" [(ngModel)]="objetFinance">
-                </div>
-                <!-- Deuxième champ liste déroulante -->
-                <div class="form-group" >
-                  <label for="select2">Type de bâtiment </label>
-                  <select class="form-control form-control-sm"  (mouseover)="showDescription($event.target.value)" id="select2" [(ngModel)]="selectedType">
-                    <option value='option1'  > Bien soumis au DPE  </option>
-                    <option value='option2' > Construction provisoire (durée d'utilisation ≤ 2 ans)  </option>
-                     <option value='option3' > Bâtiment indépendant avec superficie <50 m² </option>
-                    <option value='option4' > Usage agricole, artisanal ou industriel</option>
-                    <option value='option5' >Lieux de culte </option>
-                    <option value='option6' >Monument historique classé </option>
-                    <option value='option7' >Bâtiment non chauffé  </option>
-                    <option value='option8' >Utilisation < 4 mois/an </option>
-                    <option value='option9' > Bâtiment situé dans les DOM-TOM</option>
-                    <option value='option10' > Bâtiment situé à l'étranger </option> 
-            
-                  </select>
-                </div>
-                <!-- Troisième champ liste déroulante -->
-                <div class="form-group" *ngIf="hideFieldForm==false">
-                  <label for="select3"> Nature du bien</label>
-                  <select class="form-control form-control-sm" id="select3" [(ngModel)]="codeBatimentSelected">
-                    <option value='option0' selected > </option>
-                    <option value='option1' selected > Résidentiel</option>
-                    <option value='option2'  >Bureaux</option>
-                    <option value='option3'>Bureaux IGH (hauteur >28 m)</option>
-                    <option value='option4'>Hôtels</option>
-                    <option value='option5'>Santé (centres hospitaliers, EHPAD, Etabl. Médicaux sociaux…)</option> 
-                    <option value='option6'>Centres commerciaux</option>
-                  </select>
-              
-            
-                  
-                </div>
-                <!-- Quatrième champ liste déroulante -->
-                <div class="form-group" *ngIf="hideFieldForm==false">
-                  <label for="select4">Etat du bien</label>
-                  <select class="form-control form-control-sm" id="select4" [(ngModel)]="selectedNatBatiment">
-                    <option value='option1'> Ancien</option>
-                    <option value='option2'>Neuf</option>
-            
-                  </select>
-                </div>
-                <!-- Autres champs de saisie -->
-                <!-- ... -->
-                <div class="form-group" *ngIf="hideFieldForm==false">
-                  <label for="input5">Siren du diagnostiqueur</label>
-                  <input type="text" class="form-control form-control-sm" id="input5" placeholder="Siren du diagnostiqueur" [(ngModel)]="SirenDPE">
-                </div>
-                <!-- 6ème champ sans label -->
-                <div class="form-group" *ngIf="hideFieldForm==false">
-                  <label for="addressBien" class="labelFormulaire">Adresse du bien</label>
-                  <div class="row">
-    
-                    <div class="col-lg-4">
-                      <input type="nomNumeroRue" class="form-control form-control-sm " placeholder="Nom et numéro de rue" [(ngModel)]="addresseBien">
-                    </div>
-                    <div class="col-lg-4">
-                      <input type="ville" class="form-control form-control-sm " placeholder="Ville " [(ngModel)]="addresseBienVille">
-                    </div>
-                    <div class="col-lg-3">
-                      <input type="codePostal" class="form-control form-control-sm" placeholder="Code Postal" [(ngModel)]="addresseBienCodePostal">
-                    </div>
-                  </div>
-                </div>
-                <div class="alertArea" *ngIf="showFirstEligiblite==true">{{messageAlert}}
-                  <img src="../../../assets/icons/alert.svg" class="imageErreur"  alt="image flèche haut" >
-                </div>
-
-                <!-- Icône de recherche -->
-                <div class="form-group">
-                  <i class="fa fa-search"></i>
-                </div>
-              </div>
-              <div class="col-lg-6">
-                <!-- Colonne 2 -->
-              
-                <div class="form-group" *ngIf="hideFieldForm==false">
-                  <label for="input7">Date de dépôt de PC</label>
-                  <input type="text" class="form-control form-control-sm" id="input8" placeholder="Ex 200000" [(ngModel)]="partLcl">
-                </div>
-                <div class="form-group" *ngIf="hideFieldForm==false">
-                  <label for="input7">Prix du bien<em> (en euro)</em></label>
-                  <input type="text" class="form-control form-control-sm" id="input6" placeholder="Ex 1000000" [(ngModel)]="prixAquisitionBien">
-                </div>
-                <div class="form-group" *ngIf="hideFieldForm==false">
-                  <label for="input7">Montant financé <em> (en euro)</em></label>
-                  <input type="text" class="form-control form-control-sm" id="input7" placeholder="Ex 900000" [(ngModel)]="montantLclFinance">
-                </div>
-                <div class="form-group" *ngIf="hideFieldForm==false">
-                  <label for="input7">Part LCL <em> (en euro)</em></label>
-                  <input type="text" class="form-control form-control-sm" id="input8" placeholder="Ex 200000" [(ngModel)]="partLcl">
-                </div>
-               
-                <div class="form-group" *ngIf="hideFieldForm==false">
-                  <label for="NormeThermique" class="labelFormulaire" >Norme Thermique </label>
-                  <select class="form-control form-control-sm" id="select5" [(ngModel)]="normeThermique">
-                    <option value='option0' selected> </option>
-                    <option value='option1'> RT2012  </option>
-                    <option value='option2'> RE2020 </option>
-                    <option value='option3' >Autre</option>
-            
-                  </select>
-                
-                  
-                </div>
-                <!-- Autres champs de saisie -->
-                <!-- ... -->
-                <div class="form-group" *ngIf="hideFieldForm==false">
-                 
-                  <label for="input10">N° du DPE</label>
-                  <div class="row">
-                  <div class="col-lg-6">
-                  <input type="text" class="form-control form-control-sm" id="input10" placeholder="Ex: 2100E0981916Z" [(ngModel)]="numeroDpeAdeme">
-                  </div>
-            
-                  <div class="col-lg-1">
-                  <span class="float-right">
-                  <img *ngIf="dpechsecked" src="../../../assets/icons/coche.png" style="width:15px; height: 15px;"  alt="image flèche haut">
-                  <img  src="../../../assets/images/search.png"  (click)="showAdemeResult(numeroDpeAdeme)" style=" margin-left: 20px; width:20px; height: 20px;" alt="image flèche haut" >
-                </span>
-          
-                  </div>
-                </div>
-              </div>
-              <div class="erreurDpe"  fxLayoutAlign="float-right " >
-                {{message}}
-              </div>
-              </div>
-            </div>
-   <!--        </div> -->
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
 <div class="container-fluid">
   <div class="row">
     <div class="col-md-12">
       <div class="card border-0">
         <div class="card-body">
           <div class="blockSize">
-      <div [class.DpeAdem]="elemenDPE == true">
-        <div [hidden]="depExist">
-         
-          <div class="DPE-Bloc" [ngStyle]="{'border-bottom': !elemenDPE ? '1px solid #d1d3fc' : ''}">
-            <span class="float-right" >
-            <img *ngIf="hiddenDPE==false" src="../../../assets/icons/arrow-up.svg" alt="image flèche haut" (click)="hideDataDPE()" />
-            <img *ngIf="hiddenDPE==true" src="../../../assets/icons/arrow-down.svg" alt="image flèche haut" (click)="showDataDPE()" />
-          </span> 
-            <h3 class="TitreDpe">Données du DPE</h3>
-          </div>
-          <div *ngIf="elemenDPE == true">
-            <form class="DpeFormulaire" [formGroup]="formGroup">
-              <div class="row">
-                <div class="col-md-4">
-                  <label for="numeroNomRue" class="champs">Adresse du bien </label>
-                  &nbsp;
-                  <input type="text" id="numeroNomRue" placeholder="Adresse" formControlName="numeroNomRue" name="numeroNomRue" >
-                  <div class="listeAdress" *ngIf="showAdressResults==true">
-                    <ul>
-                      <li *ngFor="let result of addressResults">
-                        <button (click)="selectAddress(result)">
-                          {{ result.properties.label }}
-                        </button>
-                      </li>
-                    </ul>
-                  </div>
+            <div [class.DpeAdem]="elemenDPE == true">
+              <div [hidden]="depExist">
+                <div class="DPE-Bloc" [ngStyle]="{'border-bottom': !elemenDPE ? '1px solid #d1d3fc' : ''}">
+                  <span class="float-right" >
+                    <img *ngIf="hiddenDPE==false" src="../../../assets/icons/arrow-up.svg" alt="image flèche haut" (click)="hideDataDPE()" />
+                    <img *ngIf="hiddenDPE==true" src="../../../assets/icons/arrow-down.svg" alt="image flèche haut" (click)="showDataDPE()" />
+                  </span> 
+                  <h3 class="TitreDpe">Données du DPE</h3>
                 </div>
-                <div class="col-md-4">
-                
-                  <input type="text" id="codePostal" placeholder="Code postal" formControlName="codePostal" name="codePostal" >
+                <div *ngIf="elemenDPE == true">
+                  <form class="DpeFormulaire" [formGroup]="formGroup">
+                    <div class="row">
+                      <div class="col-md-3">
+                        <label for="numeroNomRue" class="champs">Adresse du bien </label>
+                        &nbsp;
+                        <input type="text" id="numeroNomRue" placeholder="Adresse" formControlName="numeroNomRue" name="numeroNomRue" >
+                        <div class="listeAdress" *ngIf="showAdressResults==true">
+                          <ul>
+                            <li *ngFor="let result of addressResults">
+                              <button (click)="selectAddress(result)">
+                                {{ result.properties.label }}
+                              </button>
+                            </li>
+                          </ul>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <input type="text" id="codePostal" placeholder="Code postal" formControlName="codePostal" name="codePostal" >
+                      </div>
+                      <div class="col-md-3">
+                        <input type="text" id="ville" placeholder="Ville" formControlName="ville" name="ville" class="InputCommunDpeAdresseVille">
+                      </div>
+                      <div class="col-md-3">
+                        <label for="dateDiangnostique" class="champs" >Date du diagnostic </label>
+                        <input type="date" id="dateDiangnostique" placeholder="dateDiangnostique" formControlName="dateDiangnostique" name="dateDiangnostique" >
+                      </div>
+                    </div>
+                    <!-- Autres champs et éléments de formulaire ici -->
+                  </form>
                 </div>
-                <div class="col-md-4">
-        
-                  <input type="text" id="ville" placeholder="Ville" formControlName="ville" name="ville" class="InputCommunDpeAdresseVille">
-                </div>
-                <label for="dateDiangnostique" class="champs" >Date du diagnostic </label>
-                <div class="col-md-4" [hidden]="hideField==true" >
-             
-                         
-                  <input type="text" id="dateDiangnostique" placeholder="dateDiangnostique" formControlName="dateDiangnostique" name="dateDiangnostique" >
-                  </div>
               </div>
-              <!-- Autres champs et éléments de formulaire ici -->
-            </form>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
 </div>
-
-</div>
-</div>
-</div>
-
