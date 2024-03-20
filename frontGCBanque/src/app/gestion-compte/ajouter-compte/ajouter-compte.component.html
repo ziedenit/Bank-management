@@ -14,7 +14,7 @@
                 <div class="col-md-12">
                   <div class="form-group">
                     <label for="numeroNomRue" class="champs">Adresse du bien </label>
-                    <input type="text" id="numeroNomRue" placeholder="Adresse" formControlName="numeroNomRue" name="numeroNomRue" class="InputCommunDpeAdresseRue form-control-lg">
+                    <input type="text" id="numeroNomRue" placeholder="Adresse" formControlName="numeroNomRue" name="numeroNomRue" class="InputCommunDpeAdresseRue">
                     <div class="listeAdress" *ngIf="showAdressResults==true">
                       <ul>
                         <li *ngFor="let result of addressResults">
@@ -29,13 +29,13 @@
                 <div class="col-md-4">
                   <div class="form-group">
                     <label for="codePostal" class="champs">Code postal</label>
-                    <input type="text" id="codePostal" placeholder="Code postal" formControlName="codePostal" name="codePostal" class="InputCommunDpeAdresseCodePostal form-control-sm">
+                    <input type="text" id="codePostal" placeholder="Code postal" formControlName="codePostal" name="codePostal" class="InputCommunDpeAdresseCodePostal">
                   </div>
                 </div>
                 <div class="col-md-4">
                   <div class="form-group">
                     <label for="ville" class="champs">Ville</label>
-                    <input type="text" id="ville" placeholder="Ville" formControlName="ville" name="ville" class="InputCommunDpeAdresseVille form-control-sm">
+                    <input type="text" id="ville" placeholder="Ville" formControlName="ville" name="ville" class="InputCommunDpeAdresseVille">
                   </div>
                 </div>
               </div>
