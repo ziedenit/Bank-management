@@ -1,6 +1,101 @@
-<style>
-  /* Ajouter un style CSS personnalisé pour réduire l'espace entre les inputs */
-  .form-row > .col-md-3:not(:last-child) {
-    margin-bottom: 8px; /* Ajustez la valeur selon vos besoins */
-  }
-</style>
+<!-- ------------------------------Titre principal OFD ------------------------------------------------------------------------>
+<h2 class ="Titre-01"> Acquisition des données et des justificatifs</h2>
+
+<!---------------------------------------bloc clients Particuliers---------------------------------------------------------->
+<div  *ngIf="clientParticulier==true" >
+  <div class="container">
+    <div  class="nav" >
+      <img  *ngIf="hiddenClient==false" src="../../../assets/icons/arrow-up.svg"  (click)="hideDataClient()" /> 
+       <img *ngIf="hiddenClient==true" src="../../../assets/icons/arrow-down.svg"   (click)="showDataClient()"/>  &nbsp;
+      Client ({{idRepers.length }}) 
+     </div>
+    <ul class="list-group" *ngIf="elementClient == true">
+      <li 
+        class="list-group-item" 
+        *ngFor="let client of clientDataList"
+      >
+      <div class="row">
+        <div class="col">
+    Nom &nbsp;&nbsp; {{client.civility }}.&nbsp; {{client.usual_last_name }} {{client.first_name}}
+        </div>
+        <div class="col"> 
+         né (e) le : &nbsp;&nbsp; {{client.birth_date}} 
+        </div>
+      </div>    
+    </li>  
+    </ul>
+    <div >
+      <!-- Affichage du message d'erreur -->
+      <div *ngIf="errorrs.length>0">
+      <div  class="error-message">
+       <ul class="list-group" *ngIf="elementClient == true">
+         <li class="list-group-item" *ngFor="let error of errorrs">
+           <div class="row">
+             <div class="col">
+               {{ error.messageErrorP }}
+             </div>
+             <div class="col">
+              idReper du Client: {{ error.idReperErrorP }}
+             </div>
+           </div>
+         </li>
+       </ul>
+     </div>
+   </div>
+   </div>
+   </div>
+  </div>
+
+<!---------------------------------------bloc clients Entreprise---------------------------------------------------------->
+<div *ngIf="clientParticulier==false">
+<div class="container">
+  
+  <div  class="nav" >
+    <img  *ngIf="hiddenClient==false" src="../../../assets/icons/arrow-up.svg"  (click)="hideDataClient()" /> 
+     <img *ngIf="hiddenClient==true" src="../../../assets/icons/arrow-down.svg"   (click)="showDataClient()"/>  &nbsp;
+    Client ({{ idRepers.length }}) 
+   </div>
+  <ul class="list-group" *ngIf="elementClient == true">
+    <li 
+      class="list-group-item"
+      *ngFor="let client of entrepriseData"
+
+    >
+    <div class="row" style="margin-top: 5px;" >
+      <div class="col" *ngIf="!nonraison">  
+       Raison Sociale &nbsp; &nbsp; &nbsp; <b>{{client.legal_name}}</b>
+      </div>
+    </div>
+
+    <div class="row" style="margin-top: 10px; margin-bottom: 10px;">
+      <div class="col">  
+        Nom &nbsp; &nbsp; &nbsp; <b> {{client.civilite }}. &nbsp;{{client.usual_last_name }} {{client.first_name}} </b>
+      </div>
+
+      <div class="col">
+       Siren &nbsp; &nbsp; &nbsp; <b>{{client.siren}} </b>
+      </div>
+    </div>
+  </li>  
+  </ul>
+  <div >
+   <!-- Affichage du message d'erreur -->
+   <div *ngIf="errors.length>0">
+   <div  class="error-message">
+    <ul class="list-group" *ngIf="elementClient == true">
+      <li class="list-group-item" *ngFor="let error of errors">
+        <div class="row">
+          <div class="col">
+            {{ error.messageErrorE}}
+          </div>
+          <div class="col">
+           idReper: {{ error.idReperErrorE }}
+          </div>
+        </div>
+      </li>
+    </ul>
+  </div>                                  
+</div>
+</div>
+</div>
+</div>
