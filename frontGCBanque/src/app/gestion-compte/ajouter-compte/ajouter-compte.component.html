@@ -1,45 +1,72 @@
-<div class="container-fluid">
-  <div [class.DpeAdem]="elemenDPE == false">
-    <div [hidden]="!depExist" *ngIf="hideFieldForm==false"> <!-- cas de la rénovation -->
-      <div class="DPE-Bloc" [ngStyle]="{'border-bottom': !elemenDPE ? '1px solid #d1d3fc' : ''}"> <!-- Bloc titre -->
-        <img *ngIf="hiddenDPE==false" src="../../../assets/icons/arrow-up.svg" alt="image flèche haut" (click)="hideDataDPE()" /> 
-        &nbsp; 
-        <img *ngIf="hiddenDPE==true" src="../../../assets/icons/arrow-down.svg" alt="image flèche haut" (click)="showDataDPE()" /> 
-        &nbsp;
-        <h3 class="TitreDpe">Données du DPE</h3>
-      </div>
-      <div *ngIf="elemenDPE == true">
-        <div>
-          <form class="DpeFormulaire" [formGroup]="formGroup">
-            <div class="row"> <!-- Start row for better alignment -->
-              <div class="col-lg-6 col-md-12">
-                <label for="numeroNomRue" class="champs">Adresse du bien </label>
-                <input matInput id="numeroNomRue" placeholder="Adresse" formControlName="numeroNomRue" name="numeroNomRue" class="InputCommunDpeAdresseRue"> 
-                <div class="listeAdress" *ngIf="showAdressResults==true">
-                  <ul>
-                    <li *ngFor="let result of addressResults">
-                      <button (click)="selectAddress(result)">
-                        {{ result.properties.label }}
-                      </button>
-                    </li>
-                  </ul>
+<div class="container-fluid ">
+  <div class="row ">
+    <div class="col-md-12">
+      <div class="card border-0">
+        <div class="card-body">
+          <div class="blockSize bg-light-gray">
+            <div [class.DpeAdem]="elemenDPE == false">
+              <div [hidden]="!depExist">
+                <div class="DPE-Bloc" [ngStyle]="{'border-bottom': !elemenDPE ? '1px solid #d1d3fc' : ''}">
+                  <span class="float-right" >
+                    <img *ngIf="hiddenDPE==false" src="../../../assets/icons/arrow-up.svg" alt="image flèche haut" (click)="hideDataDPE()" />
+                    <img *ngIf="hiddenDPE==true" src="../../../assets/icons/arrow-down.svg" alt="image flèche haut" (click)="showDataDPE()" />
+                  </span> 
+                  <h3 class="d-inline-block font-weight-bold">Données du DPE</h3>
+                </div>
+                <div *ngIf="elemenDPE == true">
+                  <form class="DpeFormulaire" [formGroup]="formGroup">
+                    <div class="row">
+                      <label for="numeroNomRue" >Adresse du bien </label>
+                      <div class="col-md-3">
+                        <input type="text" id="numeroNomRue" placeholder="Adresse" formControlName="numeroNomRue" name="numeroNomRue">
+                        <div class="listeAdress" *ngIf="showAdressResults==true">
+                          <ul>
+                            <li *ngFor="let result of addressResults">
+                              <button (click)="selectAddress(result)">
+                                {{ result.properties.label }}
+                              </button>
+                            </li>
+                          </ul>
+                        </div>
+                      </div>
+                    
+                      <label for="Code postal"  >Code postal </label>
+                      <div class="col-md-3" >
+                        <input type="text" id="codePostal" placeholder="Code postal" formControlName="codePostal" name="codePostal"  >
+                      </div>
+                      <label for="Ville"  >Ville </label>
+                      <div class="col-md-3 ">
+                        <input type="text" id="ville" placeholder="Ville" formControlName="ville" name="ville" >
+                      </div>
+                     
+                    </div>
+                    <div class="row">
+                    <label for="dateDiangnostique"  >Date du diagnostic </label>
+                    <div class="col-md-3">
+                 
+                      <input type="text" id="dateDiangnostique" placeholder="dateDiangnostique" formControlName="dateDiangnostique" name="dateDiangnostique"  >
+                    </div>
+                    <label for="anneeConstruction"  >Année de construction
+                    </label>
+                    <div class="col-md-3">
+                    
+                      <input type="text" id="anneeConstruction" placeholder="anneeConstruction" formControlName="anneeConstruction" name="anneeConstruction"  >
+                    </div>
+                    <label for="TypeBatiment"  >Type de bien
+                    </label>
+                    <div class="col-md-3">
+                      <input type="text" id="TypeBatiment" placeholder="TypeBatiment" formControlName="TypeBatiment" name="TypeBatiment"  >
+                    </div>
+                    </div>
+                    <div class="row">
+                    </div>
+
+                    <!-- Autres champs et éléments de formulaire ici -->
+                  </form>
                 </div>
               </div>
-              <div class="col-lg-6 col-md-12">
-                <div class="row"> <!-- Start nested row for better alignment -->
-                  <div class="col-md-6">
-                    <label for="codePostal" class="champs">Code postal</label>
-                    <input matInput id="codePostal" placeholder="Code postal" formControlName="codePostal" name="codePostal" class="InputCommunDpeAdresseCodePostal">
-                  </div>
-                  <div class="col-md-6">
-                    <label for="ville" class="champs">Ville</label>
-                    <input matInput id="ville" placeholder="Ville" formControlName="ville" name="ville" class="InputCommunDpeAdresseVille">
-                  </div>
-                </div> <!-- End nested row -->
-              </div>
-              <!-- Other form elements go here -->
-            </div> <!-- End row -->
-          </form>
+            </div>
+          </div>
         </div>
       </div>
     </div>
