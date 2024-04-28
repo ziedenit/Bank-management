@@ -1,13 +1,13 @@
-<div class="container-fluid ">
-  <div class="row ">
-    <div class="col-md-12">
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-lg-12">
       <div class="card border-0">
         <div class="card-body">
           <div class="blockSize bg-light-gray">
             <div [class.DpeAdem]="elemenDPE == false">
               <div [hidden]="!depExist">
                 <div class="DPE-Bloc" [ngStyle]="{'border-bottom': !elemenDPE ? '1px solid #d1d3fc' : ''}">
-                  <span class="float-right" >
+                  <span class="float-right">
                     <img *ngIf="hiddenDPE==false" src="../../../assets/icons/arrow-up.svg" alt="image flèche haut" (click)="hideDataDPE()" />
                     <img *ngIf="hiddenDPE==true" src="../../../assets/icons/arrow-down.svg" alt="image flèche haut" (click)="showDataDPE()" />
                   </span> 
@@ -16,8 +16,8 @@
                 <div *ngIf="elemenDPE == true">
                   <form class="DpeFormulaire" [formGroup]="formGroup">
                     <div class="row">
-                      <label for="numeroNomRue" >Adresse du bien </label>
-                      <div class="col-md-3">
+                      <label class="col-lg-3 col-md-12" for="numeroNomRue">Adresse du bien</label>
+                      <div class="col-lg-3 col-md-6">
                         <input type="text" id="numeroNomRue" placeholder="Adresse" formControlName="numeroNomRue" name="numeroNomRue">
                         <div class="listeAdress" *ngIf="showAdressResults==true">
                           <ul>
@@ -29,39 +29,30 @@
                           </ul>
                         </div>
                       </div>
-                    
-                      <label for="Code postal"  >Code postal </label>
-                      <div class="col-md-3" >
-                        <input type="text" id="codePostal" placeholder="Code postal" formControlName="codePostal" name="codePostal"  >
+                      <label class="col-lg-3 col-md-12" for="codePostal">Code postal</label>
+                      <div class="col-lg-3 col-md-6">
+                        <input type="text" id="codePostal" placeholder="Code postal" formControlName="codePostal" name="codePostal">
                       </div>
-                      <label for="Ville"  >Ville </label>
-                      <div class="col-md-3 ">
-                        <input type="text" id="ville" placeholder="Ville" formControlName="ville" name="ville" >
+                      <label class="col-lg-3 col-md-12" for="ville">Ville</label>
+                      <div class="col-lg-3 col-md-6">
+                        <input type="text" id="ville" placeholder="Ville" formControlName="ville" name="ville">
                       </div>
-                     
                     </div>
                     <div class="row">
-                    <label for="dateDiangnostique"  >Date du diagnostic </label>
-                    <div class="col-md-3">
-                 
-                      <input type="text" id="dateDiangnostique" placeholder="dateDiangnostique" formControlName="dateDiangnostique" name="dateDiangnostique"  >
+                      <label class="col-lg-3 col-md-12" for="dateDiangnostique">Date du diagnostic</label>
+                      <div class="col-lg-3 col-md-6">
+                        <input type="text" id="dateDiangnostique" placeholder="Date du diagnostic" formControlName="dateDiangnostique" name="dateDiangnostique">
+                      </div>
+                      <label class="col-lg-3 col-md-12" for="anneeConstruction">Année de construction</label>
+                      <div class="col-lg-3 col-md-6">
+                        <input type="text" id="anneeConstruction" placeholder="Année de construction" formControlName="anneeConstruction" name="anneeConstruction">
+                      </div>
+                      <label class="col-lg-3 col-md-12" for="TypeBatiment">Type de bien</label>
+                      <div class="col-lg-3 col-md-6">
+                        <input type="text" id="TypeBatiment" placeholder="Type de bien" formControlName="TypeBatiment" name="TypeBatiment">
+                      </div>
                     </div>
-                    <label for="anneeConstruction"  >Année de construction
-                    </label>
-                    <div class="col-md-3">
-                    
-                      <input type="text" id="anneeConstruction" placeholder="anneeConstruction" formControlName="anneeConstruction" name="anneeConstruction"  >
-                    </div>
-                    <label for="TypeBatiment"  >Type de bien
-                    </label>
-                    <div class="col-md-3">
-                      <input type="text" id="TypeBatiment" placeholder="TypeBatiment" formControlName="TypeBatiment" name="TypeBatiment"  >
-                    </div>
-                    </div>
-                    <div class="row">
-                    </div>
-
-                    <!-- Autres champs et éléments de formulaire ici -->
+                    <!-- Other form elements go here -->
                   </form>
                 </div>
               </div>
