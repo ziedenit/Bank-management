@@ -1,63 +1,51 @@
-<div class="container-fluid">
-  <div class="row">
-    <div class="col-lg-12">
-      <div class="card border-0">
-        <div class="card-body">
-          <div class="blockSize bg-light-gray">
-            <div [class.DpeAdem]="elemenDPE == false">
-              <div [hidden]="!depExist">
-                <div class="DPE-Bloc" [ngStyle]="{'border-bottom': !elemenDPE ? '1px solid #d1d3fc' : ''}">
-                  <span class="float-right">
-                    <img *ngIf="hiddenDPE==false" src="../../../assets/icons/arrow-up.svg" alt="image flèche haut" (click)="hideDataDPE()" />
-                    <img *ngIf="hiddenDPE==true" src="../../../assets/icons/arrow-down.svg" alt="image flèche haut" (click)="showDataDPE()" />
-                  </span> 
-                  <h3 class="d-inline-block font-weight-bold">Données du DPE</h3>
-                </div>
-                <div *ngIf="elemenDPE == true">
-                  <form class="DpeFormulaire" [formGroup]="formGroup">
-                    <div class="row">
-                      <div class="col-lg-3 col-md-6">
-                        <label for="numeroNomRue" class="d-block">Adresse du bien</label>
-                        <input type="text" id="numeroNomRue" placeholder="Adresse" formControlName="numeroNomRue" name="numeroNomRue" class="form-control">
-                        <div class="listeAdress" *ngIf="showAdressResults==true">
-                          <ul>
-                            <li *ngFor="let result of addressResults">
-                              <button (click)="selectAddress(result)">
-                                {{ result.properties.label }}
-                              </button>
-                            </li>
-                          </ul>
-                        </div>
-                      </div>
-                      <div class="col-lg-3 col-md-6">
-                        <label for="codePostal" class="d-block">Code postal</label>
-                        <input type="text" id="codePostal" placeholder="Code postal" formControlName="codePostal" name="codePostal" class="form-control">
-                      </div>
-                      <div class="col-lg-3 col-md-6">
-                        <label for="ville" class="d-block">Ville</label>
-                        <input type="text" id="ville" placeholder="Ville" formControlName="ville" name="ville" class="form-control">
-                      </div>
-                      <div class="col-lg-3 col-md-6">
-                        <label for="dateDiangnostique" class="d-block">Date du diagnostic</label>
-                        <input type="text" id="dateDiangnostique" placeholder="Date du diagnostic" formControlName="dateDiangnostique" name="dateDiangnostique" class="form-control">
-                      </div>
-                      <div class="col-lg-3 col-md-6">
-                        <label for="anneeConstruction" class="d-block">Année de construction</label>
-                        <input type="text" id="anneeConstruction" placeholder="Année de construction" formControlName="anneeConstruction" name="anneeConstruction" class="form-control">
-                      </div>
-                      <div class="col-lg-3 col-md-6">
-                        <label for="TypeBatiment" class="d-block">Type de bien</label>
-                        <input type="text" id="TypeBatiment" placeholder="Type de bien" formControlName="TypeBatiment" name="TypeBatiment" class="form-control">
-                      </div>
-                      <!-- Autres champs et éléments de formulaire ici -->
-                    </div>
-                  </form>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+<div class="container" > 
+<div class="justificatifs" *ngIf="hideFieldForm==false" >
+
+  <div class="blocJust">
+  <img  *ngIf="hiddenJustificatif==false" src="../../../assets/icons/arrow-up.svg"  (click)="hideDataJustificatif()" class="haut"  /> 
+   &nbsp; <img *ngIf="hiddenJustificatif==true" src="../../../assets/icons/arrow-down.svg" class="bas"  (click)="showDataJustificatif() "/> &nbsp;
+  <h3 class="TitleJustificatif"> Justificatifs</h3>
+  </div >
+
+<div *ngIf="elementJustificatif == true" > <!--elementJustificatif==afficher ou non la partie justificatifs -->
+<div class="Parcourir" ><!-- showJustif== le justificatif est non disponible en GED-->
+
+  <!--demander le justificatif attestant la date de depot de permis de costruire  -->
+    <div *ngIf="dateDepot" class="file-upload">
+      <p >Document attestant de la date de  dépôt du permis de construire </p>
+      
+      <div class="Choix-Justificatif" [ngClass]="{ 'disabled': isFieldsDisabled }" >
       </div>
+      <input type="text" id="dateDepot" class="file-input" [(ngModel)]="dateDepotFileName" readonly [disabled]="isFieldsDisabled">
+      <button class="browse-btn" (click)="selectFile('dateDepot')">Parcourir...</button>
+      <input type="file" id="dateDepotFile" style="display: none" (change)="updateFileName('dateDepot', $event)">
     </div>
+
+   
+  <!--demander le DPE ou le compromis de vente si le numéro DPE est saisi-->
+  <div *ngIf="numeroDpeAdeme" class="file-upload">
+    <div class="Choix-Justificatif" [ngClass]="{ 'disabled': isFieldsDisabled }" >
+      <select class="form-list" id="Justificatif" required [(ngModel)]="Justificatif" name="Justificatif" [disabled]="isFieldsDisabled">
+        <option value='option1'  > DPE </option>
+        <option value='option2'> Compromis de vente  </option>
+      </select>
+    </div>
+    <input type="text" id="dpe" class="file-input" [(ngModel)]="dpeFileName" readonly [disabled]="isFieldsDisabled">
+    <button class="browse-btn" (click)="selectFile('dpe')" [disabled]="isFieldsDisabled" >Parcourir...</button>
+    <input type="file" id="dpeFile" style="display: none" (change)="updateFileName('dpe', $event)" [disabled]="isFieldsDisabled">
+</div>
+
+
+<!--demander la norme thermique si elle est renseignée -->
+<div *ngIf="normeThermique && normeThermique!== 'option0' &&  !dateDepot"  class="file-upload"> 
+  <p >Document attestant de la Norme thermique </p>
+   <div class="Choix-Justificatif" [ngClass]="{ 'disabled': isFieldsDisabled }" >
   </div>
+  <input type="text" id="Normethermique" class="file-input" [(ngModel)]="NormethermiqueFileName" readonly [disabled]="isFieldsDisabled">
+  <button class="browse-btn" (click)="selectFile('Normethermique')">Parcourir...</button>
+  <input type="file" id="NormethermiqueFile" style="display: none" (change)="updateFileName('Normethermique', $event)">
+</div>
+</div>
+</div>
+</div>
 </div>
