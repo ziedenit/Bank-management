@@ -1,25 +1,24 @@
 <div class="row">
-                      <label for="numeroNomRue" class="champs">Adresse du bien </label>
-                      <div class="col-md-3">
-                        &nbsp;    &nbsp;   &nbsp; <input type="text" id="numeroNomRue" placeholder="Adresse" formControlName="numeroNomRue" name="numeroNomRue">
-                        <div class="listeAdress" *ngIf="showAdressResults==true">
-                          <ul>
-                            <li *ngFor="let result of addressResults">
-                              <button (click)="selectAddress(result)">
-                                {{ result.properties.label }}
-                              </button>
-                            </li>
-                          </ul>
-                        </div>
-                      </div>
-                      &nbsp;    &nbsp;   &nbsp;
-                      <label for="Code postal" class="champs" >Code postal </label>
-                      <div class="col-md-3">
-                        <input type="text" id="codePostal" placeholder="Code postal" formControlName="codePostal" name="codePostal"  >
-                      </div>
-                      <label for="Ville" class="champs" >Ville </label>
-                      <div class="col-md-3">
-                        <input type="text" id="ville" placeholder="Ville" formControlName="ville" name="ville" >
-                      </div>
-                     
-                    </div>
+    <div class="col-md-6">
+        <label for="numeroNomRue" class="champs">Adresse du bien</label>
+        <input type="text" id="numeroNomRue" placeholder="Adresse" formControlName="numeroNomRue" name="numeroNomRue">
+        <div class="listeAdress" *ngIf="showAdressResults==true">
+            <ul>
+                <li *ngFor="let result of addressResults">
+                    <button (click)="selectAddress(result)">
+                        {{ result.properties.label }}
+                    </button>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <label for="codePostal" class="champs">Code postal</label>
+        <input type="text" id="codePostal" placeholder="Code postal" formControlName="codePostal" name="codePostal">
+    </div>
+    <div class="col-md-3">
+        <label for="ville" class="champs">Ville</label>
+        <input type="text" id="ville" placeholder="Ville" formControlName="ville" name="ville">
+    </div>
+</div>
+
