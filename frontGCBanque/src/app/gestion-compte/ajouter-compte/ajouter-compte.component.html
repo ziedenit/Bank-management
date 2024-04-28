@@ -1,23 +1,25 @@
-<div class="container-fluid bg-light-gray">
-    <div class="row">
-        <div class="col-12">
-            <div [class.DpeAdem]="elemenDPE == false">
-                <div [hidden]="!depExist" *ngIf="hideFieldForm == false">
-                    <div class="DPE-Bloc" [ngStyle]="{'border-bottom': !elemenDPE ? '1px solid #d1d3fc' : ''}">
-                        <img *ngIf="hiddenDPE == false" src="../../../assets/icons/arrow-up.svg" alt="image flèche haut" (click)="hideDataDPE()" />
-                        &nbsp; <img *ngIf="hiddenDPE == true" src="../../../assets/icons/arrow-down.svg" alt="image flèche haut" (click)="showDataDPE()" /> &nbsp;
-                        <h3 class="TitreDpe">Données du DPE</h3>
+<div class="row">
+                      <label for="numeroNomRue" class="champs">Adresse du bien </label>
+                      <div class="col-md-3">
+                        &nbsp;    &nbsp;   &nbsp; <input type="text" id="numeroNomRue" placeholder="Adresse" formControlName="numeroNomRue" name="numeroNomRue">
+                        <div class="listeAdress" *ngIf="showAdressResults==true">
+                          <ul>
+                            <li *ngFor="let result of addressResults">
+                              <button (click)="selectAddress(result)">
+                                {{ result.properties.label }}
+                              </button>
+                            </li>
+                          </ul>
+                        </div>
+                      </div>
+                      &nbsp;    &nbsp;   &nbsp;
+                      <label for="Code postal" class="champs" >Code postal </label>
+                      <div class="col-md-3">
+                        <input type="text" id="codePostal" placeholder="Code postal" formControlName="codePostal" name="codePostal"  >
+                      </div>
+                      <label for="Ville" class="champs" >Ville </label>
+                      <div class="col-md-3">
+                        <input type="text" id="ville" placeholder="Ville" formControlName="ville" name="ville" >
+                      </div>
+                     
                     </div>
-                    <div *ngIf="elemenDPE == true">
-                        <!-- Your form content here -->
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-.bg-light-gray {
-    background-color: #f5f5f5; /* or any other shade of gray */
-    padding: 20px; /* Adjust padding as needed */
-}
