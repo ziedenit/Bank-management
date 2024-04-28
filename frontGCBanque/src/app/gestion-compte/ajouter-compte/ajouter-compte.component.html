@@ -1,127 +1,23 @@
-<div [class.DpeAdem]="elemenDPE == false">
-  <div  [hidden]="!depExist" *ngIf="hideFieldForm==false"  >  <!-- cas de la rénovation-->
-
-    
-  <div class="DPE-Bloc" [ngStyle]="{'border-bottom': !elemenDPE ? '1px solid #d1d3fc' : ''}"> <!--Bloc titre-->
-  <img  *ngIf="hiddenDPE==false" src="../../../assets/icons/arrow-up.svg"  alt="image flèche haut"  (click)="hideDataDPE()" /> 
-   &nbsp; <img *ngIf="hiddenDPE==true" src="../../../assets/icons/arrow-down.svg"  alt="image flèche haut" (click)="showDataDPE()"/> 
-   &nbsp;
-   <h3 class="TitreDpe">Données du DPE</h3>
-  </div>
-   <div *ngIf="elemenDPE == true">
-   <div>
-   <form class= "DpeFormulaire"  [formGroup]="formGroup"   > 
-    <div>
-      <label for="numeroNomRue" class="champs">Adresse du bien </label>
-      <input matInput id="numeroNomRue" placeholder="Adresse" formControlName="numeroNomRue" name="numeroNomRue" class="InputCommunDpeAdresseRue"> 
-      <div  class ="listeAdress" *ngIf="showAdressResults==true">
-        <ul >
-          <li *ngFor="let result of addressResults">
-            <button (click)="selectAddress(result)">
-              {{ result.properties.label }}
-            </button>
-          </li>
-        </ul>
-      </div>
+<div class="container-fluid bg-light-gray">
+    <div class="row">
+        <div class="col-12">
+            <div [class.DpeAdem]="elemenDPE == false">
+                <div [hidden]="!depExist" *ngIf="hideFieldForm == false">
+                    <div class="DPE-Bloc" [ngStyle]="{'border-bottom': !elemenDPE ? '1px solid #d1d3fc' : ''}">
+                        <img *ngIf="hiddenDPE == false" src="../../../assets/icons/arrow-up.svg" alt="image flèche haut" (click)="hideDataDPE()" />
+                        &nbsp; <img *ngIf="hiddenDPE == true" src="../../../assets/icons/arrow-down.svg" alt="image flèche haut" (click)="showDataDPE()" /> &nbsp;
+                        <h3 class="TitreDpe">Données du DPE</h3>
+                    </div>
+                    <div *ngIf="elemenDPE == true">
+                        <!-- Your form content here -->
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-    <div>
-      <input matInput id="codePostal" placeholder="Code postal" formControlName="codePostal" name="codePostal" class="InputCommunDpeAdresseCodePostal">
-      <input matInput id="ville" placeholder="Ville" formControlName="ville" name="ville" class="InputCommunDpeAdresseVille">
-    </div>  
-
-    <div [hidden]="hideField==true" >
-      <label for="dateDiangnostique" class="champs" >Date du diagnostic </label>
-      <input matInput id="dateDiangnostique" formControlName="dateDiangnostique"  name="dateDiangnostique"class="InputCommunDpe">
-    </div>
- 
-    <div >
-      <label for="anneeConstruction" class="champs" >Année de construction
-        <span class="required">*</span>
-      </label>
-      <input matInput id="anneeConstruction"  
-      formControlName="anneeConstruction" name="anneeConstruction" class="InputCommunDpe" required
-      value="">
-    </div>
-
-    <div [hidden]="hideField==true" >
-      <label for="TypeBatiment" class="champs">Type de bien  </label>
-      <input matInput id="TypeBatiment" formControlName="typeBatiment" type='text' name="TypeBatiment" class="InputCommunDpe">
-    </div>
-
-    <div [hidden]="hideField==true">
-      <label for="LettreCEP" class="champs">Lettre CEP <span class="required">*</span></label>
-      <input matInput type="text" id="LettreCEP" formControlName="lettreCEP" name="LettreCEP" class="InputCommunDpe" >
-    </div> 
-
-
-    <div [hidden]="hideField==false" >
-      <label class="champs" >Lettre CEP
-      <span class="required">*</span></label>
-      <select id="LettreCEPlist" name="LettreCEPlist" formControlName="lettreCEP" class="InputCommunDpe" style="width: 145px;
-      height:26px; margin-right: 30px; margin-top: 20px; border-radius:0px ; border:1px solid black; font-size: 12px; border-radius: 3px; padding-bottom: 5px;" >
-        <option value='option0' > </option>
-        <option value='option1' >A</option>
-        <option value='option2' >B </option>
-        <option value='option3' >C </option>
-        <option value='option4' >D</option>
-        <option value='option5' >E</option>
-        <option value='option6' >F </option>
-        <option value='option7' >G</option> 
-      </select>   
-    </div> 
-
-    <div>
-      <label for="ValeurCEP" class="champs">Valeur CEP <em>(en kWhep/m².an)</em>     <span class="required"> *</span></label>
-      <input matInput type="text" id="ValeurCEP"  name="ValeurCEP" formControlName="valeurCEP"  class="InputCommunDpe">
-    </div>
- 
-    <div >
-      &nbsp;<label for="SurfaceDuBien" class="champs">Surface du bien <em>(en m²) </em><span class="required"> *</span></label>
-      <input matInput type="text" id="SurfaceDuBien" formControlName="surfaceBien" name="SurfaceDuBien" class="InputCommunDpe"  >
-    </div>
-    
- 
-     <div [hidden]="hideField==true">
-      <label for="LettreGES" class="champs">Lettre GES <span class="required">*</span></label>
-      <input matInput type="text" id="LettreGES" formControlName="lettreGES" name="LettreGES"  class="InputCommunDpe">
-    </div> 
-
-    <div [hidden]="hideField==false"  >
-      <label class="champs" >Lettre GES
-      <span class="required">*</span></label>
-      <select id="lettreGeslist" name="lettreGeslist"  formControlName="lettreGES" class="InputCommunDpe" style="width: 145px;
-      height:26px; margin-right: 30px; margin-top: 20px; border-radius:0px ; border:1px solid black;  font-size: 12px;border-radius: 3px; padding-bottom: 5px;" >
-        <option value='option0' > </option>
-        <option value='option1' >A</option>
-        <option value='option2' >B </option>
-        <option value='option3' >C </option>
-        <option value='option4' >D</option>
-        <option value='option5' >E</option>
-        <option value='option6' >F </option>
-        <option value='option7' >G</option> 
-      </select>   
-    </div> 
- 
-    <div class="espace ">
-      <label for="ValeurGES" class="champs"> Valeur GES <em>(en kWhep/m².an)</em>     <span class="required"> *</span></label>
-      <input matInput type="text" id="ValeurGES" formControlName="valeurGES"  name="ValeurGES"  class="InputCommunDpe" >
-      <img  *ngIf="valGesObligatoire==true" src="../../../assets/icons/obligatoire.svg" style="width:15px; height: 15px;" alt="image flèche haut" >
-    </div>
-
-    <div class="espace "[hidden]="hideField==true">
-      <label for="EnergieType" class="champs"> Type d'énergie</label>
-      <input matInput type="text" id="EnergieType" formControlName="EnergieType"  name="EnergieType"  class="InputCommunDpe" >
-      <img  *ngIf="valGesObligatoire==true" src="../../../assets/icons/obligatoire.svg" style="width:15px; height: 15px;" alt="image flèche haut" >
-    </div>
-  </form>
 </div>
-</div>
-</div>
-<br>
 
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
+.bg-light-gray {
+    background-color: #f5f5f5; /* or any other shade of gray */
+    padding: 20px; /* Adjust padding as needed */
+}
