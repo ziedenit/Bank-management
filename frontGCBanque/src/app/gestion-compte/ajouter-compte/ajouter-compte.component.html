@@ -16,9 +16,9 @@
                 <div *ngIf="elemenDPE == true">
                   <form class="DpeFormulaire" [formGroup]="formGroup">
                     <div class="row">
-                      <label class="col-lg-3 col-md-12" for="numeroNomRue">Adresse du bien</label>
                       <div class="col-lg-3 col-md-6">
-                        <input type="text" id="numeroNomRue" placeholder="Adresse" formControlName="numeroNomRue" name="numeroNomRue">
+                        <label for="numeroNomRue" class="d-block">Adresse du bien</label>
+                        <input type="text" id="numeroNomRue" placeholder="Adresse" formControlName="numeroNomRue" name="numeroNomRue" class="form-control">
                         <div class="listeAdress" *ngIf="showAdressResults==true">
                           <ul>
                             <li *ngFor="let result of addressResults">
@@ -29,30 +29,28 @@
                           </ul>
                         </div>
                       </div>
-                      <label class="col-lg-3 col-md-12" for="codePostal">Code postal</label>
                       <div class="col-lg-3 col-md-6">
-                        <input type="text" id="codePostal" placeholder="Code postal" formControlName="codePostal" name="codePostal">
+                        <label for="codePostal" class="d-block">Code postal</label>
+                        <input type="text" id="codePostal" placeholder="Code postal" formControlName="codePostal" name="codePostal" class="form-control">
                       </div>
-                      <label class="col-lg-3 col-md-12" for="ville">Ville</label>
                       <div class="col-lg-3 col-md-6">
-                        <input type="text" id="ville" placeholder="Ville" formControlName="ville" name="ville">
+                        <label for="ville" class="d-block">Ville</label>
+                        <input type="text" id="ville" placeholder="Ville" formControlName="ville" name="ville" class="form-control">
                       </div>
+                      <div class="col-lg-3 col-md-6">
+                        <label for="dateDiangnostique" class="d-block">Date du diagnostic</label>
+                        <input type="text" id="dateDiangnostique" placeholder="Date du diagnostic" formControlName="dateDiangnostique" name="dateDiangnostique" class="form-control">
+                      </div>
+                      <div class="col-lg-3 col-md-6">
+                        <label for="anneeConstruction" class="d-block">Année de construction</label>
+                        <input type="text" id="anneeConstruction" placeholder="Année de construction" formControlName="anneeConstruction" name="anneeConstruction" class="form-control">
+                      </div>
+                      <div class="col-lg-3 col-md-6">
+                        <label for="TypeBatiment" class="d-block">Type de bien</label>
+                        <input type="text" id="TypeBatiment" placeholder="Type de bien" formControlName="TypeBatiment" name="TypeBatiment" class="form-control">
+                      </div>
+                      <!-- Autres champs et éléments de formulaire ici -->
                     </div>
-                    <div class="row">
-                      <label class="col-lg-3 col-md-12" for="dateDiangnostique">Date du diagnostic</label>
-                      <div class="col-lg-3 col-md-6">
-                        <input type="text" id="dateDiangnostique" placeholder="Date du diagnostic" formControlName="dateDiangnostique" name="dateDiangnostique">
-                      </div>
-                      <label class="col-lg-3 col-md-12" for="anneeConstruction">Année de construction</label>
-                      <div class="col-lg-3 col-md-6">
-                        <input type="text" id="anneeConstruction" placeholder="Année de construction" formControlName="anneeConstruction" name="anneeConstruction">
-                      </div>
-                      <label class="col-lg-3 col-md-12" for="TypeBatiment">Type de bien</label>
-                      <div class="col-lg-3 col-md-6">
-                        <input type="text" id="TypeBatiment" placeholder="Type de bien" formControlName="TypeBatiment" name="TypeBatiment">
-                      </div>
-                    </div>
-                    <!-- Other form elements go here -->
                   </form>
                 </div>
               </div>
