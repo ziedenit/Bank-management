@@ -1,76 +1,35 @@
-package com.banque.fr.webServices;
-
-import java.io.IOException;
-import java.util.List;
-
-import javax.mail.MessagingException;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import com.banque.fr.entites.Compte;
-import com.banque.fr.entites.Operation;
-import com.banque.fr.services.impl.CompteService;
-import com.banque.fr.services.impl.OperationService;
-
-@RestController
-
-@CrossOrigin
-public class CompteControleur {
-
-	@Autowired
-	CompteService compteService;
-	
-	@RequestMapping("compte")
-	String home() {
-		return "Hello compteservice";
-	}
-	
-	@GetMapping(value = "getCompte/{idCompte}")
-	Compte getCompte(@PathVariable("idCompte") Long id) {
-		return (compteService.getCompte(id));
-	}
-
-	// nous utilisons ici @Requestbody pour passer un object de type compte en
-	// paramètres
-	@PostMapping(value = "creerCompte")
-	Compte creerCompte(@RequestBody Compte c) throws MessagingException, IOException {
-		return (compteService.creerCompte(c));
-
-	}
-
-	@PutMapping(value = "modifierCompte")
-	Compte updateCompte(@RequestBody Compte c) {
-		return (compteService.updateCompte(c));
-
-	}
-
-	@DeleteMapping(value = "suppCompte/{idCompte}")
-	Boolean supprimerCompte(@PathVariable("idCompte") Long id) {
-		return (compteService.supprimerCompte(id));
-	}
-	
-	
-	
-	
-	
-	@GetMapping(value = "recherchebyRIB/{ribCompte}")
-	Compte rechercherbyRib(@PathVariable("ribCompte") String rib) {
-		return (compteService.rechercherbyRib(rib));
-
-	}
-
-	@GetMapping(value = "toutesComptes")
-	List<Compte> retournerTous() {
-		return (compteService.retournerTous());
-	}
-
-}
+ public Bien createBienFromFinancementGarantieDto(FinancementGarantieDto financementGarantieDto, BienGarantieDto bienGarantieDto) {
+Refactor this method to reduce its Cognitive Complexity from 30 to the 15 allowed.
+        Bien bien = Bien.builder()
+                .idBien(IdGeneratorService.generateId("B"))
+                .adresseComplete(bienGarantieDto.isBienFinanceLCL() ? financementGarantieDto.getAdresseBien() : bienGarantieDto.getAdresseBien())
+                .codePostal(bienGarantieDto.isBienFinanceLCL() ? financementGarantieDto.getCodePostalBien() : bienGarantieDto.getCodePostalBien())
+                .codeNormeThermique(bienGarantieDto.isBienFinanceLCL() ? financementGarantieDto.getCodeNormeThermique() : bienGarantieDto.getCodeNormeThermique())
+                .nomCommune(bienGarantieDto.isBienFinanceLCL() ? financementGarantieDto.getVilleBien() : bienGarantieDto.getVilleBien())
+                .paysBien(bienGarantieDto.isBienFinanceLCL() ? financementGarantieDto.getPaysBien() : bienGarantieDto.getPaysBien())
+                .surfaceBien(bienGarantieDto.isBienFinanceLCL() ? financementGarantieDto.getSurfaceBien() : bienGarantieDto.getSurfaceBien() == null ? 0.00 : bienGarantieDto.getSurfaceBien())
+Extract this nested ternary operation into an independent statement.
+                .typeEnergie(bienGarantieDto.isBienFinanceLCL() ? financementGarantieDto.getTypeEnergie() : bienGarantieDto.getTypeEnergie())
+                .typeBatiment(bienGarantieDto.isBienFinanceLCL() ? financementGarantieDto.getTypeBatiment() : bienGarantieDto.getTypeBatiment())
+                .codeBatiment(bienGarantieDto.isBienFinanceLCL() ? financementGarantieDto.getCodeBatiment() : bienGarantieDto.getCodeBatiment())
+                .etatBien(bienGarantieDto.isBienFinanceLCL() ? financementGarantieDto.getEtatBien() : bienGarantieDto.getEtatBien())
+                .bienFinanceLCL(bienGarantieDto.isBienFinanceLCL() ? financementGarantieDto.isBienFinanceLCL() : bienGarantieDto.isBienFinanceLCL())
+                .prixBien(bienGarantieDto.isBienFinanceLCL() ? financementGarantieDto.getPrixBien() : bienGarantieDto.getPrixBien() == null ? 0.00 : bienGarantieDto.getPrixBien())
+Extract this nested ternary operation into an independent statement.
+                .montantFinanceLCL(bienGarantieDto.isBienFinanceLCL() ? financementGarantieDto.getMontantFinanceLCL() : bienGarantieDto.getMontantFinanceLCL() == null ? 0.00 : bienGarantieDto.getMontantFinanceLCL())
+Extract this nested ternary operation into an independent statement.
+                .partLCL(bienGarantieDto.isBienFinanceLCL() ? financementGarantieDto.getPartLCL() : bienGarantieDto.getPartLCL() == null ? 0.00 : bienGarantieDto.getPartLCL())
+Extract this nested ternary operation into an independent statement.
+                .dpeActuel(Dpe.builder()
+                        .numeroDpe(bienGarantieDto.isBienFinanceLCL() ? financementGarantieDto.getNumeroDpe() : bienGarantieDto.getNumeroDpe())
+                        .estimationCep(bienGarantieDto.isBienFinanceLCL() ? financementGarantieDto.getEstimationCep() : bienGarantieDto.getEstimationCep())
+                        .classeCep(bienGarantieDto.isBienFinanceLCL() ? financementGarantieDto.getClasseCep() : bienGarantieDto.getClasseCep())
+                        .estimationGes(bienGarantieDto.isBienFinanceLCL() ? financementGarantieDto.getEstimationGes() : bienGarantieDto.getEstimationGes())
+                        .classeGes(bienGarantieDto.isBienFinanceLCL() ? financementGarantieDto.getClasseGes() : bienGarantieDto.getClasseGes())
+                        .dateEtablissementDpe(bienGarantieDto.isBienFinanceLCL() ? financementGarantieDto.getDateEtablissementDpe() : bienGarantieDto.getDateEtablissementDpe())
+                        .dateFinValiditeDpe(bienGarantieDto.isBienFinanceLCL() ? financementGarantieDto.getDateFinValiditeDpe() : bienGarantieDto.getDateFinValiditeDpe())
+                        .sirenDiagnostiqueur(bienGarantieDto.isBienFinanceLCL() ? financementGarantieDto.getSirenDiagnostiqueur() : bienGarantieDto.getSirenDiagnostiqueur())
+                        .build())
+                .build();
+Immediately return this expression instead of assigning it to the temporary variable "bien".
+        return bien;
