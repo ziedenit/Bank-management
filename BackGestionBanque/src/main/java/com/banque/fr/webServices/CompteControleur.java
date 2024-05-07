@@ -1,78 +1,160 @@
-import com.cl.msofd.exception.DpeAdemeNotFoundException;
-import com.cl.msofd.model.DpeAdeme;
-import com.cl.msofd.repository.DpeAdemeRepository;
-import com.cl.msofd.repository.DpeAdemeRepositoryCustom;
-import com.cl.msofd.utility.JSONUtilOFD;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.mockito.stubbing.Answer;
-import org.springframework.http.*;
-import org.springframework.http.client.ClientHttpRequest;
-import org.springframework.http.client.ClientHttpResponse;
-import org.springframework.test.util.ReflectionTestUtils;
-import org.springframework.web.client.RestTemplate;
+package com.cl.msofd.service;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.net.URI;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
+import com.cl.logs.commun.CommonLogger;
+import com.cl.logs.commun.CommonLoggerFactory;
+import com.cl.logs.types.EventTyp;
+import com.cl.logs.types.SecEventTyp;
+import com.cl.msofd.model.ContextAlignement;
+import com.cl.msofd.model.Referentiel;
+import com.cl.msofd.utility.CalculAlignementStrategy;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.stereotype.Service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.when;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
-public class DpeAdemeServiceTest {
 
-    @Mock
-    private DpeAdemeRepository dpeAdemeRepository;
+@Service
+public class AlignementService {
 
-    @Mock
-    private DpeAdemeRepositoryCustom dpeAdemeRepositoryCustom;
+    private final CommonLogger commonLogger = CommonLoggerFactory.getLogger(AlignementService.class);
+    SimpleDateFormat formatDate = new SimpleDateFormat("dd/MM/yyyy");
+    Date startDate;
+    Date endDate;
+    Integer anneeDebutConstruction;
+    Integer anneeFinConstruction;
+    Integer anneeConstruction;
+    double valeurCeptop;
+    private final MongoTemplate mongoTemplate;
+    double valeurCepmax;
 
-    @Mock
-    private JSONUtilOFD jsonUtils;
-
-    @Mock
-    private RestTemplate restTemplate;
-
-    @InjectMocks
-    private DpeAdemeService dpeAdemeService;
-
-    @BeforeEach
-    public void setUp() {
-        MockitoAnnotations.initMocks(this);
-        ReflectionTestUtils.setField(dpeAdemeService, "ademeHttpClient", restTemplate);
+    @Autowired
+    public AlignementService(MongoTemplate mongoTemplate) {
+        this.mongoTemplate = mongoTemplate;
     }
 
-    @Test
-    public void testGetDpeWithProxy() throws ExecutionException, InterruptedException, IOException {
-        String numDpe = "dummyNumDpe";
-        String expectedUrl = Constants.ADEME_URL + numDpe;
-
-        // Mock response from Ademe service
-        DpeAdeme dpeAdeme = new DpeAdeme(); // Create a dummy DpeAdeme object
-        String jsonBody = "{\"results\": [{\"numDpe\": \"" + numDpe + "\"}]}";
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> responseEntity = new HttpEntity<>(jsonBody, headers);
-        ResponseEntity<String> responseEntityMock = new ResponseEntity<>(jsonBody, headers, HttpStatus.OK);
-
-        // Mock RestTemplate behavior
-        when(restTemplate.exchange(eq(expectedUrl), eq(HttpMethod.GET), any(HttpEntity.class), eq(String.class)))
-                .thenReturn(responseEntityMock);
-
-        // Mock JSONUtilOFD conversion
-        when(jsonUtils.covertFromJsonToObject(eq(jsonBody), eq(DpeAdeme.class))).thenReturn(dpeAdeme);
-
-        // Test the method
-        DpeAdeme result = dpeAdemeService.getDpe(numDpe);
-
-        // Verify the result
-        assertEquals(dpeAdeme, result);
+    ///////////////////////////////////obtenirValeurCepTop///////////////////////////////////////////////////
+    public double obtenirValeurCepTop(String codeRecherche) {
+        Query query = new Query(Criteria.where("table").is("seuil_cep_top").and("code").is(codeRecherche));
+        commonLogger.eventTyp(EventTyp.APPLICATIVE).secEventTyp(SecEventTyp.METIER).logger().info("searching ValeurCepTop by code : {}", codeRecherche);
+        Referentiel referentiel = mongoTemplate.findOne(query, Referentiel.class);
+        if (referentiel != null) {
+            return Double.parseDouble(referentiel.getValeur1());
+        } else {
+            return 0;
+        }
     }
+
+    ////////////////////////////////obtenirValeurCepMax///////////////////////////////////////////////////////
+    public double obtenirValeurCepMax(String codeRecherche) {
+        Query query = new Query(Criteria.where("table").is("seuil_cep_max").and("code").is(codeRecherche));
+        commonLogger.eventTyp(EventTyp.APPLICATIVE).secEventTyp(SecEventTyp.METIER).logger().info("searching ValeurCepMax by code : {}", codeRecherche);
+        Referentiel referentiel = mongoTemplate.findOne(query, Referentiel.class);
+        if (referentiel != null) {
+            return Double.parseDouble(referentiel.getValeur1());
+        } else {
+            return 0;
+        }
+    }
+
+/////////////////////////////////calcul de l'alignement//////////////////////////////////////////////////
+
+    public String alignement(ContextAlignement ligneContext) {
+        String aligne = "07";
+        try {
+            initializeDateRange(); // Initialize start and end dates
+
+            String typeObjetFinancement = ligneContext.getTypeObjetFinancement();
+            anneeConstruction = ligneContext.getAnneeConstruction();
+            String etiquetteDpe = (ligneContext.getEtiquetteDpe() == null ? "NC" : ligneContext.getEtiquetteDpe());
+            double valeurCep = ligneContext.getValeurCep();
+            Date dateDepotPc = ligneContext.getDateDepotPc();
+            boolean presenceDpe = ligneContext.isPresenceDpe();
+            boolean presenceDateDepotPc = ligneContext.isPresenceDateDepotPc();
+            String normeThermique = (ligneContext.getNormeThermique() == null ? "NC" : ligneContext.getNormeThermique());
+            String codeBatiment = ligneContext.getCodeBatiment();
+            valeurCeptop = obtenirValeurCepTop(codeBatiment);
+            valeurCepmax = obtenirValeurCepMax(codeBatiment);
+
+
+            // Update valeurCep if it's 0
+            if (valeurCep == 0.0) {
+                valeurCep = 10000.0;
+            }
+
+            if (typeObjetFinancement != null && typeObjetFinancement.equals("02")) {
+                aligne = alignementAcquisition(presenceDpe, presenceDateDepotPc, etiquetteDpe, valeurCep, dateDepotPc, normeThermique);
+            }
+        } catch (Exception e) {
+            commonLogger.eventTyp(EventTyp.APPLICATIVE).secEventTyp(SecEventTyp.METIER).logger().info("Calcul : update error");
+            aligne = "07";
+        }
+        return aligne;
+    }
+
+    private void initializeDateRange() throws ParseException {
+        startDate = formatDate.parse("01/01/1700");
+        endDate = formatDate.parse("31/12/2012");
+        anneeDebutConstruction = 1700;
+        anneeFinConstruction = 2012;
+    }
+
+    private String alignementAcquisition(boolean presenceDpe, boolean presenceDateDepotPc, String etiquetteDpe,
+                                         double valeurCep, Date dateDepotPc, String normeThermique) throws ParseException {
+        if (presenceDateDepotPc) {
+            if (presenceDpe) {
+                return alignementAcquisitionDpePresent(etiquetteDpe, valeurCep, dateDepotPc, normeThermique);
+            } else {
+                return alignementAcquisitionDpeAbsent(dateDepotPc);
+            }
+        } else {
+            return alignementAcquisitionAncien(presenceDpe, etiquetteDpe, valeurCep, normeThermique);
+        }
+    }
+
+    private String alignementAcquisitionDpePresent(String etiquetteDpe, double valeurCep, Date dateDepotPc,
+                                                   String normeThermique) throws ParseException {
+        CalculAlignementStrategy calculAlignementFirstStrategy = new CalculAlignementStrategy();
+        if (dateDepotPc.compareTo(endDate) <= 0 && dateDepotPc.compareTo(startDate) > 0) {
+            return calculAlignementFirstStrategy.aligneDpeCep(etiquetteDpe, valeurCep, valeurCeptop);
+        } else if (dateDepotPc.compareTo(formatDate.parse("31/12/2020")) <= 0) {
+            return calculAlignementFirstStrategy.alignCepDpeEtNormeTh(etiquetteDpe, valeurCep, valeurCeptop, normeThermique, endDate);
+        } else if (dateDepotPc.compareTo(formatDate.parse("31/12/2021")) <= 0) {
+            return calculAlignementFirstStrategy.aligneCepCepmax(valeurCep, valeurCepmax);
+        } else {
+            return "01";
+        }
+    }
+
+    private String alignementAcquisitionDpeAbsent(Date dateDepotPc) throws ParseException {
+        if (dateDepotPc.compareTo(formatDate.parse("01/01/2022")) >= 0) {
+            return "01";
+        } else {
+            return "07";
+        }
+    }
+
+    private String alignementAcquisitionAncien(boolean presenceDpe, String etiquetteDpe, double valeurCep,
+                                               String normeThermique) {
+        CalculAlignementStrategy calculAlignementFirstStrategy = new CalculAlignementStrategy();
+        if (presenceDpe && anneeConstruction > 1700 && anneeConstruction <= 2012) {
+            return calculAlignementFirstStrategy.alignCepDpeEtNormeTh(etiquetteDpe, valeurCep, valeurCeptop, normeThermique, endDate);
+        } else if (anneeConstruction <= 2020) {
+            return calculAlignementFirstStrategy.alignCepDpeEtNormeTh(etiquetteDpe, valeurCep, valeurCeptop, normeThermique, endDate);
+        } else if (anneeConstruction.equals(2021)) {
+            return calculAlignementFirstStrategy.aligneCepCepmax(valeurCep, valeurCepmax);
+        } else if (anneeConstruction >= 2022) {
+            return calculAlignementFirstStrategy.aligneCepCepmaxNorm(valeurCep, valeurCepmax, normeThermique);
+        } else {
+            return "07";
+        }
+    }
+
+
+
 }
+
