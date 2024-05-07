@@ -1,16 +1,12 @@
-private String alignForAcquisitionInNewBuild(ContextXTRA ligneContext) {
-    if (ligneContext.isPresenceDateDepotPc() && ligneContext.isPresenceDateDepotPcJustificatif()) {
-        if (ligneContext.isPresenceDpe() && ligneContext.isPresenceDpeJustificatif()) {
-            return alignForDateDepotAndDpe(ligneContext);
-        } else {
-            return alignForDateDepotWithoutDpe(ligneContext);
-        }
-    } else {
-        return alignForOldBuild(ligneContext);
-    }
+private boolean isAcquisition(String typeObjetFinancement) {
+    return typeObjetFinancement.equals("02");
 }
 
-private String alignForDateDepotAndDpe(ContextXTRA ligneContext) {
+private boolean isAcquisitionInNewBuild(ContextXTRA ligneContext) {
+    return ligneContext.isPresenceDateDepotPc() && ligneContext.isPresenceDateDepotPcJustificatif();
+}
+
+private String alignForAcquisitionInNewBuild(ContextXTRA ligneContext) {
     try {
         Date dateDepotPc = ligneContext.getDateDepotPc();
         if (dateDepotPc.compareTo(endDate) <= 0 && dateDepotPc.compareTo(startDate) > 0) {
@@ -44,27 +40,15 @@ private String alignForDateDepotAndDpe(ContextXTRA ligneContext) {
     }
 }
 
-private String alignForDateDepotWithoutDpe(ContextXTRA ligneContext) {
-    try {
-        Date dateDepotPc = ligneContext.getDateDepotPc();
-        if (dateDepotPc.compareTo(startDate) >= 0) {
-            return "01";
-        } else {
-            return "07";
-        }
-    } catch (ParseException e) {
-        commonLogger.eventTyp(EventTyp.APPLICATIVE).secEventTyp(SecEventTyp.METIER).logger().info("Calcul : update error");
-        return "07";
-    }
+private boolean isAcquisitionInOldBuild(ContextXTRA ligneContext) {
+    return !ligneContext.isPresenceDateDepotPc() || !ligneContext.isPresenceDateDepotPcJustificatif();
 }
 
-private String alignForOldBuild(ContextXTRA ligneContext) {
+private String alignForAcquisitionInOldBuild(ContextXTRA ligneContext) {
     try {
         Date dateDepotPc = ligneContext.getDateDepotPc();
-        if (!ligneContext.isPresenceDateDepotPc() || !ligneContext.isPresenceDateDepotPcJustificatif()) {
-            if (dateDepotPc != null && dateDepotPc.compareTo(endDate) > 0) {
-                return "07";
-            }
+        if (dateDepotPc != null && dateDepotPc.compareTo(endDate) > 0) {
+            return "07";
         }
         // Add logic for old build alignment
         return "07";
