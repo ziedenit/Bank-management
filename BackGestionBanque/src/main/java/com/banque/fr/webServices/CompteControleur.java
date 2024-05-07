@@ -1,135 +1,84 @@
 public String alignement(ContextAlignement ligneContext) {
-        String aligne = "07";
-        try {
-            startDate = formatDate.parse("01/01/1700");
-            endDate = formatDate.parse("31/12/2012");
-            anneeDebutConstruction = 1700;
-            anneeFinConstruction = 2012;
-            String codeBatiment = ligneContext.getCodeBatiment();
-            double valeurCeptop = obtenirValeurCepTop(codeBatiment);
-            double valeurCepmax = obtenirValeurCepMax(codeBatiment);
+    String aligne = "07";
+    try {
+        initializeDateRange(); // Initialize start and end dates
 
-            ///////////////////////////////Acquisition//////////////////////////////////////////
-            String typeObjetFinancement = ligneContext.getTypeObjetFinancement();
-            Integer anneeConstruction = ligneContext.getAnneeConstruction();
-            String etiquetteDpe = (ligneContext.getEtiquetteDpe() == null ? "NC" : ligneContext.getEtiquetteDpe());
-            double valeurCep = ligneContext.getValeurCep();
-            Date dateDepotPc = ligneContext.getDateDepotPc();
-            boolean presenceDpe = ligneContext.isPresenceDpe();
-            boolean presenceDateDepotPc = ligneContext.isPresenceDateDepotPc();
-            String normeThermique = (ligneContext.getNormeThermique() == null ? "NC" : ligneContext.getNormeThermique());
+        String typeObjetFinancement = ligneContext.getTypeObjetFinancement();
+        Integer anneeConstruction = ligneContext.getAnneeConstruction();
+        String etiquetteDpe = (ligneContext.getEtiquetteDpe() == null ? "NC" : ligneContext.getEtiquetteDpe());
+        double valeurCep = ligneContext.getValeurCep();
+        Date dateDepotPc = ligneContext.getDateDepotPc();
+        boolean presenceDpe = ligneContext.isPresenceDpe();
+        boolean presenceDateDepotPc = ligneContext.isPresenceDateDepotPc();
+        String normeThermique = (ligneContext.getNormeThermique() == null ? "NC" : ligneContext.getNormeThermique());
 
-
-            if (valeurCep == 0.0) {
-                valeurCep = 10000.0;
-            }
-
-
-            if (typeObjetFinancement != null) {
-                if (typeObjetFinancement.equals("02")) { //objet de financement =Acquisition 
-
-                    if (presenceDateDepotPc) {// si présence date de depot de PC ==> Acquisition dans le neuf 
-                        if (presenceDpe) {
-
-//--------------------------------1700__2012----------------------------------------------------------//                       	
-                            startDate = formatDate.parse("01/01/1700");
-                            endDate = formatDate.parse("31/12/2012");
-                            if (dateDepotPc.compareTo(endDate) <= 0 && dateDepotPc.compareTo(startDate) > 0) {
-                                CalculAlignementStrategy calculAlignementFirstStrategy = new CalculAlignementStrategy();
-                                aligne = calculAlignementFirstStrategy.aligneDpeCep(
-                                        etiquetteDpe, valeurCep, valeurCeptop);
-                                return aligne;
-                            }
-//---------------------------------------------2013--2020---------------------------------------------//
-                            endDate = formatDate.parse("31/12/2020");
-                            if (dateDepotPc.compareTo(endDate) <= 0) {
-                                CalculAlignementStrategy calculAlignementSecondStrategy = new CalculAlignementStrategy();
-                                aligne = calculAlignementSecondStrategy.alignCepDpeEtNormeTh(
-                                        etiquetteDpe, valeurCep, valeurCeptop
-                                        , normeThermique, endDate);
-                                return aligne;
-                            }
-// --------------------------------------------2021---------------------------------------------------//
-                            endDate = formatDate.parse("31/12/2021");
-                            if (dateDepotPc.compareTo(endDate) <= 0) {
-                                CalculAlignementStrategy calculAlignementThirdStrategy = new CalculAlignementStrategy();
-                                aligne = calculAlignementThirdStrategy.aligneCepCepmax(valeurCep, valeurCepmax);
-                                return aligne;
-                            }
-
-// -------------------------------------------->2022---------------------------------------------------//
-                            startDate = formatDate.parse("01/01/2022");
-                            if (dateDepotPc.compareTo(startDate) >= 0) {
-                                aligne = "01";
-                                return aligne;
-                            }
-                        }
-                        // Absence DPE
-                        else {
-                            startDate = formatDate.parse("01/01/2022");
-                            if (dateDepotPc.compareTo(startDate) >= 0) {
-                                aligne = "01";
-                                return aligne;
-                            } else {
-                                aligne = "07";
-                                return aligne;
-                            }
-                        }
-                    }
-////////////////////////////////////////////////////////Ancien ////////////////////////////////////////////////////////////////////			    	
-
-                    if (!presenceDateDepotPc && isPresentDepEtAnneeConstr(presenceDpe, anneeConstruction)) {
-                        //--------------------------------1700__2012----------------------------------------------------------//
-                        anneeDebutConstruction = 1700;
-                        anneeFinConstruction = 2012;
-                        if (anneeConstruction > anneeDebutConstruction && anneeConstruction <= anneeFinConstruction) {
-                            CalculAlignementStrategy calculAlignementSecondStrategy = new CalculAlignementStrategy();
-                            aligne = calculAlignementSecondStrategy.alignCepDpeEtNormeTh(
-                                    etiquetteDpe, valeurCep, valeurCeptop
-                                    , normeThermique, endDate);
-                            return aligne;
-                        }
-
-//---------------------------------------------2013 et 2020---------------------------------------------------------------------//
-                        anneeFinConstruction = 2020;
-                        if (anneeConstruction <= anneeFinConstruction) {
-                            CalculAlignementStrategy calculAlignementSecondStrategy = new CalculAlignementStrategy();
-                            aligne = calculAlignementSecondStrategy.alignCepDpeEtNormeTh(
-                                    etiquetteDpe, valeurCep, valeurCeptop
-                                    , normeThermique, endDate);
-                            return aligne;
-                        }
-
-// --------------------------------------------2021--------------------------------------------------------------------------------//
-                        anneeFinConstruction = 2021;
-                        if (anneeConstruction.equals(anneeFinConstruction)) {
-
-                            CalculAlignementStrategy calculAlignementThirdStrategy = new CalculAlignementStrategy();
-                            aligne = calculAlignementThirdStrategy.aligneCepCepmax(valeurCep, valeurCepmax);
-                            return aligne;
-                        }
-
-
-// --------------------------------------------> 2022--------------------------------------------------------------------------------//
-                        anneeDebutConstruction = 2022;
-                        if (anneeConstruction >= anneeDebutConstruction) {
-                            CalculAlignementStrategy calculAlignementFourthStrategy = new CalculAlignementStrategy();
-                            aligne = calculAlignementFourthStrategy.aligneCepCepmaxNorm(valeurCep, valeurCepmax, normeThermique);
-                            return aligne;
-                        } else {    // Absence DPE
-                            aligne = "07";
-                            return aligne;
-                        }
-
-                    }
-                }// end Acquisition
-                commonLogger.eventTyp(EventTyp.APPLICATIVE).secEventTyp(SecEventTyp.METIER).logger().info("Fin : Calcul Alignement pour les bien en aquisition ");
-
-            }
-        } catch (Exception e) {
-            commonLogger.eventTyp(EventTyp.APPLICATIVE).secEventTyp(SecEventTyp.METIER).logger().info("Calcul : update error");
-            aligne = "07";
-            return aligne;
+        // Update valeurCep if it's 0
+        if (valeurCep == 0.0) {
+            valeurCep = 10000.0;
         }
-        return aligne;
+
+        if (typeObjetFinancement != null && typeObjetFinancement.equals("02")) {
+            aligne = alignementAcquisition(presenceDpe, presenceDateDepotPc, etiquetteDpe, valeurCep, dateDepotPc, normeThermique);
+        }
+    } catch (Exception e) {
+        commonLogger.eventTyp(EventTyp.APPLICATIVE).secEventTyp(SecEventTyp.METIER).logger().info("Calcul : update error");
+        aligne = "07";
     }
+    return aligne;
+}
+
+private void initializeDateRange() throws ParseException {
+    startDate = formatDate.parse("01/01/1700");
+    endDate = formatDate.parse("31/12/2012");
+    anneeDebutConstruction = 1700;
+    anneeFinConstruction = 2012;
+}
+
+private String alignementAcquisition(boolean presenceDpe, boolean presenceDateDepotPc, String etiquetteDpe,
+                                     double valeurCep, Date dateDepotPc, String normeThermique) throws ParseException {
+    if (presenceDateDepotPc) {
+        if (presenceDpe) {
+            return alignementAcquisitionDpePresent(etiquetteDpe, valeurCep, dateDepotPc, normeThermique);
+        } else {
+            return alignementAcquisitionDpeAbsent(dateDepotPc);
+        }
+    } else {
+        return alignementAcquisitionAncien(presenceDpe, etiquetteDpe, valeurCep, normeThermique);
+    }
+}
+
+private String alignementAcquisitionDpePresent(String etiquetteDpe, double valeurCep, Date dateDepotPc,
+                                               String normeThermique) throws ParseException {
+    if (dateDepotPc.compareTo(endDate) <= 0 && dateDepotPc.compareTo(startDate) > 0) {
+        return alignementDpeCep(etiquetteDpe, valeurCep, valeurCeptop);
+    } else if (dateDepotPc.compareTo(formatDate.parse("31/12/2020")) <= 0) {
+        return alignementCepDpeEtNormeTh(etiquetteDpe, valeurCep, valeurCeptop, normeThermique, endDate);
+    } else if (dateDepotPc.compareTo(formatDate.parse("31/12/2021")) <= 0) {
+        return alignementCepCepmax(valeurCep, valeurCepmax);
+    } else {
+        return "01";
+    }
+}
+
+private String alignementAcquisitionDpeAbsent(Date dateDepotPc) throws ParseException {
+    if (dateDepotPc.compareTo(formatDate.parse("01/01/2022")) >= 0) {
+        return "01";
+    } else {
+        return "07";
+    }
+}
+
+private String alignementAcquisitionAncien(boolean presenceDpe, String etiquetteDpe, double valeurCep,
+                                           String normeThermique) throws ParseException {
+    if (presenceDpe && anneeConstruction > 1700 && anneeConstruction <= 2012) {
+        return alignementCepDpeEtNormeTh(etiquetteDpe, valeurCep, valeurCeptop, normeThermique, endDate);
+    } else if (anneeConstruction <= 2020) {
+        return alignementCepDpeEtNormeTh(etiquetteDpe, valeurCep, valeurCeptop, normeThermique, endDate);
+    } else if (anneeConstruction.equals(2021)) {
+        return alignementCepCepmax(valeurCep, valeurCepmax);
+    } else if (anneeConstruction >= 2022) {
+        return alignementCepCepmaxNorm(valeurCep, valeurCepmax, normeThermique);
+    } else {
+        return "07";
+    }
+}
