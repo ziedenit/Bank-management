@@ -1,142 +1,78 @@
-package com.cl.msofd.service;
-
-import com.cl.logs.commun.CommonLogger;
-import com.cl.logs.commun.CommonLoggerFactory;
-import com.cl.logs.types.EventTyp;
-import com.cl.logs.types.SecEventTyp;
-import com.cl.msofd.exception.DpeAdemeExistingException;
 import com.cl.msofd.exception.DpeAdemeNotFoundException;
-import com.cl.msofd.model.Ademe;
 import com.cl.msofd.model.DpeAdeme;
 import com.cl.msofd.repository.DpeAdemeRepository;
 import com.cl.msofd.repository.DpeAdemeRepositoryCustom;
-import com.cl.msofd.utility.Constants;
 import com.cl.msofd.utility.JSONUtilOFD;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.mockito.stubbing.Answer;
+import org.springframework.http.*;
+import org.springframework.http.client.ClientHttpRequest;
+import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.web.client.RestTemplate;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.net.http.HttpResponse.BodyHandlers;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
-@Service
-public class DpeAdemeService {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.when;
 
-    @Autowired
+public class DpeAdemeServiceTest {
+
+    @Mock
     private DpeAdemeRepository dpeAdemeRepository;
 
-    @Autowired
+    @Mock
     private DpeAdemeRepositoryCustom dpeAdemeRepositoryCustom;
 
-    @Autowired
-    private HttpClient ademeHttpClient;
-
-    @Autowired
+    @Mock
     private JSONUtilOFD jsonUtils;
 
+    @Mock
+    private RestTemplate restTemplate;
 
-    private final CommonLogger commonLogger = CommonLoggerFactory.getLogger(DpeAdemeService.class);
+    @InjectMocks
+    private DpeAdemeService dpeAdemeService;
 
-    private DpeAdeme dpeAdemePersist;
-
-
-    public DpeAdeme create(DpeAdeme dpeAdeme) {
-        commonLogger.eventTyp(EventTyp.APPLICATIVE).secEventTyp(SecEventTyp.METIER).logger().info("create dpeAdeme : {}", dpeAdeme);
-        Optional<DpeAdeme> existingDpe = dpeAdemeRepositoryCustom.findByNumDpe(dpeAdeme.getNumDpe());
-        return (DpeAdeme) existingDpe.map(dpe -> {
-            throw new DpeAdemeExistingException(String.format("le numéro DPE %s est déja crée ", dpeAdeme.getNumDpe()));
-        }).orElseGet(() -> dpeAdemeRepository.save(dpeAdeme));
+    @BeforeEach
+    public void setUp() {
+        MockitoAnnotations.initMocks(this);
+        ReflectionTestUtils.setField(dpeAdemeService, "ademeHttpClient", restTemplate);
     }
 
+    @Test
+    public void testGetDpeWithProxy() throws ExecutionException, InterruptedException, IOException {
+        String numDpe = "dummyNumDpe";
+        String expectedUrl = Constants.ADEME_URL + numDpe;
 
-    public DpeAdeme getDpe(String numDpe) throws ExecutionException, InterruptedException, IOException {
+        // Mock response from Ademe service
+        DpeAdeme dpeAdeme = new DpeAdeme(); // Create a dummy DpeAdeme object
+        String jsonBody = "{\"results\": [{\"numDpe\": \"" + numDpe + "\"}]}";
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> responseEntity = new HttpEntity<>(jsonBody, headers);
+        ResponseEntity<String> responseEntityMock = new ResponseEntity<>(jsonBody, headers, HttpStatus.OK);
 
-        commonLogger.eventTyp(EventTyp.APPLICATIVE).secEventTyp(SecEventTyp.METIER).logger().info("OFD : Requête Ademe numéro DPE : {}", numDpe);
+        // Mock RestTemplate behavior
+        when(restTemplate.exchange(eq(expectedUrl), eq(HttpMethod.GET), any(HttpEntity.class), eq(String.class)))
+                .thenReturn(responseEntityMock);
 
-        String url = Constants.ADEME_URL + numDpe;
+        // Mock JSONUtilOFD conversion
+        when(jsonUtils.covertFromJsonToObject(eq(jsonBody), eq(DpeAdeme.class))).thenReturn(dpeAdeme);
 
-        HttpRequest request = HttpRequest.
-                newBuilder()
-                .uri(URI.create(url))
-                .build();
+        // Test the method
+        DpeAdeme result = dpeAdemeService.getDpe(numDpe);
 
-        CompletableFuture<HttpResponse<String>> response = ademeHttpClient.sendAsync(request, BodyHandlers.ofString());
-        Ademe ademe = jsonUtils.covertFromJsonToObject(response.get().body(), Ademe.class);
-
-        if (!ademe.getResults().isEmpty()) {
-
-            DpeAdeme dpeAdeme = ademe.getResults().get(0);
-
-            if (dpeAdeme.getNumDpe().equals(numDpe)) {
-                return dpeAdeme;
-            }
-
-            if (dpeAdeme.getNumDpeRemplace().equals(numDpe)) {
-                dpeAdeme.setNumDpeRemplace(dpeAdeme.getNumDpe());
-                dpeAdeme.setNumDpe(numDpe);
-            }
-            if (dpeAdeme.getNumDpe().equals(numDpe) || dpeAdeme.getNumDpeRemplace().equals(numDpe)) {
-                 dpeAdemePersist = create(dpeAdeme);
-
-            }
-            return dpeAdemePersist;
-        } else {
-            throw new DpeAdemeNotFoundException(String.format("Le DPE %s est inexistant", numDpe));
-        }
+        // Verify the result
+        assertEquals(dpeAdeme, result);
     }
-    
-    
- 
-    
-    public DpeAdeme getDpeNeuf(String numDpe) throws ExecutionException, InterruptedException, IOException {
-
-        commonLogger.eventTyp(EventTyp.APPLICATIVE).secEventTyp(SecEventTyp.METIER).logger().info("OFD : Requête Ademe numéro DPE : {}", numDpe);
-
-        String url = Constants.URL_NEUF + numDpe;
-
-        HttpRequest request = HttpRequest.
-                newBuilder()
-                .uri(URI.create(url))
-                .build();
-       
-        CompletableFuture<HttpResponse<String>> response = ademeHttpClient.sendAsync(request, BodyHandlers.ofString());
-        Ademe ademe = jsonUtils.covertFromJsonToObject(response.get().body(), Ademe.class);
-
-        if (!ademe.getResults().isEmpty()) {
-
-            DpeAdeme dpeAdeme = ademe.getResults().get(0);
-
-            if (dpeAdeme.getNumDpe().equals(numDpe)) {
-                return dpeAdeme;
-            }
-
-            if (dpeAdeme.getNumDpeRemplace().equals(numDpe)) {
-                dpeAdeme.setNumDpeRemplace(dpeAdeme.getNumDpe());
-                dpeAdeme.setNumDpe(numDpe);
-            }
-            if (dpeAdeme.getNumDpe().equals(numDpe) || dpeAdeme.getNumDpeRemplace().equals(numDpe)) {
-                 dpeAdemePersist = create(dpeAdeme);
-
-            }
-            return dpeAdemePersist;
-        } else {
-            throw new DpeAdemeNotFoundException(String.format("Le DPE %s est inexistant", numDpe));
-        }
-    }
-       
 }
-i have proxy to mock to test this service how ca i do a class test for this service 
-@Configuration
-public class AppConfiguration {
-
-    @Value("${ademe.proxy.host}")
-    private String proxyHost;
-
-    @Value("${ademe.proxy.port}")
-    private int proxyPort;
