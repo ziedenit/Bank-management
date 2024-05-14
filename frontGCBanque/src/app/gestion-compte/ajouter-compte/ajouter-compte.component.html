@@ -1,26 +1,423 @@
-<div class="container-fluid">
+<h2 class ="Titre-01"> Acquisition des données et des justificatifs</h2>
+
+<!---------------------------------------bloc clients Particuliers---------------------------------------------------------->
+<div  *ngIf="clientParticulier==true" >
+<div class="container-fluid mb-4">
+  <div class="row">
+    <div class="col-12">
+      <div  class="nav" >
+        <img  *ngIf="hiddenClient==false" src="../../../assets/icons/arrow-up.svg"  (click)="hideDataClient()" /> 
+         <img *ngIf="hiddenClient==true" src="../../../assets/icons/arrow-down.svg"   (click)="showDataClient()"/>  &nbsp;
+        Client ({{idRepers.length }}) 
+       </div>
+    </div>
+  </div>
+  <div class="row" *ngIf="elementClient">
+    <div class="col-12">
+      <ul class="list-group">
+        <li class="list-group-item" *ngFor="let client of clientDataList">
+          <div class="row">
+            <div class="col">
+              Nom &nbsp;&nbsp; {{client.civility }}.&nbsp; {{client.nomUsageClient }} {{client.prenomClient}}
+            </div>
+            <div class="col">
+              né (e) le : &nbsp;&nbsp; {{client.dateNaissanceClient}} 
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-12">
+      <!-- Affichage du message d'erreur -->
+      <div *ngIf="errors.length > 0">
+        <div class="error-message">
+          <ul class="list-group">
+            <li class="list-group-item" *ngFor="let error of errors">
+              <div class="row">
+                <div class="col">
+                  {{ error.messageErrorP  }}
+                </div>
+                <div class="col">
+                  idReper du Client: {{ error.idReperErrorP }}
+                </div>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+<div  *ngIf="clientParticulier==false" >
+<div class="container-fluid mb-4">
+  <div class="row">
+    <div class="col-12">
+      <div  class="nav" >
+        <img  *ngIf="hiddenClient==false" src="../../../assets/icons/arrow-up.svg"  (click)="hideDataClient()" /> 
+         <img *ngIf="hiddenClient==true" src="../../../assets/icons/arrow-down.svg"   (click)="showDataClient()"/>  &nbsp;
+        Client ({{idRepers.length }}) 
+       </div>
+    </div>
+  </div>
+  <div class="row" *ngIf="elementClient">
+    <div class="col-12">
+      <ul class="list-group">
+        <li class="list-group-item" *ngFor="let client of entrepriseData">
+          <div class="row">
+            <div class="col"  *ngIf="!nonraison">
+              Raison Sociale &nbsp; &nbsp; &nbsp; <b>  {{client.legalName}} </b>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col">  
+              Nom &nbsp; &nbsp; &nbsp; <b> {{client.civilite }}. &nbsp;{{client.usuaLastName }} {{client.firstName}} </b>
+            </div>
+      
+            <div class="col">
+             Siren &nbsp; &nbsp; &nbsp; <b>{{client.siren}} </b>
+            </div>
+          </div>
+      
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-12">
+      <!-- Affichage du message d'erreur -->
+      <div *ngIf="errors.length > 0">
+        <div class="error-message">
+          <ul class="list-group">
+            <li class="list-group-item" *ngFor="let error of errors">
+              <div class="row">
+                <div class="col">
+                  {{ error.messageErrorE}}
+                </div>
+                <div class="col">
+                  idReper: {{ error.idReperErrorE }}
+                </div>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!--  <div class="container-fluid mb-4">
+  <div class="row">
+    <div class="col-md-12">
+      <div class="nav">
+        <img *ngIf="hiddenBien==false" src="../../../assets/icons/arrow-up.svg" alt="image flèche haut" (click)="hideDataBien()" />
+        <img *ngIf="hiddenBien==true" src="../../../assets/icons/arrow-down.svg" alt="image flèche haut" (click)="showDataBien()" /> &nbsp;
+        Liste des biens ({{ biens.length }})
+      </div>
+
+      <ul class="list-group" *ngIf="elementBien == true">
+        <li class="list-group-item" *ngFor="let bien of biens; let i = index">
+          <div class="row">
+            <div class="col-md-6">
+              <input type="checkbox" (change)="setCheckedBien(bien, i, $event)" />
+              &nbsp;{{ bien.typeBatiment }}
+            </div>
+            <div class="col-md-6">
+              {{ bien.adresseComplete }}
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div> -->
+
+
+
+
+
+
+<div class="container-fluid  ">
   <div class="row">
     <div class="col-12">
       <div class="card border-0">
         <div class="card-body">
           <div class="blockSize">
-            <h3 class="d-inline-block font-weight-bold">Objet de financement</h3>
-            <span class="float-right">
-              <img *ngIf="hiddenObjetfinancement==false" src="../../../assets/icons/arrow-up.svg" alt="Fleche haut" (click)="hideDataObjetFinancement()">
-              <img *ngIf="hiddenObjetfinancement==true" src="../../../assets/icons/arrow-down.svg" alt="Fleche bas" (click)="showDataObjetFinancement()">
-            </span>
-          </div>
-          <div *ngIf="elementObjetfinancement == true" class="row">
-            <div class="col-lg-6">
-              <!-- Colonne 1 -->
-              <div class="form-group">
-                <!-- Votre formulaire ici -->
+          
+        
+          <!-- Flèche pour ouvrir et fermer le formulaire -->
+          <h3 class="d-inline-block font-weight-bold">Object Financement</h3>
+        <span class="float-right" >
+            <img *ngIf="hiddenObjetfinancement==false" src="../../../assets/icons/arrow-up.svg" alt="Fleche haut" (click)="hideDataObjetFinancement()">
+            <img *ngIf="hiddenObjetfinancement==true" src="../../../assets/icons/arrow-down.svg" alt="Fleche bas" (click)="showDataObjetFinancement()">
+          </span> 
+         <div *ngIf="elementObjetfinancement == true"> 
+            <!-- Votre formulaire ici -->
+            <div class="row">
+              <div class="col-lg-6">
+                <div class="form-group" >
+                  <label for="familleObjet">Famille objet de financement </label>
+                  <select class="form-control form-control-sm"  id="selectedFamilleObjet" [(ngModel)]="selectedFamilleObjet">
+                    <option value='option0' selected> </option>
+                    <option value='option1'>Immobilier </option>
+                    <option value='option2'>Installation, maintenance et réparation d'équipement/technologie liés aux bâtiments</option>
+                    <option value='option3'>Énergies renouvelables </option>
+                    <option value='option4'>Transport </option>
+                    <option value='option5'>Autres </option>
+                  </select>
+                 <span class="required">*</span>
+                </div>
+
+                <!-- Colonne 1 -->
+                <div class="form-group ">
+                  <label for="input1">Object financé</label>
+                  <input type="text" class="form-control form-control-sm" id="input1" placeholder="Renovation ou aquisition" [(ngModel)]="objetFinance">
+                </div>
+                <!-- Deuxième champ liste déroulante -->
+                <div class="form-group" >
+                  <label for="select2">Type de bâtiment </label>
+                  <select class="form-control form-control-sm"  (mouseover)="showDescription($event.target.value)" id="select2" [(ngModel)]="selectedType">
+                    <option value='option1'  > Bien soumis au DPE  </option>
+                    <option value='option2' > Construction provisoire (durée d'utilisation ≤ 2 ans)  </option>
+                     <option value='option3' > Bâtiment indépendant avec superficie <50 m² </option>
+                    <option value='option4' > Usage agricole, artisanal ou industriel</option>
+                    <option value='option5' >Lieux de culte </option>
+                    <option value='option6' >Monument historique classé </option>
+                    <option value='option7' >Bâtiment non chauffé  </option>
+                    <option value='option8' >Utilisation < 4 mois/an </option>
+                    <option value='option9' > Bâtiment situé dans les DOM-TOM</option>
+                    <option value='option10' > Bâtiment situé à l'étranger </option> 
+            
+                  </select>
+                </div>
+                <!-- Troisième champ liste déroulante -->
+                <div class="form-group" *ngIf="hideFieldForm==false">
+                  <label for="select3"> Nature du bien</label>
+                  <select class="form-control form-control-sm" id="select3" [(ngModel)]="codeBatimentSelected">
+                    <option value='option0' selected > </option>
+                    <option value='option1' selected > Résidentiel</option>
+                    <option value='option2'  >Bureaux</option>
+                    <option value='option3'>Bureaux IGH (hauteur >28 m)</option>
+                    <option value='option4'>Hôtels</option>
+                    <option value='option5'>Santé (centres hospitaliers, EHPAD, Etabl. Médicaux sociaux…)</option> 
+                    <option value='option6'>Centres commerciaux</option>
+                  </select>
+              
+            
+                  
+                </div>
+                <!-- Quatrième champ liste déroulante -->
+                <div class="form-group" *ngIf="hideFieldForm==false">
+                  <label for="select4">Etat du bien</label>
+                  <select class="form-control form-control-sm" id="select4" [(ngModel)]="selectedNatBatiment">
+                    <option value='option1'> Ancien</option>
+                    <option value='option2'>Neuf</option>
+            
+                  </select>
+                </div>
+                <!-- Autres champs de saisie -->
+                <!-- ... -->
+                <div class="form-group" *ngIf="hideFieldForm==false">
+                  <label for="input5">Siren du diagnostiqueur</label>
+                  <input type="text" class="form-control form-control-sm" id="input5" placeholder="Siren du diagnostiqueur" [(ngModel)]="SirenDPE">
+                </div>
+                <!-- 6ème champ sans label -->
+                <div class="form-group" *ngIf="hideFieldForm==false">
+                  <label for="addressBien" class="labelFormulaire">Adresse du bien</label>
+                  <div class="row">
+    
+                    <div class="col-lg-4">
+                      <input type="nomNumeroRue" class="form-control form-control-sm " placeholder="Nom et numéro de rue" [(ngModel)]="addresseBien">
+                    </div>
+                    <div class="col-lg-4">
+                      <input type="ville" class="form-control form-control-sm " placeholder="Ville " [(ngModel)]="addresseBienVille">
+                    </div>
+                    <div class="col-lg-3">
+                      <input type="codePostal" class="form-control form-control-sm" placeholder="Code Postal" [(ngModel)]="addresseBienCodePostal">
+                    </div>
+                  </div>
+                </div>
+                <div class="alertArea" *ngIf="showFirstEligiblite==true">{{messageAlert}}
+                  <img src="../../../assets/icons/alert.svg" class="imageErreur"  alt="image flèche haut" >
+                </div>
+
+                <!-- Icône de recherche -->
+                <div class="form-group">
+                  <i class="fa fa-search"></i>
+                </div>
+              </div>
+              <div class="col-lg-6">
+                <!-- Colonne 2 -->
+              
+                <div class="form-group" *ngIf="hideFieldForm==false">
+                  <label for="dateDepot">Date de dépôt de PC</label>
+                  <input type="date" id="dateDepot" class="form-control form-control-sm"  [(ngModel)]="dateDepotPc">
+                </div>
+                <div class="form-group" *ngIf="hideFieldForm==false">
+                  <label for="input7">Prix du bien<em> (en euro)</em></label>
+                  <input type="text" class="form-control form-control-sm" id="input6" placeholder="Ex 1000000" [(ngModel)]="prixAquisitionBien">
+                </div>
+                <div class="form-group" *ngIf="hideFieldForm==false">
+                  <label for="input7">Montant financé <em> (en euro)</em></label>
+                  <input type="text" class="form-control form-control-sm" id="input7" placeholder="Ex 900000" [(ngModel)]="montantLclFinance">
+                </div>
+                <div class="form-group" *ngIf="hideFieldForm==false">
+                  <label for="input7">Part LCL <em> (en euro)</em></label>
+                  <input type="text" class="form-control form-control-sm" id="input8" placeholder="Ex 200000" [(ngModel)]="partLcl">
+                </div>
+               
+                <div class="form-group" *ngIf="hideFieldForm==false">
+                  <label for="NormeThermique" class="labelFormulaire" >Norme Thermique </label>
+                  <select class="form-control form-control-sm" id="select5" [(ngModel)]="normeThermique">
+                    <option value='option0' selected> </option>
+                    <option value='option1'> RT2012  </option>
+                    <option value='option2'> RE2020 </option>
+                    <option value='option3' >Autre</option>
+            
+                  </select>
+                
+                  
+                </div>
+                <!-- Autres champs de saisie -->
+                <!-- ... -->
+                <div class="form-group" *ngIf="hideFieldForm==false">
+                 
+                  <label for="input10">N° du DPE</label>
+                  <div class="row">
+                  <div class="col-lg-6">
+                  <input type="text" class="form-control form-control-sm" id="input10" placeholder="Ex: 2100E0981916Z" [(ngModel)]="numeroDpeAdeme">
+                  </div>
+            
+                  <div class="col-lg-1">
+                  <span class="float-right">
+                  <img *ngIf="dpechsecked" src="../../../assets/icons/coche.png" style="width:10px; height: 10px; margin-left: 10px;"  alt="image flèche haut">
+                  <img  src="../../../assets/images/search.png"  (click)="showAdemeResult(numeroDpeAdeme)" style=" margin-left: 10px; width:20px; height: 20px;" alt="image flèche haut" >
+                </span>
+          
+                  </div>
+                </div>
+              </div>
+              <div class="erreurDpe"  fxLayoutAlign="float-right " >
+                {{message}}
+              </div>
               </div>
             </div>
-            <div class="col-lg-6">
-              <!-- Colonne 2 -->
-              <div class="form-group">
-                <!-- Votre formulaire ici -->
+   <!--        </div> -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-lg-12">
+      <div class="card border-0">
+        <div class="card-body">
+          <div class="blockSize bg-light-gray">
+            <div [class.DpeAdem]="elemenDPE == false">
+              <div [hidden]="!depExist">
+                <div class="DPE-Bloc" [ngStyle]="{'border-bottom': !elemenDPE ? '1px solid #d1d3fc' : ''}">
+                  <span class="float-right">
+                    <img *ngIf="hiddenDPE==false" src="../../../assets/icons/arrow-up.svg" alt="image flèche haut" (click)="hideDataDPE()" />
+                    <img *ngIf="hiddenDPE==true" src="../../../assets/icons/arrow-down.svg" alt="image flèche haut" (click)="showDataDPE()" />
+                  </span> 
+                  <h3 class="d-inline-block font-weight-bold">Données du DPE</h3>
+                </div>
+                <div *ngIf="elemenDPE == true">
+                  <form class="DpeFormulaire" [formGroup]="formGroup">
+                    <div class="row">
+                      <div class="col-lg-3 col-md-6">
+                        <label for="numeroNomRue" class="d-block">Adresse du bien</label>
+                        <input type="text" id="numeroNomRue" placeholder="Adresse" formControlName="numeroNomRue" name="numeroNomRue" class="form-control">
+                        <div class="listeAdress" *ngIf="showAdressResults==true">
+                          <ul>
+                            <li *ngFor="let result of addressResults">
+                              <button (click)="selectAddress(result)">
+                                {{ result.properties.label }}
+                              </button>
+                            </li>
+                          </ul>
+                        </div>
+                      </div>
+                      <div class="col-lg-3 col-md-6">
+                        <label for="codePostal" class="d-block">Code postal</label>
+                        <input type="text" id="codePostal" placeholder="Code postal" formControlName="codePostal" name="codePostal" class="form-control">
+                      </div>
+                      <div class="col-lg-3 col-md-6">
+                        <label for="ville" class="d-block">Ville</label>
+                        <input type="text" id="ville" placeholder="Ville" formControlName="ville" name="ville" class="form-control">
+                      </div>
+                      <div class="col-lg-3 col-md-6">
+                        <label for="dateDiangnostique" class="d-block">Date du diagnostic</label>
+                        <input type="text" id="dateDiangnostique" placeholder="Date du diagnostic" formControlName="dateDiangnostique" name="dateDiangnostique" class="form-control">
+                      </div>
+                      <div class="col-lg-3 col-md-6">
+                        <label for="anneeConstruction" class="d-block">Année de construction</label>
+                        <input type="text" id="anneeConstruction" placeholder="Année de construction" formControlName="anneeConstruction" name="anneeConstruction" class="form-control">
+                      </div>
+                      <div class="col-lg-3 col-md-6" [hidden]="hideField==false" >
+                        <label for="TypeBatiment" class="d-block">Type de bien</label>
+                        <input type="text" id="TypeBatiment" placeholder="Type de bien" formControlName="TypeBatiment" name="TypeBatiment" class="form-control">
+                      </div>
+                      <div class="col-lg-3 col-md-6">
+                        <label for="surfaceBien"  class="champs">Surface du bien <em>(en m²) </em><span class="required">*</span></label>
+                        <input type="text" id="surfaceBien" placeholder="Surface du bien" formControlName="surfaceBien" name="surfaceBien" class="form-control">
+                
+                      </div>
+
+                      <div class="col-lg-3 col-md-6" [hidden]="hideField==false">
+                        <label for="EnergieType"  class="champs">Type d'énergie</label>
+                        <input type="text" id="EnergieType" placeholder="Type Energie" formControlName="EnergieType" name="EnergieType" class="form-control">
+                        <img  *ngIf="valGesObligatoire==true" src="../../../assets/icons/obligatoire.svg" style="width:15px; height: 15px;" alt="image flèche haut" >
+                      </div>
+                      <div class="col-lg-3 col-md-6" [hidden]="hideField==false" style="margin-top: 10px;">
+                        <label class="champs" >Lettre GES
+                        <span class="required">*</span></label>
+                        <select id="lettreGeslist" name="lettreGeslist"  formControlName="lettreGES" class="form-control" >
+                          <option value='option0' > </option>
+                          <option value='option1' >A</option>
+                          <option value='option2' >B </option>
+                          <option value='option3' >C </option>
+                          <option value='option4' >D</option>
+                          <option value='option5' >E</option>
+                          <option value='option6' >F </option>
+                          <option value='option7' >G</option> 
+                        </select> 
+                      </div>
+                      <div class="col-lg-3 col-md-6" [hidden]="hideField==false" style="margin-top: 10px;">
+                        <label class="champs" >Lettre GES
+                        <span class="required">*</span></label>
+                        <select id="LettreCEPlist" name="LettreCEPlist"  formControlName="lettreCEP" class="form-control"  >
+                          <option value='option0' > </option>
+                          <option value='option1' >A</option>
+                          <option value='option2' >B </option>
+                          <option value='option3' >C </option>
+                          <option value='option4' >D</option>
+                          <option value='option5' >E</option>
+                          <option value='option6' >F </option>
+                          <option value='option7' >G</option> 
+                        </select> 
+                      </div>
+                      <div class="col-lg-3 col-md-6"  style="margin-top: 10px;">
+                        <label for="ValeurCEP" class="champs">Valeur CEP <em>(en kWhep/m².an)</em>     <span class="required"> *</span></label>
+      <input type="text" id="ValeurCEP"  placeholder="ValeurCEP" formControlName="valeurCEP"  class="form-control">
+     
+                                   
+    </div>
+    <div class="col-lg-3 col-md-6"  style="margin-top: 10px;">
+      <label for="valeurGES" class="champs"> Valeur GES <em>(en kWhep/m².an)</em>     <span class="required"> *</span></label>
+<input type="text" id="valeurGES"  placeholder="valeurGES" formControlName="valeurGES"  class="form-control">
+
+                 
+</div>
+    
+                      <!-- Autres champs et éléments de formulaire ici -->
+                    </div>
+                  </form>
+                </div>
               </div>
             </div>
           </div>
@@ -29,3 +426,127 @@
     </div>
   </div>
 </div>
+
+<div class="container-fluid" > 
+  <div class="justificatifs" *ngIf="hideFieldForm==false" >
+  
+    <div class="blocJust">
+    <img  *ngIf="hiddenJustificatif==false" src="../../../assets/icons/arrow-up.svg"  (click)="hideDataJustificatif()" class="haut"  /> 
+     &nbsp; <img *ngIf="hiddenJustificatif==true" src="../../../assets/icons/arrow-down.svg" class="bas"  (click)="showDataJustificatif() "/> &nbsp;
+    <h3 class="TitleJustificatif"> Justificatifs</h3>
+    </div >
+  
+  <div *ngIf="elementJustificatif == true" > <!--elementJustificatif==afficher ou non la partie justificatifs -->
+  <div class="Parcourir" ><!-- showJustif== le justificatif est non disponible en GED-->
+  
+    <!--demander le justificatif attestant la date de depot de permis de costruire  -->
+      <div *ngIf="dateDepot" class="file-upload">
+        <p >Document attestant de la date de  dépôt du permis de construire </p>
+        
+        <div class="Choix-Justificatif" [ngClass]="{ 'disabled': isFieldsDisabled }" >
+        </div>
+        <input type="text" id="dateDepot" class="file-input" [(ngModel)]="dateDepotFileName" readonly [disabled]="isFieldsDisabled">
+        <button class="browse-btn" (click)="selectFile('dateDepot')">Parcourir...</button>
+        <input type="file" id="dateDepotFile" style="display: none" (change)="updateFileName('dateDepot', $event)">
+      </div>
+  
+     
+    <!--demander le DPE ou le compromis de vente si le numéro DPE est saisi-->
+    <div *ngIf="numeroDpeAdeme" class="file-upload">
+      <div class="Choix-Justificatif" [ngClass]="{ 'disabled': isFieldsDisabled }" >
+        <select class="form-list" id="Justificatif" required [(ngModel)]="Justificatif" name="Justificatif" [disabled]="isFieldsDisabled">
+          <option value='option1'  > DPE </option>
+          <option value='option2'> Compromis de vente  </option>
+        </select>
+      </div>
+      <input type="text" id="dpe" class="file-input" [(ngModel)]="dpeFileName" readonly [disabled]="isFieldsDisabled">
+      <button class="browse-btn" (click)="selectFile('dpe')" [disabled]="isFieldsDisabled" >Parcourir...</button>
+      <input type="file" id="dpeFile" style="display: none" (change)="updateFileName('dpe', $event)" [disabled]="isFieldsDisabled">
+  </div>
+  
+  
+  <!--demander la norme thermique si elle est renseignée -->
+  <div *ngIf="normeThermique && normeThermique!== 'option0' &&  !dateDepot"  class="file-upload"> 
+    <p >Document attestant de la Norme thermique </p>
+     <div class="Choix-Justificatif" [ngClass]="{ 'disabled': isFieldsDisabled }" >
+    </div>
+    <input type="text" id="Normethermique" class="file-input" [(ngModel)]="NormethermiqueFileName" readonly [disabled]="isFieldsDisabled">
+    <button class="browse-btn" (click)="selectFile('Normethermique')">Parcourir...</button>
+    <input type="file" id="NormethermiqueFile" style="display: none" (change)="updateFileName('Normethermique', $event)">
+  </div>
+  </div>
+  </div>
+  <br>
+  </div>
+  <div class="container-fluid"></div>
+  <div class="resultats" *ngIf="hideFieldForm==false" >
+  
+    
+    <div  class="blocResults">
+      <img  *ngIf="hiddenResults==false" src="../../../assets/icons/arrow-up.svg"  (click)="hideDataResults()"   /> 
+       &nbsp; <img *ngIf="hiddenResults==true" src="../../../assets/icons/arrow-down.svg" (click)="showDataResults()"/>  &nbsp;
+      <h3 class="TitleJustificatif"> Résultats</h3>
+    </div >
+    
+  <div  *ngIf="elementResults==true" >
+     <div *ngIf="selectedType !== 'option1'" class="erreurMessageResultat">
+     <p>Financement non éligible à la Taxonomie</p>
+    </div>
+    
+    <div *ngIf="DpeResults && hideFieldForm==false" >   
+      <div  class='textblock' >
+        <div class="ResultatVert">
+        &nbsp;     
+      <img  src="../../../assets/icons/coche.png" style="width:15px; height: 15px;" >  
+        {{alignementResultText}}</div>
+      </div>
+      
+      <div [hidden]="!champObligatoire" class='error-message'>
+        <div class="Resultatrougee">
+        &nbsp; <img  *ngIf="donneeObligatoire" src="../../../assets/icons/alert.svg" class="imageErreur">
+        &nbsp;  {{donneeObligatoire}}</div>
+       </div>
+  
+      
+      <div [hidden]="dpeIsPresent" class='textblock'>
+        <div *ngIf="errorDpeMessage" class="error-message">
+          <div class="Resultatrouge">
+        &nbsp; <img  *ngIf="dpeIsPresent==false" src="../../../assets/icons/alert.svg" class="imageErreur"  >
+        {{ errorDpeMessage }}</div>
+      </div> 
+  
+  
+      <div *ngIf="errorNormeThermiqueMessage" class="error-message">
+        <div class="Resultatrouge">
+        &nbsp; <img  *ngIf="dpeIsPresent==false" src="../../../assets/icons/alert.svg" class="imageErreur"  >
+        {{ errorNormeThermiqueMessage }} </div>
+      </div>
+  
+  
+      <div *ngIf="errorDateDepotMessage" class="error-message">
+        <div class="Resultatrouge">
+        &nbsp; <img  *ngIf="dpeIsPresent==false" src="../../../assets/icons/alert.svg" class="imageErreur"  >
+        {{errorDateDepotMessage}}</div>
+      </div>
+      </div>
+  
+      </div>
+      </div>  
+  
+      </div>
+    </div>
+      <div class="container-fluid" >
+  
+        <div class=footer>
+        <div class="ButtonsFooter" style="display: flex; justify-content: flex-end">
+        <!-- <button  class="precedent" routerLink="/generale" >Précédent</button>
+         &nbsp;    -->
+       <button (click)="showAlignement()"   mat-raised-button color="primary" [disabled]="selectedType!='option1'">Calculer</button>
+         &nbsp; 
+       <button  mat-raised-button color="primary"  (click)="postContinuer()" >Continuer</button>
+      </div>
+      </div>
+      
+      
+      </div>
+ 
