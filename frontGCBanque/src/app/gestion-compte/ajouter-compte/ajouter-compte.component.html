@@ -1,16 +1,32 @@
- <div class="form-group" >
-                  <label for="select2">Type de bâtiment </label>
-                  <select class="form-control form-control-sm"  (mouseover)="showDescription($event.target.value)" id="select2" [(ngModel)]="selectedType">
-                    <option value='option1'  > Bien soumis au DPE  </option>
-                    <option value='option2' > Construction provisoire (durée d'utilisation ≤ 2 ans)  </option>
-                     <option value='option3' > Bâtiment indépendant avec superficie <50 m² </option>
-                    <option value='option4' > Usage agricole, artisanal ou industriel</option>
-                    <option value='option5' >Lieux de culte </option>
-                    <option value='option6' >Monument historique classé </option>
-                    <option value='option7' >Bâtiment non chauffé  </option>
-                    <option value='option8' >Utilisation < 4 mois/an </option>
-                    <option value='option9' > Bâtiment situé dans les DOM-TOM</option>
-                    <option value='option10' > Bâtiment situé à l'étranger </option> 
-            
-                  </select>
-                </div>
+<div class="form-group">
+    <label for="select2">Type de bâtiment</label>
+    <select class="form-control form-control-sm" id="select2" [(ngModel)]="selectedType" (mouseenter)="showDescription($event)">
+        <option *ngFor="let option of options" [value]="option.value" [title]="option.description">{{ option.label }}</option>
+    </select>
+</div>
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-select',
+  templateUrl: './select.component.html',
+  styleUrls: ['./select.component.css']
+})
+export class SelectComponent {
+  selectedType: string;
+  options: { value: string, label: string, description: string }[] = [
+    { value: 'option1', label: 'Bien soumis au DPE', description: 'Description de l\'option 1' },
+    { value: 'option2', label: 'Construction provisoire (durée d\'utilisation ≤ 2 ans)', description: 'Description de l\'option 2' },
+    { value: 'option3', label: 'Bâtiment indépendant avec superficie <50 m²', description: 'Description de l\'option 3' },
+    // Ajoutez d'autres options avec leur description
+  ];
+
+  showDescription(event: MouseEvent): void {
+    const target = event.target as HTMLSelectElement;
+    const selectedIndex = target.selectedIndex;
+    const selectedOption = this.options[selectedIndex];
+    if (selectedOption) {
+      target.setAttribute('title', selectedOption.description);
+    }
+  }
+}
+
