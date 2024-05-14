@@ -1,58 +1,6 @@
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.BeanWrapper;
-import org.springframework.beans.BeanWrapperImpl;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
+import java.lang.reflect.Field;
 
-import java.beans.PropertyDescriptor;
-import java.util.HashSet;
-import java.util.Set;
-
-@Service
-public class FinancementService {
-
-    @Autowired
-    private FinancementRepository financementRepository;
-
-    public Financement patchFinancementChamps(String idFinancement, Financement financementToUpdate) {
-        Financement existingFinancement = financementRepository.findById(idFinancement)
-                .orElseThrow(() -> new RuntimeException("Financement non trouvé avec l'ID : " + idFinancement));
-
-        copyNonNullProperties(financementToUpdate, existingFinancement);
-        
-        return financementRepository.save(existingFinancement);
-    }
-
-    private void copyNonNullProperties(Object source, Object target) {
-        BeanUtils.copyProperties(source, target, getNullPropertyNames(source));
-    }
-
-    private String[] getNullPropertyNames(Object source) {
-        final BeanWrapper src = new BeanWrapperImpl(source);
-        PropertyDescriptor[] pds = src.getPropertyDescriptors();
-
-        Set<String> emptyNames = new HashSet<>();
-        for (PropertyDescriptor pd : pds) {
-            Object srcValue = src.getPropertyValue(pd.getName());
-            if (srcValue == null || StringUtils.isEmpty(srcValue)) emptyNames.add(pd.getName());
-        }
-        String[] result = new String[emptyNames.size()];
-        return emptyNames.toArray(result);
-    }
-}
-///////////////////
-         . Pour patcher les champs d'un objet imbriqué sans écraser l'existant, vous devez implémenter une logique spécifique dans votre méthode patchFinancementChamps.
-
-Voici une approche générale pour patcher les champs d'un objet imbriqué tout en conservant les valeurs existantes :
-
-Parcourir les champs de l'objet à mettre à jour.
-Pour chaque champ, vérifier s'il est différent de null.
-Si le champ est non null, mettre à jour le champ correspondant dans l'objet existant sans écraser sa valeur.
-Si le champ est null, ne rien faire pour ce champ, conservant ainsi la valeur existante.
-Voici un exemple de la méthode patchFinancementChamps qui implémente cette logique :
-         ///
-         public Financement patchFinancementChamps(String idFinancement, Financement financementToUpdate) {
+public Financement patchFinancementChamps(String idFinancement, Financement financementToUpdate) {
     Financement existingFinancement = financementRepository.findById(idFinancement);
     
     if (existingFinancement == null) {
@@ -61,30 +9,21 @@ Voici un exemple de la méthode patchFinancementChamps qui implémente cette log
     }
     
     // Parcourir les champs de l'objet à mettre à jour
-    if (financementToUpdate.getObjetFinancement() != null) {
-        // Mettre à jour l'objet financement imbriqué
-        existingFinancement.setObjetFinancement(updateObjetFinancement(existingFinancement.getObjetFinancement(), financementToUpdate.getObjetFinancement()));
+    for (Field field : Financement.class.getDeclaredFields()) {
+        field.setAccessible(true);
+        try {
+            // Récupérer la valeur du champ dans l'objet à mettre à jour
+            Object updatedValue = field.get(financementToUpdate);
+            // Si le champ n'est pas null dans l'objet à mettre à jour, le mettre à jour dans l'objet existant
+            if (updatedValue != null) {
+                field.set(existingFinancement, updatedValue);
+            }
+        } catch (IllegalAccessException e) {
+            // Gérer l'exception si l'accès au champ est interdit
+            e.printStackTrace();
+        }
     }
-    
-    if (financementToUpdate.getAlignement() != null) {
-        // Mettre à jour l'alignement
-        existingFinancement.setAlignement(financementToUpdate.getAlignement());
-    }
-    
-    // Mettre à jour d'autres champs de la même manière
     
     // Enregistrer les modifications dans la base de données
     return financementRepository.save(existingFinancement);
-}
-
-private ObjetFinancement updateObjetFinancement(ObjetFinancement existingObjetFinancement, ObjetFinancement newObjetFinancement) {
-    // Parcourir les champs de l'objet financement à mettre à jour
-    if (newObjetFinancement.getCodeObjetFinancement() != null) {
-        // Mettre à jour le code de l'objet financement
-        existingObjetFinancement.setCodeObjetFinancement(newObjetFinancement.getCodeObjetFinancement());
-    }
-    
-    // Mettre à jour d'autres champs de la même manière
-    
-    return existingObjetFinancement;
 }
