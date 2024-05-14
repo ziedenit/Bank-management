@@ -1,29 +1,123 @@
-import java.lang.reflect.Field;
-
-public Financement patchFinancementChamps(String idFinancement, Financement financementToUpdate) {
-    Financement existingFinancement = financementRepository.findById(idFinancement);
-    
-    if (existingFinancement == null) {
-        // Gérer le cas où l'objet à mettre à jour n'existe pas
-        return null;
-    }
-    
-    // Parcourir les champs de l'objet à mettre à jour
-    for (Field field : Financement.class.getDeclaredFields()) {
-        field.setAccessible(true);
-        try {
-            // Récupérer la valeur du champ dans l'objet à mettre à jour
-            Object updatedValue = field.get(financementToUpdate);
-            // Si le champ n'est pas null dans l'objet à mettre à jour, le mettre à jour dans l'objet existant
-            if (updatedValue != null) {
-                field.set(existingFinancement, updatedValue);
+{
+    "id": "6618f40f19671736855fd34b",
+    "origineCreation": null,
+    "dateCreation": "2024-04-12T10:42:55",
+    "origineModification": null,
+    "dateModification": "2024-04-12T10:42:55",
+    "idFinancement": "FT5BSB83X",
+    "objetFinancement": {
+        "id": null,
+        "origineCreation": null,
+        "dateCreation": "2024-04-24T17:21:56",
+        "origineModification": null,
+        "dateModification": "2024-04-24T17:21:56",
+        "idObjetFinancement": null,
+        "codeObjetFinancement": null,
+        "quotePartObjet": 90.0,
+        "codeFamilleObjet": null,
+        "gainCEP": null,
+        "dateFinTravaux": null,
+        "bien": null,
+        "dpeAvantTravaux": null,
+        "dpeApresTravaux": null,
+        "alignement": null,
+        "eligibilite": null,
+        "garantie": [
+            {
+                "id": null,
+                "origineCreation": null,
+                "dateCreation": "2024-04-24T17:21:56",
+                "origineModification": null,
+                "dateModification": "2024-04-24T17:21:56",
+                "idGarantie": null,
+                "typeObjetGarantie": null,
+                "bien": {
+                    "id": null,
+                    "origineCreation": null,
+                    "dateCreation": "2024-04-24T17:21:56",
+                    "origineModification": null,
+                    "dateModification": "2024-04-24T17:21:56",
+                    "idBien": null,
+                    "codeBatiment": null,
+                    "codeNormeThermique": null,
+                    "typeBatiment": null,
+                    "codeTypeBatiment": null,
+                    "numeroVoie": null,
+                    "typeVoie": null,
+                    "nomRue": null,
+                    "etatBien": null,
+                    "typeEnergie": null,
+                    "codeTypeEnergie": null,
+                    "batiment": null,
+                    "escalier": null,
+                    "etage": null,
+                    "porte": null,
+                    "codePostal": null,
+                    "nomCommune": null,
+                    "paysBien": null,
+                    "adresseComplete": null,
+                    "codeDepartement": null,
+                    "codeInseeCommune": null,
+                    "numeroLot": null,
+                    "numeroNomRue": null,
+                    "typeUsage": null,
+                    "anneeConstruction": null,
+                    "periodeConstruction": null,
+                    "dateDepotPc": null,
+                    "dateDebutConstruction": null,
+                    "surfaceBien": null,
+                    "bienFinanceLCL": true,
+                    "numeroFiscalLocal": null,
+                    "coordonneeCartographiqueX": null,
+                    "coordonneeCartographiqueY": null,
+                    "prixBien": 6.2782563145214256E16,
+                    "montantFinanceLCL": null,
+                    "partLCL": null,
+                    "dpeActuel": null
+                },
+                "topAlignement": null,
+                "topEligibilite": null
             }
-        } catch (IllegalAccessException e) {
-            // Gérer l'exception si l'accès au champ est interdit
-            e.printStackTrace();
-        }
-    }
-    
-    // Enregistrer les modifications dans la base de données
-    return financementRepository.save(existingFinancement);
+        ],
+        "piecesJustificatives": null,
+        "statut": 0
+    },
+    "alignement": null,
+    "eligibilite": null,
+    "eligibleDpe": null,
+    "intervenant": {
+        "id": null,
+        "origineCreation": null,
+        "dateCreation": "2024-04-12T10:42:55",
+        "origineModification": null,
+        "dateModification": "2024-04-12T10:42:55",
+        "idIntervenant": null,
+        "idReper": [
+            "1245887962"
+        ]
+    },
+    "indicateurFinancementDedie": null,
+    "indicateurNatureDurable": null,
+    "typeRisqueClimatiqueAttenue": null,
+    "codeApplicatifOrigine": "02",
+    "indicateurReprise": false,
+    "statut": 0,
+    "agenceCompte": "003800000056968N"
 }
+//////////
+
+
+j'ai voulu patcher uniquement le champs "idRper":"1245887977" pour l'objet mentionné ci haut mais l'api ne patch pas j'ai passé ca http://localhost:8081/api/v1/financement/champs/FT5BSB83X mais avec un json contenant uniquement le champs a patcher
+{
+    "idReper": "1245887977"
+   
+}
+mais le resultat c'est null en fait  
+@PatchMapping("/champs/{idFinancement}")
+    public ResponseEntity<Financement> patchFinancementChamps(@PathVariable String idFinancement, @RequestBody Financement financementToUpdate) {
+        commonLogger.eventTyp(EventTyp.APPLICATIVE).secEventTyp(SecEventTyp.METIER).logger().info("Financement: patch fields");
+        Financement updatedFinancement = financementService.patchFinancementChamps(idFinancement, financementToUpdate);
+        return ResponseEntity.ok(updatedFinancement);
+    }
+        financementToUpdate est pris comme null
+        comme je peux corriger la méthode pour qu'elle patch bien uniquement un champs bien determiné  dans un objet imbriqué comme intervenant 
