@@ -1,210 +1,158 @@
-<div class="container"> 
-  <div class= "FORMULAIRE">
-
-   <div>
-    <div class="blockSize">
-    <img  *ngIf="hiddenObjetfinancement==false" src="../../../assets/icons/arrow-up.svg" alt="image flèche haut"  (click)="hideDataObjetFinancement()" /> 
-      &nbsp; <img *ngIf="hiddenObjetfinancement==true" src="../../../assets/icons/arrow-down.svg"  alt="image flèche haut"  (click)="showDataObjetFinancement()"/>  
-    <h3 class="titreObjetFinancement"> Objet de financement</h3> 
-    </div>
-  
-<div *ngIf="elementObjetfinancement == true">
-<div >
-  <div class="col">
-    <div class="col1"> 
-
-   <!-------------------- champs famille non envoyé dans le context ----------------------->
-   <div *ngIf="presenceFamilleObjet==false && presenceObjet==false"    class="form-group">
-     <div class="famille_objet_">
-    <label for="familleObjet" class="labelFormulaire">Famille objet de financement </label>
-      <select [(ngModel)]="selectedFamilleObjet" class="form-list" id="selectedFamilleObjet" name="selectedFamilleObjet">
-        <option value='option0' selected> </option>
-        <option value='option1'>Immobilier </option>
-        <option value='option2'>Installation, maintenance et réparation d'équipement/technologie liés aux bâtiments</option>
-        <option value='option3'>Énergies renouvelables </option>
-        <option value='option4'>Transport </option>
-        <option value='option5'>Autres </option>
-      </select>
-      &nbsp;<span class="required">*</span>
-    </div>
-  </div>
-
-<!-------------------- champs famille envoyé et pas l'objet de financement----------------------->
- <div *ngIf="presenceFamilleObjet==true && presenceObjet==false" class="obCont">
-  <label class="labelFormulaire" for="familleContext">Famille objet de financement</label>
-  <input matInput  class="objetFinance" id="familleObjet" [(ngModel)]="familleObjetText" name="ObjectFinance"/> 
-</div>
-
-
-<!-------------------- champs objet financé non envoyé dans le context ----------------------->
-<div class ="objetContext" >
-  <div class="objetNonContexte">
-    <div *ngIf="presenceObjet==false"    class="form-group">
-      <label for="objetFinancementType" class="labelFormulaire">Objet du financement </label>
-        <select [(ngModel)]="selectedObjetFinancement" class="form-list" id="selectedObjetFinancement" name="selectedObjetFinancement">
-          <option value='option0' selected> </option>
-          <option value='option1' *ngIf="selectedFamilleObjet=='option1' || familleObjet=='01' ">Construction de bâtiment </option>
-          <option value='option2' *ngIf="selectedFamilleObjet=='option1' || familleObjet=='01'">Acquisition de bâtiment </option>
-          <option value='option3' *ngIf="selectedFamilleObjet=='option1' ||familleObjet=='01'">Rénovation de bâtiment</option>
-          <option value='option4'*ngIf="selectedFamilleObjet=='option1' ||familleObjet=='01'">Acquisition de bâtiment + Rénovation de bâtiment</option>
-          <option value='option5'*ngIf="selectedFamilleObjet=='option1' || familleObjet=='01' || selectedFamilleObjet=='option2' ">Equipements favorisant l'efficacité énergétique et performance énergétique du bâtiment</option>
-          <option value='option6'*ngIf="selectedFamilleObjet=='option1' || selectedFamilleObjet=='option2' || selectedFamilleObjet=='option4' || familleObjet=='immobilier'">Stations de recharge pour véhicules électriques</option>
-          <option value='option7'*ngIf="selectedFamilleObjet=='option3' || selectedFamilleObjet=='option2'">Technologies liées aux énergies renouvelables</option>  
-        </select>
-        &nbsp;<span class="required">*</span>
-      </div>
-  </div>
-  </div>
-
-<!-------------------- champs objet financé envoyé dans le contexte ----------------------->
-    <div class="Objet_Form" *ngIf="presenceObjet==true" >
-    <label class="labelFormulaire" for="ObjectFinance">Object financé</label>
-    <input matInput  class="objetFinance" id="ObjectFinance" [(ngModel)]="objetFinance"  name="ObjectFinance"/> 
-   </div>
-
-<!------------------ champs éligibilité du bien ---------------- -->
-    <div class="form-group" >
-      <label class="labelFormulaire" for="typeDeBien">Eligibilité au DPE </label>
-      &nbsp;<span class="required">*</span>
-      <select class="form-list"   (mouseover)="showDescription($event.target.value)" style="height:30px" id="typeDeBien" name="typeDeBien" [(ngModel)]="selectedType" (change)="onTypeChange()"  >
- 
-        <option value='option2' > Construction provisoire (durée d'utilisation ≤ 2 ans)  </option>
-         <option value='option3' > Bâtiment indépendant avec superficie <50 m² </option>
-        <option value='option4' > Usage agricole, artisanal ou industriel</option>
-        <option value='option5' >Lieux de culte </option>
-        <option value='option6' >Monument historique classé </option>
-        <option value='option7' >Bâtiment non chauffé  </option>
-        <option value='option8' >Locations saisonnières ou résidences secondaires</option>
-        <option value='option9' > Bâtiment situé dans les DOM-TOM</option>
-        <option value='option10' > Bâtiment situé à l'étranger </option> 
-        <option value='option1'  > Autre bien immobilier </option>
-      </select>   
-    </div> 
-
-    <!-------------- champs catégorie du batiment  -------------------------->
-    <div class="form-group"  *ngIf="hideFieldForm==false"  >
-      <label for="categorieBatiment" class="labelFormulaire"> Nature du bien </label>
-      <select  [(ngModel)]="codeBatimentSelected"  class="form-list" style="height:30px" id="categorieBatiment" name="categorieBatiment"  [disabled]="isFieldsDisabled"  >
-        <option value='option0' selected > </option>
-        <option value='option1' selected > Résidentiel</option>
-        <option value='option2'  >Bureaux</option>
-        <option value='option3'>Bureaux IGH (hauteur >28 m)</option>
-        <option value='option4'>Hôtels</option>
-        <option value='option5'>Santé (centres hospitaliers, EHPAD, Etabl. Médicaux sociaux…)</option> 
-        <option value='option6'>Centres commerciaux</option>
-      </select>
-      &nbsp;<span class="required">*</span>
-    </div> 
-    
-     <!-------------- champs nature du bien -------------------------------->
-    <div class="form-group"  *ngIf="hideFieldForm==false"  >
-    <label for="categorieBatiment" class="labelFormulaire">Etat du bien  </label>
-      <select [(ngModel)]="selectedNatBatiment"  class="form-list" id="natureBien" name="natureBien" [disabled]="isFieldsDisabled" >
-        <option value='option0' selected> </option>
-        <option value='option1'> Ancien</option>
-        <option value='option2'>Neuf</option>
-      </select>
-      <img  *ngIf="natureBienObligatoire==true" src="../../../assets/icons/obligatoire.svg" style="width:15px; height: 15px;" alt="image flèche haut" >
-      &nbsp;<span class="required">*</span>
-    </div>
-
-
-    <div class="form-group" *ngIf="hideFieldForm==false " >
-      <label for="dateDepot" class="labelFormulaire"> Date de dépôt de PC</label>
-      <span class="required" *ngIf="selectedNatBatiment=='option2'"> *</span>
-      <input class="date" type="date" id="dateDepot" [(ngModel)]="dateDepot" placeholder="yyyy/MM/dd" [disabled]="isFieldsDisabled" />
-    </div>
-
-
-    <!--------------------- adresse complète ------------------------------->
-    <div class="form-group" *ngIf="presenceadresse && hideFieldForm==false"  [ngClass]="{ 'disabled': isFieldsDisabled }">
-      <label for="addressBien" class="labelFormulaire">Adresse du bien</label>
-      <input type="text" class="adresseBienInput"  placeholder="Adresse du bien" id="addressBien" [(ngModel)]="addresseBien" name="description" [disabled]="isFieldsDisabled" />
-    <div class="form-group">
-      <div  class="addComplete">
-        <ul >
-          <li *ngFor="let result of addressResult">
-            <button (click)="selectAddres(result)">
-              {{ result.properties.label }}
-            </button>
-          </li>
-        </ul>
-      </div>
-    </div>
-    </div>
-
-    <div *ngIf="presenceadresse && hideFieldForm==false" [disabled]="isFieldsDisabled" class="adresseCodeVille">
-      <input matInput id="codePostal"   [(ngModel)]="addresseBienCodePostal" (ngModelChange)="onFieldChange()" placeholder="Code postal"  name="codePostal" class="form-groupCodePostal" [ngClass]="{ 'disabled': isFieldsDisabled }">
-      <span class="required">*</span>
-      <input matInput id="ville"   [(ngModel)]="addresseBienVille"  (ngModelChange)="onFieldChange()" placeholder="Ville"  name="ville" class="form-groupNomVille" [ngClass]="{ 'disabled': isFieldsDisabled }">
-      <span class="required">*</span>
-      </div>   
-  </div>
-
- <!-----------------------------------------------------colonne 2 de formulaire ----------------------------------------------->
-  <div class="col2">   
-
-    <div class="alertArea" *ngIf="showFirstEligiblite==true">{{messageAlert}}
-      <img src="../../../assets/icons/alert.svg" class="imageErreur"  alt="image flèche haut" >
-    </div>
-
-   
-        <div  class="form-group" *ngIf="hideFieldForm==false  ">
-          <label for="prixAquisitionBien" class="labelFormulaire" >Prix du bien <em> (en euro)</em> </label>  
-          <span class="required"> *</span>
-          <input type="text" [(ngModel)]="prixAquisitionBien"  class="champsForm"  id=prixAquisitionBien  name="description" [disabled]="isFieldsDisabled" />
+<div class="container-fluid  ">
+  <div class="row">
+    <div class="col-12">
+      <div class="card border-0">
+        <div class="card-body">
+          <div class="blockSize">
           
-        </div>
-
-        <div   class="form-group"  *ngIf="hideFieldForm==false " >
-          <label for="montantFinance" class="labelFormulaire">Montant financé <br> <em>(en euro)</em></label>
-          <span class="required"> *</span>
-          <input type="text" [(ngModel)]="montantLclFinance"  class="champsForm"  id=montantLclFinance  name="description" [disabled]="isFieldsDisabled" />
-        </div>
+        
+          <!-- Flèche pour ouvrir et fermer le formulaire -->
+          <h3 class="d-inline-block font-weight-bold">Object Financement</h3>
+        <span class="float-right" >
+            <img *ngIf="hiddenObjetfinancement==false" src="../../../assets/icons/arrow-up.svg" alt="Fleche haut" (click)="hideDataObjetFinancement()">
+            <img *ngIf="hiddenObjetfinancement==true" src="../../../assets/icons/arrow-down.svg" alt="Fleche bas" (click)="showDataObjetFinancement()">
+          </span> 
+         <div *ngIf="elementObjetfinancement == true"> 
+            <!-- Votre formulaire ici -->
+            <div class="row">
+              <div class="col-lg-6">
+                <!-- Colonne 1 -->
+                <div class="form-group ">
+                  <label for="input1">Object financé</label>
+                  <input type="text" class="form-control form-control-sm" id="input1" placeholder="Renovation ou aquisition" [(ngModel)]="objetFinance">
+                </div>
+                <!-- Deuxième champ liste déroulante -->
+                <div class="form-group" >
+                  <label for="select2">Type de bâtiment </label>
+                  <select class="form-control form-control-sm"  (mouseover)="showDescription($event.target.value)" id="select2" [(ngModel)]="selectedType">
+                    <option value='option1'  > Bien soumis au DPE  </option>
+                    <option value='option2' > Construction provisoire (durée d'utilisation ≤ 2 ans)  </option>
+                     <option value='option3' > Bâtiment indépendant avec superficie <50 m² </option>
+                    <option value='option4' > Usage agricole, artisanal ou industriel</option>
+                    <option value='option5' >Lieux de culte </option>
+                    <option value='option6' >Monument historique classé </option>
+                    <option value='option7' >Bâtiment non chauffé  </option>
+                    <option value='option8' >Utilisation < 4 mois/an </option>
+                    <option value='option9' > Bâtiment situé dans les DOM-TOM</option>
+                    <option value='option10' > Bâtiment situé à l'étranger </option> 
+            
+                  </select>
+                </div>
+                <!-- Troisième champ liste déroulante -->
+                <div class="form-group" *ngIf="hideFieldForm==false">
+                  <label for="select3"> Nature du bien</label>
+                  <select class="form-control form-control-sm" id="select3" [(ngModel)]="codeBatimentSelected">
+                    <option value='option0' selected > </option>
+                    <option value='option1' selected > Résidentiel</option>
+                    <option value='option2'  >Bureaux</option>
+                    <option value='option3'>Bureaux IGH (hauteur >28 m)</option>
+                    <option value='option4'>Hôtels</option>
+                    <option value='option5'>Santé (centres hospitaliers, EHPAD, Etabl. Médicaux sociaux…)</option> 
+                    <option value='option6'>Centres commerciaux</option>
+                  </select>
+              
+            
+                  
+                </div>
+                <!-- Quatrième champ liste déroulante -->
+                <div class="form-group" *ngIf="hideFieldForm==false">
+                  <label for="select4">Etat du bien</label>
+                  <select class="form-control form-control-sm" id="select4" [(ngModel)]="selectedNatBatiment">
+                    <option value='option1'> Ancien</option>
+                    <option value='option2'>Neuf</option>
+            
+                  </select>
+                </div>
+                <!-- Autres champs de saisie -->
+                <!-- ... -->
+                <div class="form-group" *ngIf="hideFieldForm==false">
+                  <label for="input5">Siren du diagnostiqueur</label>
+                  <input type="text" class="form-control form-control-sm" id="input5" placeholder="Siren du diagnostiqueur" [(ngModel)]="SirenDPE">
+                </div>
+                <!-- 6ème champ sans label -->
+                <div class="form-group" *ngIf="hideFieldForm==false">
+                  <label for="addressBien" class="labelFormulaire">Adresse du bien</label>
+                  <div class="row">
     
+                    <div class="col-lg-4">
+                      <input type="nomNumeroRue" class="form-control form-control-sm " placeholder="Nom et numéro de rue" [(ngModel)]="addresseBien">
+                    </div>
+                    <div class="col-lg-4">
+                      <input type="ville" class="form-control form-control-sm " placeholder="Ville " [(ngModel)]="addresseBienVille">
+                    </div>
+                    <div class="col-lg-3">
+                      <input type="codePostal" class="form-control form-control-sm" placeholder="Code Postal" [(ngModel)]="addresseBienCodePostal">
+                    </div>
+                  </div>
+                </div>
+                <div class="alertArea" *ngIf="showFirstEligiblite==true">{{messageAlert}}
+                  <img src="../../../assets/icons/alert.svg" class="imageErreur"  alt="image flèche haut" >
+                </div>
 
-        <div  class="form-group"  *ngIf="hideFieldForm==false ">
-          <div class="partLCL">
-          <label for="partLcl" class="labelFormulaire">Part LCL <em> (en euro)</em></label>
-          <span class="required"> *</span>
-          <input type="text" [(ngModel)]="partLcl" class="champsForm"   id=partLcl  name="description" [disabled]="isFieldsDisabled" />
-        </div> 
+                <!-- Icône de recherche -->
+                <div class="form-group">
+                  <i class="fa fa-search"></i>
+                </div>
+              </div>
+              <div class="col-lg-6">
+                <!-- Colonne 2 -->
+              
+                <div class="form-group" *ngIf="hideFieldForm==false">
+                  <label for="dateDepot">Date de dépôt de PC</label>
+                  <input type="date" id="dateDepot" class="form-control form-control-sm"  [(ngModel)]="dateDepotPc">
+                </div>
+                <div class="form-group" *ngIf="hideFieldForm==false">
+                  <label for="input7">Prix du bien<em> (en euro)</em></label>
+                  <input type="text" class="form-control form-control-sm" id="input6" placeholder="Ex 1000000" [(ngModel)]="prixAquisitionBien">
+                </div>
+                <div class="form-group" *ngIf="hideFieldForm==false">
+                  <label for="input7">Montant financé <em> (en euro)</em></label>
+                  <input type="text" class="form-control form-control-sm" id="input7" placeholder="Ex 900000" [(ngModel)]="montantLclFinance">
+                </div>
+                <div class="form-group" *ngIf="hideFieldForm==false">
+                  <label for="input7">Part LCL <em> (en euro)</em></label>
+                  <input type="text" class="form-control form-control-sm" id="input8" placeholder="Ex 200000" [(ngModel)]="partLcl">
+                </div>
+               
+                <div class="form-group" *ngIf="hideFieldForm==false">
+                  <label for="NormeThermique" class="labelFormulaire" >Norme Thermique </label>
+                  <select class="form-control form-control-sm" id="select5" [(ngModel)]="normeThermique">
+                    <option value='option0' selected> </option>
+                    <option value='option1'> RT2012  </option>
+                    <option value='option2'> RE2020 </option>
+                    <option value='option3' >Autre</option>
+            
+                  </select>
+                
+                  
+                </div>
+                <!-- Autres champs de saisie -->
+                <!-- ... -->
+                <div class="form-group" *ngIf="hideFieldForm==false">
+                 
+                  <label for="input10">N° du DPE</label>
+                  <div class="row">
+                  <div class="col-lg-6">
+                  <input type="text" class="form-control form-control-sm" id="input10" placeholder="Ex: 2100E0981916Z" [(ngModel)]="numeroDpeAdeme">
+                  </div>
+            
+                  <div class="col-lg-1">
+                  <span class="float-right">
+                  <img *ngIf="dpechsecked" src="../../../assets/icons/coche.png" style="width:10px; height: 10px; margin-left: 10px;"  alt="image flèche haut">
+                  <img  src="../../../assets/images/search.png"  (click)="showAdemeResult(numeroDpeAdeme)" style=" margin-left: 10px; width:20px; height: 20px;" alt="image flèche haut" >
+                </span>
+          
+                  </div>
+                </div>
+              </div>
+              <div class="erreurDpe"  fxLayoutAlign="float-right " >
+                {{message}}
+              </div>
+              </div>
+            </div>
+   <!--        </div> -->
         </div>
-
-
-        <div class="form-group" *ngIf="hideFieldForm==false"  [ngClass]="{ 'disabled': isFieldsDisabled }" >
-          <label for="NormeThermique" class="labelFormulaire" >Norme Thermique </label>
-          <select class="form-list" style="height:30px"id="NormeThermique" required [(ngModel)]="normeThermique"  name="NormeThermique" [disabled]="isFieldsDisabled">
-            <option value='option0' selected> </option>
-            <option value='option1'> RT2012  </option>
-            <option value='option2'> RE2020 </option>
-            <option value='option3' >Autre</option>
-          </select>
-        </div>  
-
-<!--//////////////////////////////////////////////////////////////////////////////////-->
-    <div  class ="form-group" *ngIf="hideFieldForm==false" [ngClass]="{ 'disabled': isFieldsDisabled }" >
-      <label class="labelFormulaire" for="dpe">Siren du diagnostiqueur</label>
-      <span class="required" *ngIf="selectedNatBatiment=='option1' || numeroDpeAdeme!=null" >*</span>  
-      <input type="text" class="adresseBienInput" placeholder="Ex: 123456789"  id ="SirenDPE" [(ngModel)]="SirenDPE"  [disabled]="isFieldsDisabled" /> 
-      <!-- <img src="../../../assets/images/help.png" style=" margin-top:-70px; margin-left: 450px ;width:20px; height: 22px;" > -->
+      </div>
     </div>
-    <div class="erreurDpe" *ngIf="hideFieldForm==false"   fxLayoutAlign="left center" style="margin-top: -50px;">
-      {{messageSiren}}
-    </div> 
-
-
-    <div  *ngIf="hideFieldForm==false" class="rechercherDPE">
-      <div [ngClass]="{ 'disabled': isFieldsDisabled }">
-        <label class="labelDPE" for="dpe">N° du DPE</label>
-        <span class="required" *ngIf="selectedNatBatiment=='option1'"> *</span>
-        <input type="text" class="update" id="numeroDpeAdeme" placeholder="Ex: 2100E0981916Z" [(ngModel)]="numeroDpeAdeme" [disabled]="isFieldsDisabled" />
-        <img  src="../../../assets/images/search.png"  (click)="showAdemeResult(numeroDpeAdeme)" style=" margin-left: 20px; width:20px; height: 20px;" alt="image flèche haut" >       
-        <div class="erreurDpe"  fxLayoutAlign="left center" >
-          {{message}}
-        </div>
-        </div>
-  </div> 
   </div>
-  </div>
-<br>
+</div>
