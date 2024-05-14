@@ -1,145 +1,90 @@
- @PatchMapping("/champs/{idFinancement}")
-    public ResponseEntity<Financement> patchFinancementChamps(@PathVariable String idFinancement, @RequestBody Financement financementToUpdate) {
-        commonLogger.eventTyp(EventTyp.APPLICATIVE).secEventTyp(SecEventTyp.METIER).logger().info("Financement: patch fields");
-        Financement updatedFinancement = financementService.patchFinancementChamps(idFinancement, financementToUpdate);
-        return ResponseEntity.ok(updatedFinancement);
-    }
-        /// service 
-        public Financement patchFinancementChamps(String idFinancement, Financement financementToUpdate)
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.BeanWrapper;
+import org.springframework.beans.BeanWrapperImpl;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
-        package com.cl.msofd.model;
+import java.beans.PropertyDescriptor;
+import java.util.HashSet;
+import java.util.Set;
 
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
-import lombok.*;
+@Service
+public class FinancementService {
 
-import java.io.Serializable;
-import java.util.Objects;
+    @Autowired
+    private FinancementRepository financementRepository;
 
+    public Financement patchFinancementChamps(String idFinancement, Financement financementToUpdate) {
+        Financement existingFinancement = financementRepository.findById(idFinancement)
+                .orElseThrow(() -> new RuntimeException("Financement non trouvé avec l'ID : " + idFinancement));
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-public class Financement extends BaseEntity implements Serializable {
-
-
-    private String idFinancement;
-    
-    @NotNull(message = "Objet financement est obligatoire")
-    @Valid
-    private ObjetFinancement objetFinancement;
-    
-    private Alignement alignement;
-    private Eligibilite eligibilite;
-    private String eligibleDpe;
-    
-    @NotNull(message = "Intervenant est obligatoire")
-    @Valid
-    private Intervenant intervenant;
-    
-    private String indicateurFinancementDedie;
-    
-    private String indicateurNatureDurable;
-    
-    private String typeRisqueClimatiqueAttenue;
-    @Pattern(regexp = "^(01|02|03|04|05|06|07|08)$", message = "le champs codeApplicatifOrigine doit etre l'une des valeurs" +
-            " 01 (VIC ou NECI) 02 (PI) 03 (CPPE) 04 (SIRIUS) 05 (DPAR) 06 (DPRO) 07 (CRM360) GGAR (08) ")
-    private String codeApplicatifOrigine;
-    
-    private boolean indicateurReprise;
-    private int statut;
-    
-    @Size(min = 16, max = 16, message = "La taille du champs agenceCompte doit etre égale à 16")
-    private String agenceCompte;
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
-        Financement that = (Financement) o;
-        return indicateurReprise == that.indicateurReprise && statut == that.statut && Objects.equals(idFinancement, that.idFinancement) && Objects.equals(objetFinancement, that.objetFinancement) && Objects.equals(alignement, that.alignement) && Objects.equals(eligibilite, that.eligibilite) && Objects.equals(intervenant, that.intervenant) && Objects.equals(indicateurFinancementDedie, that.indicateurFinancementDedie) && Objects.equals(indicateurNatureDurable, that.indicateurNatureDurable) && Objects.equals(typeRisqueClimatiqueAttenue, that.typeRisqueClimatiqueAttenue) && Objects.equals(codeApplicatifOrigine, that.codeApplicatifOrigine) && Objects.equals(agenceCompte, that.agenceCompte);
+        copyNonNullProperties(financementToUpdate, existingFinancement);
+        
+        return financementRepository.save(existingFinancement);
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), idFinancement, objetFinancement, alignement, eligibilite, intervenant, indicateurFinancementDedie, indicateurNatureDurable, typeRisqueClimatiqueAttenue, codeApplicatifOrigine, indicateurReprise, statut, agenceCompte);
+    private void copyNonNullProperties(Object source, Object target) {
+        BeanUtils.copyProperties(source, target, getNullPropertyNames(source));
+    }
+
+    private String[] getNullPropertyNames(Object source) {
+        final BeanWrapper src = new BeanWrapperImpl(source);
+        PropertyDescriptor[] pds = src.getPropertyDescriptors();
+
+        Set<String> emptyNames = new HashSet<>();
+        for (PropertyDescriptor pd : pds) {
+            Object srcValue = src.getPropertyValue(pd.getName());
+            if (srcValue == null || StringUtils.isEmpty(srcValue)) emptyNames.add(pd.getName());
+        }
+        String[] result = new String[emptyNames.size()];
+        return emptyNames.toArray(result);
     }
 }
-  ///
-        package com.cl.msofd.model;
+///////////////////
+         . Pour patcher les champs d'un objet imbriqué sans écraser l'existant, vous devez implémenter une logique spécifique dans votre méthode patchFinancementChamps.
 
-import java.io.Serializable;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+Voici une approche générale pour patcher les champs d'un objet imbriqué tout en conservant les valeurs existantes :
 
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
-
-@Getter
-@Setter
-@ToString
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-public class ObjetFinancement extends BaseEntity implements Serializable {
-
-    private static final long serialVersionUID = 1L;
-
-    private String idObjetFinancement;
+Parcourir les champs de l'objet à mettre à jour.
+Pour chaque champ, vérifier s'il est différent de null.
+Si le champ est non null, mettre à jour le champ correspondant dans l'objet existant sans écraser sa valeur.
+Si le champ est null, ne rien faire pour ce champ, conservant ainsi la valeur existante.
+Voici un exemple de la méthode patchFinancementChamps qui implémente cette logique :
+         ///
+         public Financement patchFinancementChamps(String idFinancement, Financement financementToUpdate) {
+    Financement existingFinancement = financementRepository.findById(idFinancement);
     
-    @Pattern(regexp = "^$|(02|03|0203|null)$", message = "code objet financement invalide")
-    @Size()
-    private String codeObjetFinancement;
-    
-    @Min(0)
-    @Max(100)
-    private Double quotePartObjet;
-    
-    private String codeFamilleObjet;
-    private Double gainCEP;
-    private Date dateFinTravaux;
-    
-    @Valid
-    private Bien bien;
-    
-    private Dpe dpeAvantTravaux;
-    private Dpe dpeApresTravaux;
-    private Alignement alignement;
-    private Eligibilite eligibilite;
-    private List<Garantie> garantie;
-    private List<Piece> piecesJustificatives;
-    private int statut;
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
-        ObjetFinancement that = (ObjetFinancement) o;
-        return statut == that.statut && Objects.equals(idObjetFinancement, that.idObjetFinancement) && Objects.equals(codeObjetFinancement, that.codeObjetFinancement) && Objects.equals(quotePartObjet, that.quotePartObjet) && Objects.equals(codeFamilleObjet, that.codeFamilleObjet) && Objects.equals(gainCEP, that.gainCEP) && Objects.equals(dateFinTravaux, that.dateFinTravaux) && Objects.equals(bien, that.bien) && Objects.equals(dpeAvantTravaux, that.dpeAvantTravaux) && Objects.equals(dpeApresTravaux, that.dpeApresTravaux) && Objects.equals(alignement, that.alignement) && Objects.equals(eligibilite, that.eligibilite) && Objects.equals(garantie, that.garantie) && Objects.equals(piecesJustificatives, that.piecesJustificatives);
+    if (existingFinancement == null) {
+        // Gérer le cas où l'objet à mettre à jour n'existe pas
+        return null;
     }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), idObjetFinancement, codeObjetFinancement, quotePartObjet, codeFamilleObjet, gainCEP, dateFinTravaux, bien, dpeAvantTravaux, dpeApresTravaux, alignement, eligibilite, garantie, piecesJustificatives, statut);
+    
+    // Parcourir les champs de l'objet à mettre à jour
+    if (financementToUpdate.getObjetFinancement() != null) {
+        // Mettre à jour l'objet financement imbriqué
+        existingFinancement.setObjetFinancement(updateObjetFinancement(existingFinancement.getObjetFinancement(), financementToUpdate.getObjetFinancement()));
     }
+    
+    if (financementToUpdate.getAlignement() != null) {
+        // Mettre à jour l'alignement
+        existingFinancement.setAlignement(financementToUpdate.getAlignement());
+    }
+    
+    // Mettre à jour d'autres champs de la même manière
+    
+    // Enregistrer les modifications dans la base de données
+    return financementRepository.save(existingFinancement);
 }
 
-
-
-
+private ObjetFinancement updateObjetFinancement(ObjetFinancement existingObjetFinancement, ObjetFinancement newObjetFinancement) {
+    // Parcourir les champs de l'objet financement à mettre à jour
+    if (newObjetFinancement.getCodeObjetFinancement() != null) {
+        // Mettre à jour le code de l'objet financement
+        existingObjetFinancement.setCodeObjetFinancement(newObjetFinancement.getCodeObjetFinancement());
+    }
+    
+    // Mettre à jour d'autres champs de la même manière
+    
+    return existingObjetFinancement;
+}
