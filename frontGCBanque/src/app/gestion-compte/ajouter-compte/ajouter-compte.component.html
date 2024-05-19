@@ -1,62 +1,671 @@
+package com.cl.msofd.service;
+
+import com.cl.logs.commun.CommonLogger;
+import com.cl.logs.commun.CommonLoggerFactory;
+import com.cl.logs.types.EventTyp;
+import com.cl.logs.types.SecEventTyp;
+import com.cl.msofd.dto.FinancementDto;
+import com.cl.msofd.dto.FinancementGarantieDto;
+import com.cl.msofd.dto.GarantieDto;
+import com.cl.msofd.dto.ResponseFinancementGarantieDto;
+import com.cl.msofd.exception.FinancementNotFoundException;
+import com.cl.msofd.exception.GarantieNotFoundException;
+import com.cl.msofd.mapper.FinancementMapper;
+import com.cl.msofd.model.*;
+import com.cl.msofd.repository.FinancementRepository;
+import com.cl.msofd.utility.Constants;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.util.ReflectionUtils;
+
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+
 @Service
+
 public class FinancementService {
 
+    private static final CommonLogger commonLogger = CommonLoggerFactory.getLogger(FinancementService.class);
+
     @Autowired
+
     private FinancementRepository financementRepository;
 
+    @Autowired
+
+    private FinancementMapper financementMapper;
+
+
+    @Autowired
+
+    private IdGeneratorService idGeneratorService;
+
+
+    public void deleteFinancementByIdFinancement(String id) {
+
+        financementRepository.deleteByIdFinancement(id);
+
+    }
+
+
+    public Financement getFinancementByIdFinancement(String idFinancement) {
+
+        return financementRepository.findByidFinancement(idFinancement)
+
+                .orElseThrow(() -> new FinancementNotFoundException(
+
+                        String.format("Le financement %s est inexistant", idFinancement)));
+
+    }
+
+
+    public Financement createFinancement(Financement financement) {
+
+        return financementRepository.save(financement);
+
+    }
+
+
+    ////////////////////////////////CPPE reserve idFinancement/////////////////////////////////////////////////////////
+
+    public String createFinancementReturnId(FinancementDto financementDto) throws Exception {
+
+        commonLogger.eventTyp(EventTyp.APPLICATIVE).secEventTyp(SecEventTyp.METIER).logger().info("create financement from  {} :", financementDto);
+
+        Financement financement = financementMapper.createFinancementFromFinancementDto(financementDto);
+
+        Financement savedFinancement = financementRepository.save(financement);
+
+        return savedFinancement.getIdFinancement();
+
+    }
+
+
+    ///////////////////////////////////CPPE reserve id Garantie/////////////////////////////////////////////////////////////////
+
+    public String createGarantieFromGarantieDto(GarantieDto garantieDto) throws FinancementNotFoundException {
+
+        List<Garantie> garantieList = new ArrayList<>();
+
+        commonLogger.eventTyp(EventTyp.APPLICATIVE).secEventTyp(SecEventTyp.METIER).logger().info("create garantie from  {} :", garantieDto);
+
+        Financement financementGarantie = financementRepository.findByidFinancement(garantieDto.getIdFinancement())
+
+                .orElseThrow(() -> new FinancementNotFoundException("Le financement avec l'ID spécifié est introuvable"));
+
+        if (garantieDto.isBienFinanceLCL()) {
+
+            Bien bienFinanceLcl = financementGarantie.getObjetFinancement().getBien();
+
+            Garantie garantie = Garantie.builder()
+
+                    .idGarantie(idGeneratorService.generateId("G"))
+
+                    .bien(bienFinanceLcl)
+
+                    .build();
+
+            garantieList.add(garantie);
+
+            financementGarantie.getObjetFinancement().setGarantie(garantieList);
+
+
+        } else {
+
+            Garantie garantie = Garantie.builder()
+
+                    .idGarantie(idGeneratorService.generateId("G"))
+
+                    .bien(Bien.builder()
+
+                            .idBien(idGeneratorService.generateId("B"))
+
+                            .bienFinanceLCL(garantieDto.isBienFinanceLCL())
+
+                            .prixBien(garantieDto.getPrixBien())
+
+                            .typeBatiment(garantieDto.getTypeBatiment())
+
+                            .dateDebutConstruction(garantieDto.getDateDebutConstruction())
+
+                            .numeroNomRue(garantieDto.getNumeroNomRue())
+
+                            .codePostal(garantieDto.getCodePostalBien())
+
+                            .nomCommune(garantieDto.getVilleBien())
+
+                            .paysBien(garantieDto.getPaysBien())
+
+                            .surfaceBien(garantieDto.getSurfaceBien())
+
+                            .dpeActuel(Dpe.builder()
+
+                                    .classeCep(garantieDto.getClasseCep())
+
+                                    .build())
+
+                            .build())
+
+                    .build();
+
+            garantieList.add(garantie);
+
+            financementGarantie.getObjetFinancement().setGarantie(garantieList);
+
+        }
+
+        financementRepository.save(financementGarantie);
+
+        return financementGarantie.getObjetFinancement().getGarantie().get(0).getIdGarantie();
+
+    }
+
+
+    //////////////////////////////////Get une garantie d'un financement par son idGarantie////////////////////////////////////////////////
+
+    public Garantie getGarantie(String idFinancement, String idGarantie) {
+
+        Garantie returnedGarantie = null;
+
+        List<Garantie> garantieList;
+
+        Financement existingFinancement = financementRepository.findByidFinancement(idFinancement).orElseThrow(() -> new FinancementNotFoundException(
+
+                String.format("Le financement %s est inexistant", idFinancement)));
+
+        commonLogger.eventTyp(EventTyp.APPLICATIVE).secEventTyp(SecEventTyp.METIER).logger().info("recherche de la garantie...");
+
+        if (existingFinancement.getObjetFinancement() != null && existingFinancement.getObjetFinancement().getGarantie() != null) {
+
+            garantieList = existingFinancement.getObjetFinancement().getGarantie();
+
+            if (garantieList.isEmpty() || !garantieIdExist(idGarantie, garantieList)) {
+
+                throw new GarantieNotFoundException(
+
+                        String.format("Le financement %s ne possède aucune garantie associée ", idFinancement));
+
+            } else {
+
+                returnedGarantie = garantieList.stream().
+
+                                filter(garantie -> garantie.getIdGarantie().equals(idGarantie))
+
+                        .toList().get(0);
+
+            }
+
+        }
+
+        return returnedGarantie;
+
+    }
+
+
+    public boolean garantieIdExist(String idGarantie, List<Garantie> garantieList) {
+
+        return garantieList.stream().
+
+                anyMatch(garantie -> garantie.getIdGarantie().equals(idGarantie));
+
+    }
+
+
+    /////////////////////////////////////////Service NECI/////////////////////////////////////////////////////////////////////
+
+    public ResponseFinancementGarantieDto createFinancementGarantie(FinancementGarantieDto financementGarantieDto) {
+
+        Financement financement = financementMapper.createFinancementFromFinancementGarantieDto(financementGarantieDto);
+
+        Financement savedFinancement = financementRepository.save(financement);
+
+        return ResponseFinancementGarantieDto.builder()
+
+                .idFinancement(savedFinancement.getIdFinancement())
+
+                .idGarantie(savedFinancement.getObjetFinancement().getGarantie()
+
+                        .stream()
+
+                        .map(Garantie::getIdGarantie)
+
+                        .toList()
+
+                )
+
+                .build();
+
+    }
+
+
+    /////////////////////////////////patch financement par objet//////////////////////////////////////////
+
     public Financement patchFinancement(String idFinancement, Financement financementToUpdate) {
-        // Récupérer le financement à partir de la base de données
-        Financement financement = financementRepository.findById(idFinancement)
-                .orElseThrow(() -> new RuntimeException("Financement non trouvé avec l'ID : " + idFinancement));
 
-        // Mettre à jour tous les champs de l'objet principal
-        updateFields(financement, financementToUpdate);
+        Financement existingFinancement = financementRepository.findByidFinancement(idFinancement).orElse(null);
 
-        // Sauvegarder le financement mis à jour dans la base de données
-        Financement financementMisAJour = financementRepository.save(financement);
+        if (existingFinancement == null) {
 
-        return financementMisAJour;
+            throw new FinancementNotFoundException(
+
+                    String.format("Le financement a modifier %s est inexistant", idFinancement));
+
+        }
+
+        Field[] fields = Financement.class.getDeclaredFields();
+
+        Arrays.stream(fields).forEach(field -> {
+            ReflectionUtils.makeAccessible(field);
+
+            try {
+
+                Object newValue = field.get(financementToUpdate);
+
+                if (newValue != null) {
+
+                    field.set(existingFinancement, newValue);
+
+                }
+
+            } catch (IllegalAccessException e) {
+
+                commonLogger.eventTyp(EventTyp.APPLICATIVE).secEventTyp(SecEventTyp.METIER).logger().info("erreur lors de l'update du financement causé par: {}", e.getMessage());
+
+            }
+
+        });
+
+        return financementRepository.save(existingFinancement);
+
     }
 
-    private void updateFields(Financement financement, Financement financementToUpdate) {
-        if (financementToUpdate.getIdFinancement() != null) {
-            financement.setIdFinancement(financementToUpdate.getIdFinancement());
-        }
-        // Mettre à jour les champs de l'objet principal
-        // Vous pouvez continuer pour les autres champs de Financement
 
-        // Mettre à jour les champs de l'objet ObjetFinancement
-        if (financementToUpdate.getObjetFinancement() != null) {
-            updateObjetFinancementFields(financement.getObjetFinancement(), financementToUpdate.getObjetFinancement());
+    ///////////////////////////////////PATCH FINANCEMENT par champs////////////////////////////////
+
+    public Financement patchFinancementChamps(String idFinancement, Financement financementToUpdate) {
+        Financement existingFinancement = financementRepository.findByidFinancement(idFinancement).orElse(null);
+        if (existingFinancement == null) {
+            throw new FinancementNotFoundException(String.format("Le financement à modifier %s est inexistant", idFinancement));
         }
 
-        // Ajoutez d'autres mises à jour pour les objets imbriqués si nécessaire
+        Class<Financement> financementClass = Financement.class;
+        Field[] fields = financementClass.getDeclaredFields();
+
+        for (Field field : fields) {
+            try {
+                ReflectionUtils.makeAccessible(field);
+                Object value = field.get(financementToUpdate);
+                if (value != null) {
+                    if ("objetFinancement".equals(field.getName())) {
+                        if (existingFinancement.getObjetFinancement() == null) {
+                            existingFinancement.setObjetFinancement((ObjetFinancement) value);
+                        } else {
+                            updateObjetFinancement(existingFinancement.getObjetFinancement(), (ObjetFinancement) value);
+                        }
+                    }
+
+                    if (Constants.ALIGNEMENT.equals(field.getName())) {
+                        if (existingFinancement.getAlignement() == null) {
+                            existingFinancement.setAlignement((Alignement) value);
+                        } else {
+                            updateAlignement(existingFinancement.getAlignement(), (Alignement) value);
+                        }
+                    }
+
+                    if (Constants.ELIGIBILITE.equals(field.getName())) {
+                        if (existingFinancement.getEligibilite() == null) {
+                            existingFinancement.setEligibilite((Eligibilite) value);
+                        } else {
+                            updateEligibilite(existingFinancement.getEligibilite(), (Eligibilite) value);
+                        }
+                    }
+
+                    if ("intervenant".equals(field.getName())) {
+                        if (existingFinancement.getIntervenant() == null) {
+                            existingFinancement.setIntervenant((Intervenant) value);
+                        } else {
+                            updateIntervenant(existingFinancement.getIntervenant(), (Intervenant) value);
+                        }
+                    } else {
+                        field.set(existingFinancement, value);
+                    }
+                }
+
+            } catch (IllegalAccessException e) {
+                commonLogger.eventTyp(EventTyp.APPLICATIVE).secEventTyp(SecEventTyp.METIER).logger().info("erreur lors de l'update du financement causé par: {}", e.getMessage());
+
+            }
+        }
+
+        return financementRepository.save(existingFinancement);
     }
 
-    private void updateObjetFinancementFields(ObjetFinancement objetFinancement, ObjetFinancement objetFinancementToUpdate) {
-        if (objetFinancementToUpdate.getIdObjetFinancement() != null) {
-            objetFinancement.setIdObjetFinancement(objetFinancementToUpdate.getIdObjetFinancement());
-        }
-        // Mettre à jour les champs de l'objet ObjetFinancement
-        // Vous pouvez continuer pour les autres champs d'ObjetFinancement
 
-        // Mettre à jour les champs du bien
-        if (objetFinancementToUpdate.getBien() != null) {
-            updateBienFields(objetFinancement.getBien(), objetFinancementToUpdate.getBien());
-        }
+    private void updateObjetFinancement(ObjetFinancement existingObjetFinancement, ObjetFinancement updatedObjetFinancement) {
+        Class<?> clazz = existingObjetFinancement.getClass();
+        Field[] fields = clazz.getDeclaredFields();
 
-        // Ajoutez d'autres mises à jour pour les objets imbriqués si nécessaire
+        for (Field field : fields) {
+            try {
+                ReflectionUtils.makeAccessible(field);
+                Object updatedValue = field.get(updatedObjetFinancement);
+
+                if (updatedValue == null) {
+                    Object existingValue = field.get(existingObjetFinancement);
+                    field.set(updatedObjetFinancement, existingValue);
+                } else {
+                    if ("bien".equals(field.getName())) {
+                        if (existingObjetFinancement.getBien() == null) {
+                            existingObjetFinancement.setBien((Bien) updatedValue);
+                        } else {
+                            updateBien(existingObjetFinancement.getBien(), (Bien) updatedValue);
+                        }
+                    }
+
+                    if (Constants.ALIGNEMENT.equals(field.getName())) {
+                        if (existingObjetFinancement.getAlignement() == null) {
+                            existingObjetFinancement.setAlignement((Alignement) updatedValue);
+                        } else {
+                            updateAlignement(existingObjetFinancement.getAlignement(), (Alignement) updatedValue);
+                        }
+                    }
+
+                    if (Constants.ELIGIBILITE.equals(field.getName())) {
+                        if (existingObjetFinancement.getEligibilite() == null) {
+                            existingObjetFinancement.setEligibilite((Eligibilite) updatedValue);
+                        } else {
+                            updateEligibilite(existingObjetFinancement.getEligibilite(), (Eligibilite) updatedValue);
+                        }
+                    }
+
+                    if ("dpeAvantTravaux".equals(field.getName())) {
+                        if (existingObjetFinancement.getDpeAvantTravaux() == null) {
+                            existingObjetFinancement.setDpeAvantTravaux((Dpe) updatedValue);
+                        } else {
+                            updateDpe(existingObjetFinancement.getDpeAvantTravaux(), (Dpe) updatedValue);
+                        }
+                    }
+
+                    if ("dpeApresTravaux".equals(field.getName())) {
+                        if (existingObjetFinancement.getDpeApresTravaux() == null) {
+                            existingObjetFinancement.setDpeApresTravaux((Dpe) updatedValue);
+                        } else {
+                            updateDpe(existingObjetFinancement.getDpeApresTravaux(), (Dpe) updatedValue);
+                        }
+                    }
+
+                    if ("garantie".equals(field.getName())) {
+                        if (existingObjetFinancement.getGarantie() == null) {
+                            existingObjetFinancement.setGarantie((List<Garantie>) updatedValue);
+                        } else {
+                            updateGaranties(existingObjetFinancement.getGarantie(), (List<Garantie>) updatedValue);
+                        }
+                    }
+
+                    if ("piecesJustificatives".equals(field.getName())) {
+                        if (existingObjetFinancement.getPiecesJustificatives() == null) {
+                            existingObjetFinancement.setPiecesJustificatives((List<Piece>) updatedValue);
+                        } else {
+                            updatePieces(existingObjetFinancement.getPiecesJustificatives(), (List<Piece>) updatedValue);
+                        }
+                    }
+
+
+                    field.set(existingObjetFinancement, updatedValue);
+                }
+            } catch (IllegalAccessException e) {
+                commonLogger.eventTyp(EventTyp.APPLICATIVE).secEventTyp(SecEventTyp.METIER).logger().info("erreur lors de l'update du financement dans l'objet de financement causé par: {}", e.getMessage());
+
+            }
+        }
     }
 
-    private void updateBienFields(Bien bien, Bien bienToUpdate) {
-        if (bienToUpdate.getSurfaceBien() != null) {
-            bien.setSurfaceBien(bienToUpdate.getSurfaceBien());
-        }
-        // Mettre à jour les champs du bien
-        // Vous pouvez continuer pour les autres champs de Bien
 
-        // Ajoutez d'autres mises à jour pour les objets imbriqués si nécessaire
+    private void updateBien(Bien existingbien, Bien updatedbien) {
+        Class<?> clazz = existingbien.getClass();
+        Field[] fields = clazz.getDeclaredFields();
+
+        for (Field field : fields) {
+            try {
+                ReflectionUtils.makeAccessible(field);
+                Object updatedValue = field.get(updatedbien);
+
+                if (updatedValue == null) {
+                    Object existingValue = field.get(existingbien);
+                    field.set(updatedbien, existingValue);
+                } else {
+                    if ("dpeActuel".equals(field.getName())) {
+                        if (existingbien.getDpeActuel() == null) {
+                            existingbien.setDpeActuel((Dpe) updatedValue);
+                        } else {
+                            updateDpe(existingbien.getDpeActuel(), (Dpe) updatedValue);
+                        }
+                    }
+
+                    field.set(existingbien, updatedValue);
+                }
+            } catch (IllegalAccessException e) {
+                commonLogger.eventTyp(EventTyp.APPLICATIVE).secEventTyp(SecEventTyp.METIER).logger().info("erreur lors de l'update du financement dans le bien causé par: {}", e.getMessage());
+
+            }
+        }
     }
 
-    // Ajoutez d'autres méthodes de mise à jour pour les objets imbriqués si nécessaire
+
+    private void updateGaranties(List<Garantie> existingGaranties, List<Garantie> updatedGaranties) {
+        if (updatedGaranties == null) {
+            return;
+        }
+
+        for (Garantie existingGarantie : existingGaranties) {
+            if (existingGarantie == null || existingGarantie.getIdGarantie() == null) {
+                continue;
+            }
+
+            boolean isUpdated = false;
+            for (Garantie updatedGarantie : updatedGaranties) {
+                if (updatedGarantie != null && updatedGarantie.getIdGarantie() != null && updatedGarantie.getIdGarantie().equals(existingGarantie.getIdGarantie())) {
+                    Class<?> clazz = existingGarantie.getClass();
+                    Field[] fields = clazz.getDeclaredFields();
+
+                    for (Field field : fields) {
+                        try {
+                            ReflectionUtils.makeAccessible(field);
+                            Object updatedValue = field.get(updatedGarantie);
+
+                            if (updatedValue == null) {
+                                Object existingValue = field.get(existingGarantie);
+                                field.set(updatedGarantie, existingValue);
+                            } else {
+
+                                if ("bien".equals(field.getName())) {
+                                    if (existingGarantie.getBien() == null) {
+                                        existingGarantie.setBien((Bien) updatedValue);
+                                    } else {
+                                        updateBien(existingGarantie.getBien(), (Bien) updatedValue);
+                                    }
+                                }
+
+                                if (Constants.ALIGNEMENT.equals(field.getName())) {
+                                    if (existingGarantie.getTopAlignement() == null) {
+                                        existingGarantie.setTopAlignement((Alignement) updatedValue);
+                                    } else {
+                                        updateAlignement(existingGarantie.getTopAlignement(), (Alignement) updatedValue);
+                                    }
+                                }
+
+                                if (Constants.ELIGIBILITE.equals(field.getName())) {
+                                    if (existingGarantie.getTopEligibilite() == null) {
+                                        existingGarantie.setTopEligibilite((Eligibilite) updatedValue);
+                                    } else {
+                                        updateEligibilite(existingGarantie.getTopEligibilite(), (Eligibilite) updatedValue);
+                                    }
+
+                                } else {
+                                    field.set(existingGarantie, updatedValue);
+                                }
+                            }
+                        } catch (IllegalAccessException e) {
+                            commonLogger.eventTyp(EventTyp.APPLICATIVE).secEventTyp(SecEventTyp.METIER).logger().info("erreur lors de l'update du financement dans la garantie causé par: {}", e.getMessage());
+
+                        }
+                    }
+
+                    isUpdated = true;
+                    break;
+                }
+            }
+            if (!isUpdated) {
+                updatedGaranties.add(existingGarantie);
+            }
+        }
+    }
+
+
+    private void updatePieces(List<Piece> existingpieces, List<Piece> updatedpieces) {
+        if (updatedpieces == null) {
+            return;
+        }
+
+        for (Piece existingpiece : existingpieces) {
+            if (existingpiece == null || existingpiece.getIdPiece() == null) {
+                continue;
+            }
+
+            boolean isUpdated = false;
+            for (Piece updatedpiece : updatedpieces) {
+                if (updatedpiece != null && updatedpiece.getIdPiece() != null && updatedpiece.getIdPiece().equals(existingpiece.getIdPiece())) {
+                    Class<?> clazz = existingpiece.getClass();
+                    Field[] fields = clazz.getDeclaredFields();
+
+                    for (Field field : fields) {
+                        try {
+                            ReflectionUtils.makeAccessible(field);
+                            Object updatedValue = field.get(updatedpiece);
+
+                            if (updatedValue == null) {
+                                Object existingValue = field.get(existingpiece);
+                                field.set(updatedpiece, existingValue);
+                            } else {
+                                field.set(existingpiece, updatedValue);
+
+                            }
+                        } catch (IllegalAccessException e) {
+                            commonLogger.eventTyp(EventTyp.APPLICATIVE).secEventTyp(SecEventTyp.METIER).logger().info("erreur lors de l'update du financement dans la piece causé par: {}", e.getMessage());
+
+                        }
+                    }
+
+                    isUpdated = true;
+                    break;
+                }
+            }
+            if (!isUpdated) {
+                updatedpieces.add(existingpiece);
+            }
+        }
+    }
+
+
+    private void updateIntervenant(Intervenant existingintervenant, Intervenant updatedintervenant) {
+        Class<?> clazz = existingintervenant.getClass();
+        Field[] fields = clazz.getDeclaredFields();
+
+        for (Field field : fields) {
+            try {
+                ReflectionUtils.makeAccessible(field);
+                Object updatedValue = field.get(updatedintervenant);
+
+                if (updatedValue == null) {
+                    Object existingValue = field.get(existingintervenant);
+                    field.set(updatedintervenant, existingValue);
+                } else {
+
+                    field.set(existingintervenant, updatedValue);
+                }
+            } catch (IllegalAccessException e) {
+                commonLogger.eventTyp(EventTyp.APPLICATIVE).secEventTyp(SecEventTyp.METIER).logger().info("erreur lors de l'update du financement dans l'intervenant causé par: {}", e.getMessage());
+
+            }
+        }
+    }
+
+
+    private void updateEligibilite(Eligibilite existingeligibilite, Eligibilite updatedeligibilite) {
+        Class<?> clazz = existingeligibilite.getClass();
+        Field[] fields = clazz.getDeclaredFields();
+
+        for (Field field : fields) {
+            try {
+                ReflectionUtils.makeAccessible(field);
+                Object updatedValue = field.get(updatedeligibilite);
+
+                if (updatedValue == null) {
+                    Object existingValue = field.get(existingeligibilite);
+                    field.set(updatedeligibilite, existingValue);
+                } else {
+
+                    field.set(existingeligibilite, updatedValue);
+                }
+            } catch (IllegalAccessException e) {
+                commonLogger.eventTyp(EventTyp.APPLICATIVE).secEventTyp(SecEventTyp.METIER).logger().info("erreur lors de l'update du financement dans l'iligibilité causé par: {}", e.getMessage());
+
+            }
+        }
+    }
+
+
+    private void updateAlignement(Alignement existingalignement, Alignement updatedalignement) {
+        Class<?> clazz = existingalignement.getClass();
+        Field[] fields = clazz.getDeclaredFields();
+
+        for (Field field : fields) {
+            try {
+                ReflectionUtils.makeAccessible(field);
+                Object updatedValue = field.get(updatedalignement);
+
+                if (updatedValue == null) {
+                    Object existingValue = field.get(existingalignement);
+                    field.set(updatedalignement, existingValue);
+                } else {
+
+                    field.set(existingalignement, updatedValue);
+                }
+            } catch (IllegalAccessException e) {
+                commonLogger.eventTyp(EventTyp.APPLICATIVE).secEventTyp(SecEventTyp.METIER).logger().info("erreur lors de l'update du financement dans l'alignement causé par: {}", e.getMessage());
+
+            }
+        }
+    }
+
+
+    private void updateDpe(Dpe existingdpe, Dpe updateddpe) {
+        Class<?> clazz = existingdpe.getClass();
+        Field[] fields = clazz.getDeclaredFields();
+
+        for (Field field : fields) {
+            try {
+                ReflectionUtils.makeAccessible(field);
+                Object updatedValue = field.get(updateddpe);
+
+                if (updatedValue == null) {
+                    Object existingValue = field.get(existingdpe);
+                    field.set(updateddpe, existingValue);
+                } else {
+
+                    field.set(existingdpe, updatedValue);
+                }
+            } catch (IllegalAccessException e) {
+                commonLogger.eventTyp(EventTyp.APPLICATIVE).secEventTyp(SecEventTyp.METIER).logger().info("erreur lors de l'update du financement dans le dpe causé par: {}", e.getMessage());
+
+            }
+        }
+    }
+
 }
+
+//
+        Refactorof  methods  patchFinancement and updateObjetFinancement to reduce its Cognitive Complexity 
