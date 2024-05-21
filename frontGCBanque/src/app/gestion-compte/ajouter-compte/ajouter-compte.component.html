@@ -1,79 +1,12 @@
-import { TestBed } from '@angular/core/testing';
-import { YourComponent } from './your.component'; // replace with your actual component path
-import { EngineService } from 'path-to-service/engine.service';
-import { EngineServiceXtra } from 'path-to-service/engine-xtra.service'; // replace with actual paths
-import { FormBuilder } from '@angular/forms';
-import { of } from 'rxjs';
-describe('YourComponent', () => {
-  let component: YourComponent;
-  let fixture: ComponentFixture<YourComponent>;
-  let engineService: jasmine.SpyObj<EngineService>;
-  let engineServiceXtra: jasmine.SpyObj<EngineServiceXtra>;
+  private String alignementAcquisition(boolean presenceDpe, boolean presenceDateDepotPc, String etiquetteDpe,
+Method has 9 parameters, which is greater than 7 authorized.
+                                         double valeurCep, double valeurCeptop, double valeurCepmax, Date dateDepotPc, String normeThermique, Integer anneeConstruction) throws ParseException {
+        if (presenceDateDepotPc) {
+            if (presenceDpe) {
+                return alignementAcquisitionDpePresent(etiquetteDpe, valeurCep, valeurCeptop, valeurCepmax, dateDepotPc, normeThermique);
+            } else {
+                return alignementAcquisitionDpeAbsent(dateDepotPc);
+            }
+        } else {
+            return alignementAcquisitionAncien(presenceDpe, etiquetteDpe, valeurCep, valeurCeptop, valeurCepmax, normeThermique, anneeConstruction);
 
-  beforeEach(async () => {
-    const engineServiceSpy = jasmine.createSpyObj('EngineService', ['alignement']);
-    const engineServiceXtraSpy = jasmine.createSpyObj('EngineServiceXtra', ['alignementXtra']);
-
-    await TestBed.configureTestingModule({
-      declarations: [ YourComponent ],
-      providers: [
-        FormBuilder,
-        { provide: EngineService, useValue: engineServiceSpy },
-        { provide: EngineServiceXtra, useValue: engineServiceXtraSpy }
-      ]
-    })
-    .compileComponents();
-
-    fixture = TestBed.createComponent(YourComponent);
-    component = fixture.componentInstance;
-    engineService = TestBed.inject(EngineService) as jasmine.SpyObj<EngineService>;
-    engineServiceXtra = TestBed.inject(EngineServiceXtra) as jasmine.SpyObj<EngineServiceXtra>;
-
-    component.formGroup = new FormBuilder().group({
-      anneeConstruction: [''],
-      lettreCEP: [''],
-      valeurCEP: ['']
-    });
-  });
-
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
-  it('should set ligneContext and ligneContextXtra properties based on form data', () => {
-    component.formGroup.setValue({ anneeConstruction: 2000, lettreCEP: 'B', valeurCEP: 150 });
-
-    component.showAlignement();
-
-    expect(component.ligneContext.anneeConstruction).toBe(2000);
-    expect(component.ligneContextXtra.anneeConstruction).toBe(2000);
-    expect(component.ligneContext.etiquetteDpe).toBe('B');
-    expect(component.ligneContextXtra.etiquetteDpe).toBe('B');
-    expect(component.ligneContext.valeurCep).toBe(150);
-    expect(component.ligneContextXtra.valeurCep).toBe(150);
-  });
-
-  it('should set codeBatiment based on selected option', () => {
-    component.codeBatimentSelected = 'option1';
-
-    component.showAlignement();
-
-    expect(component.ligneContext.codeBatiment).toBe('00001');
-    expect(component.ligneContextXtra.codeBatiment).toBe('00001');
-  });
-
-  it('should call alignement and alignementXtra services and set results', () => {
-    engineService.alignement.and.returnValue(of('01'));
-    engineServiceXtra.alignementXtra.and.returnValue(of('01'));
-
-    component.showAlignement();
-
-    expect(engineService.alignement).toHaveBeenCalled();
-    expect(engineServiceXtra.alignementXtra).toHaveBeenCalled();
-    expect(component.alignementResultText).toBe('Eligible et aligné à la Taxonomie');
-    expect(component.alignementResult).toBe('01');
-    expect(component.alignementXtraResultText).toBe('Aligné à la Taxonomie');
-    expect(component.alignementXtraResult).toBe('01');
-  });
-
-  // Additional tests for other conditions can be added here
-});
