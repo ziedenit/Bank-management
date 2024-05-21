@@ -1,220 +1,79 @@
-	ligneContext: LigneContext =
-		{
-		    typeObjetFinancement: "",
-		    dateDepotPc: new Date(''),
-		    anneeConstruction: 0 ,
-		    etiquetteDpe: '',
-		    valeurCep: 0,
-		    presenceDpe:true,
-		    presenceDateDepotPc: false,
-		    presenceAttestation: false,
-		    normeThermique: '',
-		    presenceDpeAvantTravaux: false,
-		    presenceDpeApresTravaux: false,
-		    gainCep: 0,
-		    codeBatiment:''
-	    };
+import { TestBed } from '@angular/core/testing';
+import { YourComponent } from './your.component'; // replace with your actual component path
+import { EngineService } from 'path-to-service/engine.service';
+import { EngineServiceXtra } from 'path-to-service/engine-xtra.service'; // replace with actual paths
+import { FormBuilder } from '@angular/forms';
+import { of } from 'rxjs';
+describe('YourComponent', () => {
+  let component: YourComponent;
+  let fixture: ComponentFixture<YourComponent>;
+  let engineService: jasmine.SpyObj<EngineService>;
+  let engineServiceXtra: jasmine.SpyObj<EngineServiceXtra>;
 
-		ligneContextXtra: LigneContextXtra =
-		{
-			typeObjetFinancement: '',
-			codeBatiment: '',
-			presenceDateDepotPc: false,
-			presenceDateDepotPcJustificatif: false,
-			dateDepotPc: new Date(''),
-		    presenceDpe: false,
-		    presenceDpeJustificatif: false,
-			presenceNormeThermique: false,
-			normeThermique: '',
-			presenceNormeThermiqueJustificatif: false,
-			anneeConstruction: 0,
-			etiquetteDpe: '',
-			valeurCep: 0,
-			presenceDpeAvantTravaux: false,
-			presenceDpeApresTravaux: false,
-		    gainCep : 0,
-	    };
+  beforeEach(async () => {
+    const engineServiceSpy = jasmine.createSpyObj('EngineService', ['alignement']);
+    const engineServiceXtraSpy = jasmine.createSpyObj('EngineServiceXtra', ['alignementXtra']);
 
-		alignementResult: string ;
-		alignementXtraResult: string;
-		alignementResultText: string ;
-		alignementXtraResultText: string ;
-	    dateDepot:any;
-		normeThermique:string;
-		selectedCepList:string
-		champSaisi:boolean;
+    await TestBed.configureTestingModule({
+      declarations: [ YourComponent ],
+      providers: [
+        FormBuilder,
+        { provide: EngineService, useValue: engineServiceSpy },
+        { provide: EngineServiceXtra, useValue: engineServiceXtraSpy }
+      ]
+    })
+    .compileComponents();
 
+    fixture = TestBed.createComponent(YourComponent);
+    component = fixture.componentInstance;
+    engineService = TestBed.inject(EngineService) as jasmine.SpyObj<EngineService>;
+    engineServiceXtra = TestBed.inject(EngineServiceXtra) as jasmine.SpyObj<EngineServiceXtra>;
 
-	  showAlignement(): void {
-		console.log("la valeur de mon dpe est", this.numeroDpeAdeme)
-		     this.DpeResults=true;
-		    this.elementResults=true;
-		    const formData = this.formGroup.value;
-			this.champObligatoire=false;
-			this.ligneContext.anneeConstruction = formData.anneeConstruction;
-			this.ligneContextXtra.anneeConstruction=formData.anneeConstruction;
-			if(this.hideField==false){
-			this.ligneContext.etiquetteDpe = formData.lettreCEP;
-			this.ligneContextXtra.etiquetteDpe=formData.lettreCEP;}
-			this.ligneContext.valeurCep = formData.valeurCEP;
-			this.ligneContextXtra.valeurCep=formData.valeurCEP;
+    component.formGroup = new FormBuilder().group({
+      anneeConstruction: [''],
+      lettreCEP: [''],
+      valeurCEP: ['']
+    });
+  });
 
-			if(this.codeBatimentSelected==='option1'){this.ligneContext.codeBatiment='00001'; this.ligneContextXtra.codeBatiment='00001'}
-			if(this.codeBatimentSelected==='option2'){this.ligneContext.codeBatiment='00002';this.ligneContextXtra.codeBatiment='00002'}
-			if(this.codeBatimentSelected==='option3'){this.ligneContext.codeBatiment='00003';this.ligneContextXtra.codeBatiment='00003'}
-			if(this.codeBatimentSelected==='option4'){this.ligneContext.codeBatiment='00004';this.ligneContextXtra.codeBatiment='00004'}
-			if(this.codeBatimentSelected==='option5'){this.ligneContext.codeBatiment='00005';this.ligneContextXtra.codeBatiment='00005'}
-			if(this.codeBatimentSelected==='option6'){this.ligneContext.codeBatiment='00006';this.ligneContextXtra.codeBatiment='00006'}
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+  it('should set ligneContext and ligneContextXtra properties based on form data', () => {
+    component.formGroup.setValue({ anneeConstruction: 2000, lettreCEP: 'B', valeurCEP: 150 });
 
-			if(this.objetFinance==='Acquisition de bâtiment'|| this.selectedObjetFinancement==='option2' ){
-				this.ligneContext.typeObjetFinancement='02';
-				this.ligneContextXtra.typeObjetFinancement='02'
-		    } else{
+    component.showAlignement();
 
-		    if(this.objetFinance==='Rénovation de bâtiment' || this.selectedObjetFinancement==='option3' ){
-			this.ligneContext.typeObjetFinancement='03';
-			this.ligneContextXtra.typeObjetFinancement='03';
-			}}
+    expect(component.ligneContext.anneeConstruction).toBe(2000);
+    expect(component.ligneContextXtra.anneeConstruction).toBe(2000);
+    expect(component.ligneContext.etiquetteDpe).toBe('B');
+    expect(component.ligneContextXtra.etiquetteDpe).toBe('B');
+    expect(component.ligneContext.valeurCep).toBe(150);
+    expect(component.ligneContextXtra.valeurCep).toBe(150);
+  });
 
-			if(this.hideField==true){
-			if(formData.lettreCEP==='option0'){
-					this.ligneContext.etiquetteDpe=''
-					this.ligneContextXtra.etiquetteDpe='';
-				}
+  it('should set codeBatiment based on selected option', () => {
+    component.codeBatimentSelected = 'option1';
 
-              if(formData.lettreCEP==='option1'){
-				this.ligneContext.etiquetteDpe='A'
-				this.ligneContextXtra.etiquetteDpe='A'
-			  }
-			  if(formData.lettreCEP==='option2'){
-				this.ligneContext.etiquetteDpe='B'
-				this.ligneContextXtra.etiquetteDpe='B'
-			  }
+    component.showAlignement();
 
-			  if(formData.lettreCEP==='option3'){
-				this.ligneContext.etiquetteDpe='C'
-				this.ligneContextXtra.etiquetteDpe='C'
-			  }
-			  if(formData.lettreCEP==='option4'){
-				this.ligneContext.etiquetteDpe='D'
-				this.ligneContextXtra.etiquetteDpe='D'
-			  }
-			  if(formData.lettreCEP==='option5'){
-				this.ligneContext.etiquetteDpe='E'
-				this.ligneContextXtra.etiquetteDpe='E'
-			  }
-			  if(formData.lettreCEP==='option6'){
-				this.ligneContext.etiquetteDpe='F'
-				this.ligneContextXtra.etiquetteDpe='F'
-			  }
-			  if(formData.lettreCEP==='option7'){
-				this.ligneContext.etiquetteDpe='G'
-				this.ligneContextXtra.etiquetteDpe='G'
-			  }
-			}
+    expect(component.ligneContext.codeBatiment).toBe('00001');
+    expect(component.ligneContextXtra.codeBatiment).toBe('00001');
+  });
 
+  it('should call alignement and alignementXtra services and set results', () => {
+    engineService.alignement.and.returnValue(of('01'));
+    engineServiceXtra.alignementXtra.and.returnValue(of('01'));
 
-		   if(this.dateDepot===undefined || this.dateDepot===""|| this.dateDepot===null){
-			   this.ligneContext.presenceDateDepotPc=false;
-			   this.ligneContext.dateDepotPc=null;
+    component.showAlignement();
 
-			   this.ligneContextXtra.presenceDateDepotPc=false;
-			   this.ligneContextXtra.dateDepotPc=null;
-		   }
+    expect(engineService.alignement).toHaveBeenCalled();
+    expect(engineServiceXtra.alignementXtra).toHaveBeenCalled();
+    expect(component.alignementResultText).toBe('Eligible et aligné à la Taxonomie');
+    expect(component.alignementResult).toBe('01');
+    expect(component.alignementXtraResultText).toBe('Aligné à la Taxonomie');
+    expect(component.alignementXtraResult).toBe('01');
+  });
 
-		    else{
-			this.ligneContext.presenceDateDepotPc=true;
-			this.ligneContext.dateDepotPc=this.dateDepot;
-
-			this.ligneContextXtra.presenceDateDepotPc=true;
-			this.ligneContextXtra.dateDepotPc=this.dateDepot;
-		   }
-
-		if(this.normeThermique===undefined || this.normeThermique===null){
-			this.ligneContext.presenceAttestation=false;
-			this.ligneContext.normeThermique=null;
-
-			this.ligneContextXtra.presenceNormeThermique=false;
-			this.ligneContextXtra.normeThermique=null;
-
-		} else{
-		   this.ligneContext.presenceAttestation=true;
-           this.ligneContextXtra.presenceNormeThermique=true;
-
-		   if(this.normeThermique==='option1'){
-			this.ligneContext.normeThermique='2012';
-			this.ligneContextXtra.normeThermique='2012'
-		   }else{
-			if (this.normeThermique==='option2'){
-			this.ligneContext.normeThermique='2020';
-			this.ligneContextXtra.normeThermique='2020'
-		   }
-		   else{
-			this.ligneContext.normeThermique='';
-			this.ligneContextXtra.normeThermique=''
-		   }
-		}
-		  }
-		  if(this.numeroDpeAdeme===undefined ||this.numeroDpeAdeme==null ||this.numeroDpeAdeme=="" ){
-			this.ligneContext.presenceDpe=false;
-			this.ligneContextXtra.presenceDpe=false;
-
-		} else{
-		   this.ligneContext.presenceDpe=true;
-		   this.ligneContextXtra.presenceDpe=true;
-		  }
-
-         //controler la présence de justificatif DPE ou compromis de vente si numéro ADEME renseigné
-		  if (!this.dpeFileName || this.dpeFileName.trim() === ''){
-			  this.ligneContextXtra.presenceDpeJustificatif=false;
-		  }else{
-			this.ligneContextXtra.presenceDpeJustificatif=true;
-			  }
-
-
-        //  controler la présence d'un justificatif attestant de la date de dépôt de permis de construire
-          if (!this.dateDepotFileName || this.dateDepotFileName.trim() === ''){
-			  this.ligneContextXtra.presenceDateDepotPcJustificatif=false;
-		}else{
-			this.ligneContextXtra.presenceDateDepotPcJustificatif=true;
-			  }
-
-
-		//controler la présence de justificatif Norme thermique (si le justificatif date depot pc est présent==> justificatif NTh=true)
-		if(this.dateDepot && (this.dateDepotFileName || !(this.dateDepotFileName.trim() === ''))){
-			this.ligneContextXtra.presenceNormeThermiqueJustificatif=true;
-		}
-		else{
-		if (!this.dateDepot && this.NormethermiqueFileName || !(this.NormethermiqueFileName.trim() === '')) {
-				this.ligneContextXtra.presenceNormeThermiqueJustificatif=true;
-		}
-		else{ this.ligneContextXtra.presenceNormeThermiqueJustificatif=false
-			 }
-	   }
-		this.engineService.alignement(this.ligneContext) .subscribe(aligne => {
-			if(aligne==="01"){
-			this.alignementResultText="Eligible et aligné à la Taxonomie";
-			this.alignementResult="01"}
-
-			if(aligne==="06"){
-		     this.alignementResultText="Eligible et non aligné à la Taxonomie ";
-			 this.alignementResult="06"}
-
-			if(aligne==="07"){
-			 this.alignementResultText="Eligible et alignement à la Taxonomie non évalué ";
-			 this.alignementResult="07"}
-
-			console.log('LineContext',this.ligneContext )
-			console.log('Alignement Simulé', this.alignementResult);
-		  });
-
-
-		this.engineServiceXtra.alignementXtra(this.ligneContextXtra).subscribe(aligneXtra => {
-		    if(aligneXtra==="01"){this.alignementXtraResultText="Aligné à la Taxonomie"; this.alignementXtraResult="01"}
-			if(aligneXtra==="06"){this.alignementXtraResultText="Non aligné à la Taxonomie " ; this.alignementXtraResult="06"}
-			if(aligneXtra==="07"){this.alignementXtraResultText="Alignement à la Taxonomie non évalué " ;this.alignementXtraResult="07"}
-
-			console.log('LineContext XTRA',this.ligneContextXtra )
-			console.log('Alignement XTRA', aligneXtra);
-		  })
-    // je veux developper un test unitaire pour ca 
+  // Additional tests for other conditions can be added here
+});
