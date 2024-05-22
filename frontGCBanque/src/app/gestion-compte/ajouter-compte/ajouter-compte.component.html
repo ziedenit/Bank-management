@@ -1,12 +1,11 @@
-  private String alignementAcquisition(boolean presenceDpe, boolean presenceDateDepotPc, String etiquetteDpe,
-Method has 9 parameters, which is greater than 7 authorized.
-                                         double valeurCep, double valeurCeptop, double valeurCepmax, Date dateDepotPc, String normeThermique, Integer anneeConstruction) throws ParseException {
-        if (presenceDateDepotPc) {
-            if (presenceDpe) {
-                return alignementAcquisitionDpePresent(etiquetteDpe, valeurCep, valeurCeptop, valeurCepmax, dateDepotPc, normeThermique);
-            } else {
-                return alignementAcquisitionDpeAbsent(dateDepotPc);
-            }
-        } else {
-            return alignementAcquisitionAncien(presenceDpe, etiquetteDpe, valeurCep, valeurCeptop, valeurCepmax, normeThermique, anneeConstruction);
-
+<div>
+  <label>Top bien financé LCL</label>
+  <div>
+    <input type="radio" id="bienFinanceOui" name="bienFinance" [(ngModel)]="bienFinanceLcl" [value]="true" />
+    <label for="bienFinanceOui">Oui</label>
+  </div>
+  <div>
+    <input type="radio" id="bienFinanceNon" name="bienFinance" [(ngModel)]="bienFinanceLcl" [value]="false" />
+    <label for="bienFinanceNon">Non</label>
+  </div>
+</div>
