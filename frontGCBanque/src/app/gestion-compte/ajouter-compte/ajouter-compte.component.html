@@ -1,11 +1,12 @@
-<div>
-  <label>Top bien financé LCL</label>
-  <div>
-    <input type="radio" id="bienFinanceOui" name="bienFinance" [(ngModel)]="bienFinanceLcl" [value]="true" />
-    <label for="bienFinanceOui">Oui</label>
-  </div>
-  <div>
-    <input type="radio" id="bienFinanceNon" name="bienFinance" [(ngModel)]="bienFinanceLcl" [value]="false" />
-    <label for="bienFinanceNon">Non</label>
-  </div>
-</div>
+public static final String DPE_ELIGIBLE ="le champ eligibileDpe doit etre\" +\n" +
+					"            \" 01 - Construction provisoire (durée d'utilisation < 2 ans)\\n\" +\n" +
+					"            \"02 - Bâtiment indépendant avec superficie <50 m² (ex : abris de jardin, mobile-home, bungalow, chalets, …)\\n\" +\n" +
+					"            \"03 - Bâtiments à usage agricole, artisanal ou industriel dans lesquels le système de chauffage/refroidissement/production d'eau chaude pour l'occupation humaine produit une faible quantité d'énergie au regard de celle nécessaire aux activités économiques\\n\" +\n" +
+					"            \"04 - Lieu de culte\\n\" +\n" +
+					"            \"05 - Monument historique classé\\n\" +\n" +
+					"            \"06 - Bâtiment non chauffé\\n\" +\n" +
+					"            \"07 - Locations saisonnières ou résidences secondaires (occupation du logement < à 4 mois par an\\n\" +\n" +
+					"            \"08 - Bâtiment situé dans les DOM-TOM\\n\" +\n" +
+					"            \"09 - Bâtiment situé à l'étranger\\n\" +\n" +
+					"            \"99 - Autre bien immobilier \"";
+Replace this String concatenation with Text block.
