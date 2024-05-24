@@ -1,13 +1,5 @@
-public static final String DPE_ELIGIBLE = """
-        le champ eligibileDpe doit etre
-        01 - Construction provisoire (durée d'utilisation < 2 ans)
-        02 - Bâtiment indépendant avec superficie <50 m² (ex : abris de jardin, mobile-home, bungalow, chalets, …)
-        03 - Bâtiments à usage agricole, artisanal ou industriel dans lesquels le système de chauffage/refroidissement/production d'eau chaude pour l'occupation humaine produit une faible quantité d'énergie au regard de celle nécessaire aux activités économiques
-        04 - Lieu de culte
-        05 - Monument historique classé
-        06 - Bâtiment non chauffé
-        07 - Locations saisonnières ou résidences secondaires (occupation du logement < à 4 mois par an)
-        08 - Bâtiment situé dans les DOM-TOM
-        09 - Bâtiment situé à l'étranger
-        99 - Autre bien immobilier
-        """;
+    private String codeNormeThermique;
+    @Pattern(regexp = "^(01|02|03)$", message = "le champ labelBien doit etre l'une des valeurs" +
+            "01: BREEAM \n" +
+            "02: LEED \n" +
+            "03: HQE")
