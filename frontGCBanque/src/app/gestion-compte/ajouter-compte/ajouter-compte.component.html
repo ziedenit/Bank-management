@@ -1,5 +1,28 @@
-<ErrorResponse>
-    <code>TECHNICAL_EXCEPTION_OCCURED </code>
-    <message>
-        <message>Invalid property 'class' of bean class [com.cl.msofd.model.Financement]: Bean property 'class' is not writable or has an invalid setter method. Does the parameter type of the setter match the return type of the getter?</message>
-    </message>
+public Financement patchFinancementChamps(String idFinancement, Financement financementToUpdate) {
+    Financement existingFinancement = financementRepository.findByidFinancement(idFinancement).orElse(null);
+    if (existingFinancement == null) {
+        throw new FinancementNotFoundException(String.format("Le financement à modifier %s est inexistant", idFinancement));
+    }
+
+    // Appliquer les patchs
+    copyNonNullProperties(financementToUpdate, existingFinancement);
+
+    // Enregistrer les modifications
+    return financementRepository.save(existingFinancement);
+}
+
+private void copyNonNullProperties(Object source, Object target) {
+    ObjectMapper objectMapper = new ObjectMapper();
+    JsonNode patchNode = objectMapper.convertValue(source, JsonNode.class);
+    Iterator<String> fieldNames = patchNode.fieldNames();
+    
+    while (fieldNames.hasNext()) {
+        String fieldName = fieldNames.next();
+        JsonNode valueNode = patchNode.get(fieldName);
+        
+        if (!valueNode.isNull()) {
+            BeanWrapper targetWrapper = new BeanWrapperImpl(target);
+            targetWrapper.setPropertyValue(fieldName, objectMapper.convertValue(valueNode, targetWrapper.getPropertyType(fieldName)));
+        }
+    }
+}
