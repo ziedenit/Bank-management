@@ -1,35 +1,58 @@
-import java.lang.reflect.Field;
-import org.springframework.util.ReflectionUtils;
-
 private void updateBien(Bien existingBien, Bien updatedBien) {
-    merge(existingBien, updatedBien);
-}
-
-private void merge(Object existingObject, Object patchObject) {
-    if (patchObject == null) {
-        return;
+        merge(existingBien, updatedBien);
     }
 
-    Class<?> clazz = existingObject.getClass();
-    Field[] fields = clazz.getDeclaredFields();
+    private void merge(Object existingObject, Object patchObject) {
+        if (patchObject == null) {
+            return;
+        }
 
-    for (Field field : fields) {
-        field.setAccessible(true);
-        try {
-            Object patchValue = field.get(patchObject);
-            Object existingValue = field.get(existingObject);
+        Class<?> clazz = existingObject.getClass();
+        Field[] fields = clazz.getDeclaredFields();
 
-            if (patchValue != null) {
-                field.set(existingObject, patchValue);
-            } else if (patchValue == null && !field.getType().isPrimitive()) {
-                // If the field is explicitly set to null, it should be set to null
-                continue;
-            }
-            // Fields that are not included in the patch will retain their existing values
-        } catch (IllegalAccessException e) {
-            // Handle error
-            commonLogger.eventTyp(EventTyp.APPLICATIVE).secEventTyp(SecEventTyp.METIER)
+        for (Field field : fields) {
+            field.setAccessible(true);
+            try {
+                Object patchValue = field.get(patchObject);
+                Object existingValue = field.get(existingObject);
+
+                if (patchValue != null) {
+                    field.set(existingObject, patchValue);
+                } else if (patchValue == null && !field.getType().isPrimitive()) {
+                    // If the field is explicitly set to null, it should be set to null
+                    continue;
+                }
+                // Fields that are not included in the patch will retain their existing values
+            } catch (IllegalAccessException e) {
+                // Handle error
+                commonLogger.eventTyp(EventTyp.APPLICATIVE).secEventTyp(SecEventTyp.METIER)
                         .logger().info("Erreur lors de l'update du financement dans le bien causé par: {}", e.getMessage());
+            }
         }
     }
-}
+    private void updateObject(Object existingObject, Object updatedObject) {
+        Class<?> clazz = existingObject.getClass();
+        Field[] fields = clazz.getDeclaredFields();
+
+        for (Field field : fields) {
+            try {
+                ReflectionUtils.makeAccessible(field);
+                if (isFieldPresent(updatedObject, field)) {
+                    Object updatedValue = field.get(updatedObject);
+
+                    if (updatedValue != null || (updatedValue instanceof String && "".equals(updatedValue))) {
+                        // Update the field value, including setting it to an empty string if specified
+                        field.set(existingObject, updatedValue);
+                    } else if (updatedValue == null && !field.getType().isPrimitive()) {
+                        // If the updated value is null and the field is not a primitive type, do not set it to null
+                        // Just retain the existing value
+                        continue;
+                    }
+                }
+            } catch (IllegalAccessException e) {
+                // Log the error
+                commonLogger.eventTyp(EventTyp.APPLICATIVE).secEventTyp(SecEventTyp.METIER)
+                        .logger().info("Erreur lors de l'update du financement dans le bien causé par: {}", e.getMessage());
+            }
+        }
+    }
