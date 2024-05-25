@@ -14,11 +14,15 @@ private void updateObject(Object existingObject, Object updatedObject) {
             ReflectionUtils.makeAccessible(field);
             if (isFieldPresent(updatedObject, field)) {
                 Object updatedValue = field.get(updatedObject);
+
                 if (updatedValue != null || (updatedValue instanceof String && "".equals(updatedValue))) {
                     // Update the field value, including setting it to an empty string if specified
                     field.set(existingObject, updatedValue);
-                } else if (updatedValue == null && field.getType().isAssignableFrom(Object.class)) {
-                    // If updated value is null, recursively update the nested object
+                } else if (updatedValue == null && !field.getType().isPrimitive()) {
+                    // If updated value is null and the field is not a primitive type, set it to null
+                    field.set(existingObject, null);
+                } else if (field.getType().isAssignableFrom(updatedObject.getClass())) {
+                    // If updated value is an object, recursively update the nested object
                     Object existingNestedValue = field.get(existingObject);
                     Object updatedNestedValue = field.get(updatedObject);
                     if (existingNestedValue != null && updatedNestedValue != null) {
