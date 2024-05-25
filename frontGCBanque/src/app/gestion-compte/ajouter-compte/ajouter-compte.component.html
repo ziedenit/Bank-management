@@ -1,5 +1,30 @@
-<dependency>
-    <groupId>com.fasterxml.jackson.datatype</groupId>
-    <artifactId>jackson-datatype-jsr310</artifactId>
-    <version>2.13.0</version> <!-- Assurez-vous de spécifier la dernière version disponible -->
-</dependency>
+public Financement patchFinancementChamps(String idFinancement, Financement financementToUpdate) {
+    Financement existingFinancement = financementRepository.findByidFinancement(idFinancement)
+            .orElseThrow(() -> new FinancementNotFoundException("Le financement à modifier est inexistant"));
+
+    updateNonNullFields(financementToUpdate, existingFinancement);
+
+    return financementRepository.save(existingFinancement);
+}
+
+private void updateNonNullFields(Object source, Object target) {
+    Class<?> sourceClass = source.getClass();
+    Class<?> targetClass = target.getClass();
+
+    Field[] sourceFields = sourceClass.getDeclaredFields();
+
+    for (Field field : sourceFields) {
+        try {
+            field.setAccessible(true);
+            Object value = field.get(source);
+            if (value != null) {
+                Field targetField = targetClass.getDeclaredField(field.getName());
+                targetField.setAccessible(true);
+                targetField.set(target, value);
+            }
+        } catch (IllegalAccessException | NoSuchFieldException e) {
+            // Gérer les exceptions
+            e.printStackTrace();
+        }
+    }
+}
