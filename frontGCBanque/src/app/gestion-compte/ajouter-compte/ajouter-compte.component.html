@@ -2,44 +2,34 @@ import java.lang.reflect.Field;
 import org.springframework.util.ReflectionUtils;
 
 private void updateBien(Bien existingBien, Bien updatedBien) {
-    updateObject(existingBien, updatedBien);
+    merge(existingBien, updatedBien);
 }
 
-private void updateObject(Object existingObject, Object updatedObject) {
+private void merge(Object existingObject, Object patchObject) {
+    if (patchObject == null) {
+        return;
+    }
+
     Class<?> clazz = existingObject.getClass();
     Field[] fields = clazz.getDeclaredFields();
 
     for (Field field : fields) {
+        field.setAccessible(true);
         try {
-            ReflectionUtils.makeAccessible(field);
-            if (isFieldPresent(updatedObject, field)) {
-                Object updatedValue = field.get(updatedObject);
+            Object patchValue = field.get(patchObject);
+            Object existingValue = field.get(existingObject);
 
-                if (updatedValue != null || (updatedValue instanceof String && "".equals(updatedValue))) {
-                    // Update the field value, including setting it to an empty string if specified
-                    field.set(existingObject, updatedValue);
-                } else if (updatedValue == null && !field.getType().isPrimitive()) {
-                    // If the updated value is null and the field is not a primitive type, do not set it to null
-                    // Just retain the existing value
-                    continue;
-                }
+            if (patchValue != null) {
+                field.set(existingObject, patchValue);
+            } else if (patchValue == null && !field.getType().isPrimitive()) {
+                // If the field is explicitly set to null, it should be set to null
+                continue;
             }
+            // Fields that are not included in the patch will retain their existing values
         } catch (IllegalAccessException e) {
-            // Log the error
+            // Handle error
             commonLogger.eventTyp(EventTyp.APPLICATIVE).secEventTyp(SecEventTyp.METIER)
                         .logger().info("Erreur lors de l'update du financement dans le bien causé par: {}", e.getMessage());
         }
-    }
-}
-
-// Helper method to check if the field is present in the updated object
-private boolean isFieldPresent(Object updatedObject, Field field) {
-    try {
-        // Check if the field has been explicitly set in the updated object
-        Field updatedField = updatedObject.getClass().getDeclaredField(field.getName());
-        updatedField.setAccessible(true);
-        return updatedField.get(updatedObject) != null || (updatedField.get(updatedObject) instanceof String && "".equals(updatedField.get(updatedObject)));
-    } catch (NoSuchFieldException | IllegalAccessException e) {
-        return false;
     }
 }
