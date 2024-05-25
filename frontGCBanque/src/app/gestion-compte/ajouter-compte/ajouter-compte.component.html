@@ -1,6 +1,15 @@
-<ErrorResponse>
-    <code>TECHNICAL_EXCEPTION_OCCURED </code>
-    <message>
-        <message>Invalid property 'class' of bean class [com.cl.msofd.model.Financement]: Bean property 'class' is not writable or has an invalid setter method. Does the parameter type of the setter match the return type of the getter?</message>
-    </message>
-</ErrorResponse>
+private void copyNonNullProperties(Object source, Object target) {
+    BeanWrapper src = new BeanWrapperImpl(source);
+    PropertyDescriptor[] pds = src.getPropertyDescriptors();
+
+    for (PropertyDescriptor pd : pds) {
+        // Exclure la propriété 'class'
+        if (!pd.getName().equals("class")) {
+            Object srcValue = src.getPropertyValue(pd.getName());
+            if (srcValue != null) {
+                BeanWrapper targetWrapper = new BeanWrapperImpl(target);
+                targetWrapper.setPropertyValue(pd.getName(), srcValue);
+            }
+        }
+    }
+}
