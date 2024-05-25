@@ -1,28 +1,6 @@
-public Financement patchFinancementChamps(String idFinancement, Financement financementToUpdate) {
-    Financement existingFinancement = financementRepository.findByidFinancement(idFinancement).orElse(null);
-    if (existingFinancement == null) {
-        throw new FinancementNotFoundException(String.format("Le financement à modifier %s est inexistant", idFinancement));
-    }
-
-    // Appliquer les patchs
-    copyNonNullProperties(financementToUpdate, existingFinancement);
-
-    // Enregistrer les modifications
-    return financementRepository.save(existingFinancement);
-}
-
-private void copyNonNullProperties(Object source, Object target) {
-    ObjectMapper objectMapper = new ObjectMapper();
-    JsonNode patchNode = objectMapper.convertValue(source, JsonNode.class);
-    Iterator<String> fieldNames = patchNode.fieldNames();
-    
-    while (fieldNames.hasNext()) {
-        String fieldName = fieldNames.next();
-        JsonNode valueNode = patchNode.get(fieldName);
-        
-        if (!valueNode.isNull()) {
-            BeanWrapper targetWrapper = new BeanWrapperImpl(target);
-            targetWrapper.setPropertyValue(fieldName, objectMapper.convertValue(valueNode, targetWrapper.getPropertyType(fieldName)));
-        }
-    }
-}
+<ErrorResponse>
+    <code>TECHNICAL_EXCEPTION_OCCURED </code>
+    <message>
+        <message>Java 8 date/time type `java.time.LocalDateTime` not supported by default: add Module "com.fasterxml.jackson.datatype:jackson-datatype-jsr310" to enable handling (through reference chain: com.cl.msofd.model.Financement["dateCreation"])</message>
+    </message>
+</ErrorResponse>
