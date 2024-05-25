@@ -1,6 +1,5 @@
-<ErrorResponse>
-    <code>TECHNICAL_EXCEPTION_OCCURED </code>
-    <message>
-        <message>Java 8 date/time type `java.time.LocalDateTime` not supported by default: add Module "com.fasterxml.jackson.datatype:jackson-datatype-jsr310" to enable handling (through reference chain: com.cl.msofd.model.Financement["dateCreation"])</message>
-    </message>
-</ErrorResponse>
+<dependency>
+    <groupId>com.fasterxml.jackson.datatype</groupId>
+    <artifactId>jackson-datatype-jsr310</artifactId>
+    <version>2.13.0</version> <!-- Assurez-vous de spécifier la dernière version disponible -->
+</dependency>
