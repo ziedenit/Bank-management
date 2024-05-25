@@ -1,5 +1,3 @@
-import java.lang.reflect.Field;
-import org.springframework.util.ReflectionUtils;
 
 private void updateBien(Bien existingBien, Bien updatedBien) {
     updateObject(existingBien, updatedBien);
@@ -19,10 +17,10 @@ private void updateObject(Object existingObject, Object updatedObject) {
                     // Update the field value, including setting it to an empty string if specified
                     field.set(existingObject, updatedValue);
                 } else if (updatedValue == null && !field.getType().isPrimitive()) {
-                    // If updated value is null and the field is not a primitive type, set it to null
+                    // If the updated value is null and the field is not a primitive type, set it to null
                     field.set(existingObject, null);
                 } else if (field.getType().isAssignableFrom(updatedObject.getClass())) {
-                    // If updated value is an object, recursively update the nested object
+                    // If the field is a nested object, recursively update it
                     Object existingNestedValue = field.get(existingObject);
                     Object updatedNestedValue = field.get(updatedObject);
                     if (existingNestedValue != null && updatedNestedValue != null) {
