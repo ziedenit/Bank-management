@@ -1,5 +1,3 @@
-je suis entain de faire le patch d'un objet mango par champs 
-ci bas un example de l'objet que je veux patcher
 {
     "id": "661927355e3f0e639f2afa66",
     "origineCreation": null,
@@ -10,9 +8,9 @@ ci bas un example de l'objet que je veux patcher
     "objetFinancement": {
         "id": null,
         "origineCreation": null,
-        "dateCreation": "2024-05-25T13:56:32",
+        "dateCreation": "2024-05-25T14:44:00",
         "origineModification": null,
-        "dateModification": "2024-05-25T13:56:32",
+        "dateModification": "2024-05-25T14:44:00",
         "idObjetFinancement": "O1F3PB3XH",
         "codeObjetFinancement": null,
         "quotePartObjet": 100.0,
@@ -22,9 +20,9 @@ ci bas un example de l'objet que je veux patcher
         "bien": {
             "id": null,
             "origineCreation": null,
-            "dateCreation": "2024-05-25T13:56:32",
+            "dateCreation": "2024-05-25T14:44:00",
             "origineModification": null,
-            "dateModification": "2024-05-25T13:56:32",
+            "dateModification": "2024-05-25T14:44:00",
             "idBien": null,
             "codeBatiment": null,
             "codeNormeThermique": null,
@@ -51,16 +49,16 @@ ci bas un example de l'objet que je veux patcher
             "typeUsage": null,
             "anneeConstruction": null,
             "periodeConstruction": null,
-            "dateDepotPc": null,
+            "dateDepotPc": "2024-05-25T14:38:50.000+00:00",
             "dateDebutConstruction": null,
-            "surfaceBien": null,
+            "surfaceBien": 200.0,
             "bienFinanceLCL": false,
             "numeroFiscalLocal": null,
             "coordonneeCartographiqueX": null,
             "coordonneeCartographiqueY": null,
             "prixBien": null,
-            "montantFinanceLCL": 20000.0,
-            "partLCL": 1000.0,
+            "montantFinanceLCL": 8000.0,
+            "partLCL": 800000.0,
             "dpeActuel": null
         },
         "dpeAvantTravaux": null,
@@ -68,18 +66,18 @@ ci bas un example de l'objet que je veux patcher
         "alignement": {
             "id": null,
             "origineCreation": null,
-            "dateCreation": "2024-05-24T21:01:02",
+            "dateCreation": "2024-05-25T14:38:03",
             "origineModification": null,
-            "dateModification": "2024-05-24T21:01:02",
+            "dateModification": "2024-05-25T14:38:03",
             "topAlignement": "07",
             "topAlignementXtra": "07"
         },
         "eligibilite": {
             "id": null,
             "origineCreation": null,
-            "dateCreation": "2024-05-24T21:01:02",
+            "dateCreation": "2024-05-25T14:38:03",
             "origineModification": null,
-            "dateModification": "2024-05-24T21:01:02",
+            "dateModification": "2024-05-25T14:38:03",
             "topEligibilite": "02"
         },
         "garantie": null,
@@ -89,18 +87,18 @@ ci bas un example de l'objet que je veux patcher
     "alignement": {
         "id": null,
         "origineCreation": null,
-        "dateCreation": "2024-05-24T21:01:02",
+        "dateCreation": "2024-05-25T14:38:03",
         "origineModification": null,
-        "dateModification": "2024-05-24T21:01:02",
+        "dateModification": "2024-05-25T14:38:03",
         "topAlignement": "07",
         "topAlignementXtra": "07"
     },
     "eligibilite": {
         "id": null,
         "origineCreation": null,
-        "dateCreation": "2024-05-24T21:01:02",
+        "dateCreation": "2024-05-25T14:38:03",
         "origineModification": null,
-        "dateModification": "2024-05-24T21:01:02",
+        "dateModification": "2024-05-25T14:38:03",
         "topEligibilite": "02"
     },
     "eligibleDpe": null,
@@ -123,46 +121,13 @@ ci bas un example de l'objet que je veux patcher
     "statut": 0,
     "agenceCompte": "003800000056968N"
 }
-les champs que j'aimerai bien patcher comme example les deux champs ci bas 
+et je veux patcher mon objet en passant ca 
  {
  "objetFinancement": {
     "bien": {
-         "montantFinanceLCL": "20000",
-         "partLCL": "1000"
+         "montantFinanceLCL": "7000",
+          "dateDepotPc":"",
+         "partLCL": "1200000"
     }
- }
- le probleme de ma méthode est que ci par exmple je patch un champs existant par une valeur vide ""
- il garde l'ancienne valeur du champs il ne le patch pas en vide ou null
- je veux adapter mon code ci bas pour qu'il patch un champs exsitant non vide vers le vide"" tous en conservant les valeurs des autres champs
- sans le modifier a vide ou a null 
- comment je peux adaapter ce code la 
- private void updateBien(Bien existingbien, Bien updatedbien) {
-        Class<?> clazz = existingbien.getClass();
-        Field[] fields = clazz.getDeclaredFields();
-
-        for (Field field : fields) {
-            try {
-                ReflectionUtils.makeAccessible(field);
-                Object updatedValue = field.get(updatedbien);
-
-                if (updatedValue == null) {
-                    Object existingValue = field.get(existingbien);
-                    field.set(updatedbien, existingValue);
-                } else {
-                    if ("dpeActuel".equals(field.getName())) {
-                        if (existingbien.getDpeActuel() == null) {
-                            existingbien.setDpeActuel((Dpe) updatedValue);
-                        } else {
-                            updateDpe(existingbien.getDpeActuel(), (Dpe) updatedValue);
-                        }
-                    }
-
-                    field.set(existingbien, updatedValue);
-                }
-            } catch (IllegalAccessException e) {
-                commonLogger.eventTyp(EventTyp.APPLICATIVE).secEventTyp(SecEventTyp.METIER).logger().info("erreur lors de l'update du financement dans le bien causé par: {}", e.getMessage());
-
-            }
-        }
-    }
-    bien c'est un objet imbriqué dans l'objet principale financement 
+    il patch les champs mentionnée dans le bien mais les autres par exemple comme surfaceBien qui ont déja une valeur il les mets a null 
+    pouvez vous m'aidez svp a adapter la méthode pour qu'elle garde les valeurs existant pour les champs que je veux pas patche 
