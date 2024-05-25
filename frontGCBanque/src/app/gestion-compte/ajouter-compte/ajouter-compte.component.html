@@ -1,6 +1,168 @@
-LABEL_BIEN_MESSAGE = """
-        le champ labelBien doit être l'une des valeurs :
-        01: BREEAM
-        02: LEED
-        03: HQE
-        """;
+je suis entain de faire le patch d'un objet mango par champs 
+ci bas un example de l'objet que je veux patcher
+{
+    "id": "661927355e3f0e639f2afa66",
+    "origineCreation": null,
+    "dateCreation": "2024-04-12T14:21:09",
+    "origineModification": null,
+    "dateModification": "2024-04-12T14:21:09",
+    "idFinancement": "F8M2CSEVQ",
+    "objetFinancement": {
+        "id": null,
+        "origineCreation": null,
+        "dateCreation": "2024-05-25T13:56:32",
+        "origineModification": null,
+        "dateModification": "2024-05-25T13:56:32",
+        "idObjetFinancement": "O1F3PB3XH",
+        "codeObjetFinancement": null,
+        "quotePartObjet": 100.0,
+        "codeFamilleObjet": null,
+        "gainCEP": null,
+        "dateFinTravaux": null,
+        "bien": {
+            "id": null,
+            "origineCreation": null,
+            "dateCreation": "2024-05-25T13:56:32",
+            "origineModification": null,
+            "dateModification": "2024-05-25T13:56:32",
+            "idBien": null,
+            "codeBatiment": null,
+            "codeNormeThermique": null,
+            "typeBatiment": null,
+            "codeTypeBatiment": null,
+            "numeroVoie": null,
+            "typeVoie": null,
+            "nomRue": null,
+            "etatBien": null,
+            "typeEnergie": null,
+            "codeTypeEnergie": null,
+            "batiment": null,
+            "escalier": null,
+            "etage": null,
+            "porte": null,
+            "codePostal": null,
+            "nomCommune": null,
+            "paysBien": null,
+            "adresseComplete": null,
+            "codeDepartement": null,
+            "codeInseeCommune": null,
+            "numeroLot": null,
+            "numeroNomRue": null,
+            "typeUsage": null,
+            "anneeConstruction": null,
+            "periodeConstruction": null,
+            "dateDepotPc": null,
+            "dateDebutConstruction": null,
+            "surfaceBien": null,
+            "bienFinanceLCL": false,
+            "numeroFiscalLocal": null,
+            "coordonneeCartographiqueX": null,
+            "coordonneeCartographiqueY": null,
+            "prixBien": null,
+            "montantFinanceLCL": 20000.0,
+            "partLCL": 1000.0,
+            "dpeActuel": null
+        },
+        "dpeAvantTravaux": null,
+        "dpeApresTravaux": null,
+        "alignement": {
+            "id": null,
+            "origineCreation": null,
+            "dateCreation": "2024-05-24T21:01:02",
+            "origineModification": null,
+            "dateModification": "2024-05-24T21:01:02",
+            "topAlignement": "07",
+            "topAlignementXtra": "07"
+        },
+        "eligibilite": {
+            "id": null,
+            "origineCreation": null,
+            "dateCreation": "2024-05-24T21:01:02",
+            "origineModification": null,
+            "dateModification": "2024-05-24T21:01:02",
+            "topEligibilite": "02"
+        },
+        "garantie": null,
+        "piecesJustificatives": [],
+        "statut": 0
+    },
+    "alignement": {
+        "id": null,
+        "origineCreation": null,
+        "dateCreation": "2024-05-24T21:01:02",
+        "origineModification": null,
+        "dateModification": "2024-05-24T21:01:02",
+        "topAlignement": "07",
+        "topAlignementXtra": "07"
+    },
+    "eligibilite": {
+        "id": null,
+        "origineCreation": null,
+        "dateCreation": "2024-05-24T21:01:02",
+        "origineModification": null,
+        "dateModification": "2024-05-24T21:01:02",
+        "topEligibilite": "02"
+    },
+    "eligibleDpe": null,
+    "intervenant": {
+        "id": null,
+        "origineCreation": null,
+        "dateCreation": "2024-04-12T14:21:09",
+        "origineModification": null,
+        "dateModification": "2024-04-12T14:21:09",
+        "idIntervenant": null,
+        "idReper": [
+            "4538872458"
+        ]
+    },
+    "indicateurFinancementDedie": "Y",
+    "indicateurNatureDurable": null,
+    "typeRisqueClimatiqueAttenue": null,
+    "codeApplicatifOrigine": "03",
+    "indicateurReprise": false,
+    "statut": 0,
+    "agenceCompte": "003800000056968N"
+}
+les champs que j'aimerai bien patcher comme example les deux champs ci bas 
+ {
+ "objetFinancement": {
+    "bien": {
+         "montantFinanceLCL": "20000",
+         "partLCL": "1000"
+    }
+ }
+ le probleme de ma méthode est que ci par exmple je patch un champs existant par une valeur vide ""
+ il garde l'ancienne valeur du champs il ne le patch pas en vide ou null
+ je veux adapter mon code ci bas pour qu'il patch un champs exsitant non vide vers le vide"" tous en conservant les valeurs des autres champs
+ sans le modifier a vide ou a null 
+ comment je peux adaapter ce code la 
+ private void updateBien(Bien existingbien, Bien updatedbien) {
+        Class<?> clazz = existingbien.getClass();
+        Field[] fields = clazz.getDeclaredFields();
+
+        for (Field field : fields) {
+            try {
+                ReflectionUtils.makeAccessible(field);
+                Object updatedValue = field.get(updatedbien);
+
+                if (updatedValue == null) {
+                    Object existingValue = field.get(existingbien);
+                    field.set(updatedbien, existingValue);
+                } else {
+                    if ("dpeActuel".equals(field.getName())) {
+                        if (existingbien.getDpeActuel() == null) {
+                            existingbien.setDpeActuel((Dpe) updatedValue);
+                        } else {
+                            updateDpe(existingbien.getDpeActuel(), (Dpe) updatedValue);
+                        }
+                    }
+
+                    field.set(existingbien, updatedValue);
+                }
+            } catch (IllegalAccessException e) {
+                commonLogger.eventTyp(EventTyp.APPLICATIVE).secEventTyp(SecEventTyp.METIER).logger().info("erreur lors de l'update du financement dans le bien causé par: {}", e.getMessage());
+
+            }
+        }
+    }
+    bien c'est un objet imbriqué dans l'objet principale financement 
