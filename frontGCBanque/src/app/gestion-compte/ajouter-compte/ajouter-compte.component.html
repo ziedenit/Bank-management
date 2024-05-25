@@ -2,28 +2,29 @@ import java.lang.reflect.Field;
 import org.springframework.util.ReflectionUtils;
 
 private void updateBien(Bien existingBien, Bien updatedBien) {
-    Class<?> clazz = existingBien.getClass();
+    updateObject(existingBien, updatedBien);
+}
+
+private void updateObject(Object existingObject, Object updatedObject) {
+    Class<?> clazz = existingObject.getClass();
     Field[] fields = clazz.getDeclaredFields();
 
     for (Field field : fields) {
         try {
             ReflectionUtils.makeAccessible(field);
-            Object updatedValue = field.get(updatedBien);
-
-            if (updatedValue != null) {
-                if (updatedValue instanceof String && ((String) updatedValue).isEmpty()) {
-                    // If updated value is an empty string, set the field to empty string
-                    field.set(existingBien, updatedValue);
-                } else if (updatedValue instanceof String || updatedValue instanceof Number || updatedValue instanceof Boolean) {
-                    // If updated value is a primitive or a wrapper type, set the field to updated value
-                    field.set(existingBien, updatedValue);
-                } else if (field.getType().isAssignableFrom(updatedValue.getClass())) {
-                    // If updated value is an object, recursively update the nested object
-                    Object existingNestedValue = field.get(existingBien);
-                    if (existingNestedValue == null) {
-                        field.set(existingBien, updatedValue);
-                    } else {
-                        updateObject(existingNestedValue, updatedValue);
+            if (isFieldPresent(updatedObject, field)) {
+                Object updatedValue = field.get(updatedObject);
+                if (updatedValue != null || (updatedValue instanceof String && "".equals(updatedValue))) {
+                    // Update the field value, including setting it to an empty string if specified
+                    field.set(existingObject, updatedValue);
+                } else if (updatedValue == null && field.getType().isAssignableFrom(Object.class)) {
+                    // If updated value is null, recursively update the nested object
+                    Object existingNestedValue = field.get(existingObject);
+                    Object updatedNestedValue = field.get(updatedObject);
+                    if (existingNestedValue != null && updatedNestedValue != null) {
+                        updateObject(existingNestedValue, updatedNestedValue);
+                    } else if (existingNestedValue == null) {
+                        field.set(existingObject, updatedNestedValue);
                     }
                 }
             }
@@ -35,32 +36,14 @@ private void updateBien(Bien existingBien, Bien updatedBien) {
     }
 }
 
-private void updateObject(Object existingObject, Object updatedObject) {
-    Class<?> clazz = existingObject.getClass();
-    Field[] fields = clazz.getDeclaredFields();
-
-    for (Field field : fields) {
-        try {
-            ReflectionUtils.makeAccessible(field);
-            Object updatedValue = field.get(updatedObject);
-
-            if (updatedValue != null) {
-                if (updatedValue instanceof String && ((String) updatedValue).isEmpty()) {
-                    field.set(existingObject, updatedValue);
-                } else if (updatedValue instanceof String || updatedValue instanceof Number || updatedValue instanceof Boolean) {
-                    field.set(existingObject, updatedValue);
-                } else if (field.getType().isAssignableFrom(updatedValue.getClass())) {
-                    Object existingNestedValue = field.get(existingObject);
-                    if (existingNestedValue == null) {
-                        field.set(existingObject, updatedValue);
-                    } else {
-                        updateObject(existingNestedValue, updatedValue);
-                    }
-                }
-            }
-        } catch (IllegalAccessException e) {
-            commonLogger.eventTyp(EventTyp.APPLICATIVE).secEventTyp(SecEventTyp.METIER)
-                        .logger().info("Erreur lors de l'update du financement dans le bien causé par: {}", e.getMessage());
-        }
+// Helper method to check if the field is present in the updated object
+private boolean isFieldPresent(Object updatedObject, Field field) {
+    try {
+        // Check if the field has been explicitly set in the updated object
+        Field updatedField = updatedObject.getClass().getDeclaredField(field.getName());
+        updatedField.setAccessible(true);
+        return updatedField.get(updatedObject) != null || (updatedField.get(updatedObject) instanceof String && "".equals(updatedField.get(updatedObject)));
+    } catch (NoSuchFieldException | IllegalAccessException e) {
+        return false;
     }
 }
