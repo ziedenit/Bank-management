@@ -1,27 +1,5 @@
-public Financement patchFinancementChamps(String idFinancement, Financement financementToUpdate) {
-    Financement existingFinancement = financementRepository.findByidFinancement(idFinancement).orElse(null);
-    if (existingFinancement == null) {
-        throw new FinancementNotFoundException(String.format("Le financement à modifier %s est inexistant", idFinancement));
-    }
-
-    // Copie des propriétés non nulles de l'objet à mettre à jour vers l'objet existant
-    copyNonNullProperties(financementToUpdate, existingFinancement);
-
-    return financementRepository.save(existingFinancement);
-}
-
-private void copyNonNullProperties(Object source, Object target) {
-    BeanWrapper src = new BeanWrapperImpl(source);
-    PropertyDescriptor[] pds = src.getPropertyDescriptors();
-
-    for (PropertyDescriptor pd : pds) {
-        String propertyName = pd.getName();
-        // Vérifier si la propriété est null dans l'objet source
-        Object srcValue = src.getPropertyValue(propertyName);
-        if (srcValue != null) {
-            // Mettre à jour la propriété correspondante dans l'objet cible
-            BeanWrapper targetWrapper = new BeanWrapperImpl(target);
-            targetWrapper.setPropertyValue(propertyName, srcValue);
-        }
-    }
-}
+<ErrorResponse>
+    <code>TECHNICAL_EXCEPTION_OCCURED </code>
+    <message>
+        <message>Invalid property 'class' of bean class [com.cl.msofd.model.Financement]: Bean property 'class' is not writable or has an invalid setter method. Does the parameter type of the setter match the return type of the getter?</message>
+    </message>
