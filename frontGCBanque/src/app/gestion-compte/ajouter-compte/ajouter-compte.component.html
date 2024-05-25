@@ -1,133 +1,66 @@
-{
-    "id": "661927355e3f0e639f2afa66",
-    "origineCreation": null,
-    "dateCreation": "2024-04-12T14:21:09",
-    "origineModification": null,
-    "dateModification": "2024-04-12T14:21:09",
-    "idFinancement": "F8M2CSEVQ",
-    "objetFinancement": {
-        "id": null,
-        "origineCreation": null,
-        "dateCreation": "2024-05-25T14:44:00",
-        "origineModification": null,
-        "dateModification": "2024-05-25T14:44:00",
-        "idObjetFinancement": "O1F3PB3XH",
-        "codeObjetFinancement": null,
-        "quotePartObjet": 100.0,
-        "codeFamilleObjet": null,
-        "gainCEP": null,
-        "dateFinTravaux": null,
-        "bien": {
-            "id": null,
-            "origineCreation": null,
-            "dateCreation": "2024-05-25T14:44:00",
-            "origineModification": null,
-            "dateModification": "2024-05-25T14:44:00",
-            "idBien": null,
-            "codeBatiment": null,
-            "codeNormeThermique": null,
-            "typeBatiment": null,
-            "codeTypeBatiment": null,
-            "numeroVoie": null,
-            "typeVoie": null,
-            "nomRue": null,
-            "etatBien": null,
-            "typeEnergie": null,
-            "codeTypeEnergie": null,
-            "batiment": null,
-            "escalier": null,
-            "etage": null,
-            "porte": null,
-            "codePostal": null,
-            "nomCommune": null,
-            "paysBien": null,
-            "adresseComplete": null,
-            "codeDepartement": null,
-            "codeInseeCommune": null,
-            "numeroLot": null,
-            "numeroNomRue": null,
-            "typeUsage": null,
-            "anneeConstruction": null,
-            "periodeConstruction": null,
-            "dateDepotPc": "2024-05-25T14:38:50.000+00:00",
-            "dateDebutConstruction": null,
-            "surfaceBien": 200.0,
-            "bienFinanceLCL": false,
-            "numeroFiscalLocal": null,
-            "coordonneeCartographiqueX": null,
-            "coordonneeCartographiqueY": null,
-            "prixBien": null,
-            "montantFinanceLCL": 8000.0,
-            "partLCL": 800000.0,
-            "dpeActuel": null
-        },
-        "dpeAvantTravaux": null,
-        "dpeApresTravaux": null,
-        "alignement": {
-            "id": null,
-            "origineCreation": null,
-            "dateCreation": "2024-05-25T14:38:03",
-            "origineModification": null,
-            "dateModification": "2024-05-25T14:38:03",
-            "topAlignement": "07",
-            "topAlignementXtra": "07"
-        },
-        "eligibilite": {
-            "id": null,
-            "origineCreation": null,
-            "dateCreation": "2024-05-25T14:38:03",
-            "origineModification": null,
-            "dateModification": "2024-05-25T14:38:03",
-            "topEligibilite": "02"
-        },
-        "garantie": null,
-        "piecesJustificatives": [],
-        "statut": 0
-    },
-    "alignement": {
-        "id": null,
-        "origineCreation": null,
-        "dateCreation": "2024-05-25T14:38:03",
-        "origineModification": null,
-        "dateModification": "2024-05-25T14:38:03",
-        "topAlignement": "07",
-        "topAlignementXtra": "07"
-    },
-    "eligibilite": {
-        "id": null,
-        "origineCreation": null,
-        "dateCreation": "2024-05-25T14:38:03",
-        "origineModification": null,
-        "dateModification": "2024-05-25T14:38:03",
-        "topEligibilite": "02"
-    },
-    "eligibleDpe": null,
-    "intervenant": {
-        "id": null,
-        "origineCreation": null,
-        "dateCreation": "2024-04-12T14:21:09",
-        "origineModification": null,
-        "dateModification": "2024-04-12T14:21:09",
-        "idIntervenant": null,
-        "idReper": [
-            "4538872458"
-        ]
-    },
-    "indicateurFinancementDedie": "Y",
-    "indicateurNatureDurable": null,
-    "typeRisqueClimatiqueAttenue": null,
-    "codeApplicatifOrigine": "03",
-    "indicateurReprise": false,
-    "statut": 0,
-    "agenceCompte": "003800000056968N"
-}
-et je veux patcher mon objet en passant ca 
- {
- "objetFinancement": {
-    "bien": {
-         "montantFinanceLCL": "7000",
-          "dateDepotPc":"",
-         "partLCL": "1200000"
+import java.lang.reflect.Field;
+import org.springframework.util.ReflectionUtils;
+
+private void updateBien(Bien existingBien, Bien updatedBien) {
+    Class<?> clazz = existingBien.getClass();
+    Field[] fields = clazz.getDeclaredFields();
+
+    for (Field field : fields) {
+        try {
+            ReflectionUtils.makeAccessible(field);
+            Object updatedValue = field.get(updatedBien);
+
+            if (updatedValue != null) {
+                if (updatedValue instanceof String && ((String) updatedValue).isEmpty()) {
+                    // If updated value is an empty string, set the field to empty string
+                    field.set(existingBien, updatedValue);
+                } else if (updatedValue instanceof String || updatedValue instanceof Number || updatedValue instanceof Boolean) {
+                    // If updated value is a primitive or a wrapper type, set the field to updated value
+                    field.set(existingBien, updatedValue);
+                } else if (field.getType().isAssignableFrom(updatedValue.getClass())) {
+                    // If updated value is an object, recursively update the nested object
+                    Object existingNestedValue = field.get(existingBien);
+                    if (existingNestedValue == null) {
+                        field.set(existingBien, updatedValue);
+                    } else {
+                        updateObject(existingNestedValue, updatedValue);
+                    }
+                }
+            }
+        } catch (IllegalAccessException e) {
+            // Log the error
+            commonLogger.eventTyp(EventTyp.APPLICATIVE).secEventTyp(SecEventTyp.METIER)
+                        .logger().info("Erreur lors de l'update du financement dans le bien causé par: {}", e.getMessage());
+        }
     }
-    il patch les champs mentionnée dans le bien mais les autres par exemple comme surfaceBien qui ont déja une valeur il les mets a null 
-    pouvez vous m'aidez svp a adapter la méthode pour qu'elle garde les valeurs existant pour les champs que je veux pas patche 
+}
+
+private void updateObject(Object existingObject, Object updatedObject) {
+    Class<?> clazz = existingObject.getClass();
+    Field[] fields = clazz.getDeclaredFields();
+
+    for (Field field : fields) {
+        try {
+            ReflectionUtils.makeAccessible(field);
+            Object updatedValue = field.get(updatedObject);
+
+            if (updatedValue != null) {
+                if (updatedValue instanceof String && ((String) updatedValue).isEmpty()) {
+                    field.set(existingObject, updatedValue);
+                } else if (updatedValue instanceof String || updatedValue instanceof Number || updatedValue instanceof Boolean) {
+                    field.set(existingObject, updatedValue);
+                } else if (field.getType().isAssignableFrom(updatedValue.getClass())) {
+                    Object existingNestedValue = field.get(existingObject);
+                    if (existingNestedValue == null) {
+                        field.set(existingObject, updatedValue);
+                    } else {
+                        updateObject(existingNestedValue, updatedValue);
+                    }
+                }
+            }
+        } catch (IllegalAccessException e) {
+            commonLogger.eventTyp(EventTyp.APPLICATIVE).secEventTyp(SecEventTyp.METIER)
+                        .logger().info("Erreur lors de l'update du financement dans le bien causé par: {}", e.getMessage());
+        }
+    }
+}
