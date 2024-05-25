@@ -1,30 +1,220 @@
-import org.springframework.beans.BeanUtils;
-
-public Financement patchFinancementChamps(String idFinancement, Financement financementToUpdate) {
-    Financement existingFinancement = financementRepository.findByidFinancement(idFinancement).orElse(null);
-    if (existingFinancement == null) {
-        throw new FinancementNotFoundException(String.format("Le financement à modifier %s est inexistant", idFinancement));
-    }
-
-    // Copier les propriétés non nulles de financementToUpdate vers existingFinancement
-    BeanUtils.copyProperties(financementToUpdate, existingFinancement, getNullPropertyNames(financementToUpdate));
-
-    // Enregistrer les modifications
-    return financementRepository.save(existingFinancement);
+Objet existant :
+{
+    "id": "661927355e3f0e639f2afa66",
+    "origineCreation": null,
+    "dateCreation": "2024-05-25T16:11:44",
+    "origineModification": null,
+    "dateModification": "2024-05-25T16:11:44",
+    "idFinancement": "F8M2CSEVQ",
+    "objetFinancement": {
+        "id": null,
+        "origineCreation": null,
+        "dateCreation": "2024-05-25T16:11:44",
+        "origineModification": null,
+        "dateModification": "2024-05-25T16:11:44",
+        "idObjetFinancement": null,
+        "codeObjetFinancement": null,
+        "quotePartObjet": null,
+        "codeFamilleObjet": null,
+        "gainCEP": null,
+        "dateFinTravaux": null,
+        "bien": {
+            "id": null,
+            "origineCreation": null,
+            "dateCreation": "2024-05-25T16:11:44",
+            "origineModification": null,
+            "dateModification": "2024-05-25T16:11:44",
+            "idBien": null,
+            "codeBatiment": null,
+            "codeNormeThermique": null,
+            "typeBatiment": null,
+            "codeTypeBatiment": null,
+            "numeroVoie": null,
+            "typeVoie": null,
+            "nomRue": null,
+            "etatBien": null,
+            "typeEnergie": null,
+            "codeTypeEnergie": null,
+            "batiment": null,
+            "escalier": null,
+            "etage": null,
+            "porte": null,
+            "codePostal": null,
+            "nomCommune": null,
+            "paysBien": null,
+            "adresseComplete": null,
+            "codeDepartement": null,
+            "codeInseeCommune": null,
+            "numeroLot": null,
+            "numeroNomRue": "13 bis",
+            "typeUsage": null,
+            "anneeConstruction": null,
+            "periodeConstruction": null,
+            "dateDepotPc": null,
+            "dateDebutConstruction": null,
+            "surfaceBien": null,
+            "bienFinanceLCL": false,
+            "numeroFiscalLocal": null,
+            "coordonneeCartographiqueX": null,
+            "coordonneeCartographiqueY": null,
+            "prixBien": null,
+            "montantFinanceLCL": 1290000.0,
+            "partLCL": 500000.0,
+            "dpeActuel": null
+        },
+        "dpeAvantTravaux": null,
+        "dpeApresTravaux": null,
+        "alignement": null,
+        "eligibilite": null,
+        "garantie": null,
+        "piecesJustificatives": null,
+        "statut": 0
+    },
+    "alignement": {
+        "id": null,
+        "origineCreation": null,
+        "dateCreation": "2024-05-25T15:45:26",
+        "origineModification": null,
+        "dateModification": "2024-05-25T15:45:26",
+        "topAlignement": "07",
+        "topAlignementXtra": "07"
+    },
+    "eligibilite": {
+        "id": null,
+        "origineCreation": null,
+        "dateCreation": "2024-05-25T15:45:26",
+        "origineModification": null,
+        "dateModification": "2024-05-25T15:45:26",
+        "topEligibilite": "02"
+    },
+    "eligibleDpe": null,
+    "intervenant": {
+        "id": null,
+        "origineCreation": null,
+        "dateCreation": "2024-04-12T14:21:09",
+        "origineModification": null,
+        "dateModification": "2024-04-12T14:21:09",
+        "idIntervenant": null,
+        "idReper": [
+            "4538872458"
+        ]
+    },
+    "indicateurFinancementDedie": "Y",
+    "indicateurNatureDurable": null,
+    "typeRisqueClimatiqueAttenue": null,
+    "codeApplicatifOrigine": "03",
+    "indicateurReprise": false,
+    "statut": 0,
+    "agenceCompte": "003800000056968N"
 }
 
-// Obtenir les noms des propriétés nulles dans un objet
-private String[] getNullPropertyNames(Object source) {
-    final BeanWrapper src = new BeanWrapperImpl(source);
-    PropertyDescriptor[] pds = src.getPropertyDescriptors();
-
-    Set<String> emptyNames = new HashSet<>();
-    for (PropertyDescriptor pd : pds) {
-        Object srcValue = src.getPropertyValue(pd.getName());
-        if (srcValue == null) {
-            emptyNames.add(pd.getName());
-        }
-    }
-    String[] result = new String[emptyNames.size()];
-    return emptyNames.toArray(result);
+objet obtenue apres patch 
+{
+    "id": "661927355e3f0e639f2afa66",
+    "origineCreation": null,
+    "dateCreation": "2024-05-25T16:15:10",
+    "origineModification": null,
+    "dateModification": "2024-05-25T16:15:10",
+    "idFinancement": "F8M2CSEVQ",
+    "objetFinancement": {
+        "id": null,
+        "origineCreation": null,
+        "dateCreation": "2024-05-25T16:15:10",
+        "origineModification": null,
+        "dateModification": "2024-05-25T16:15:10",
+        "idObjetFinancement": null,
+        "codeObjetFinancement": null,
+        "quotePartObjet": null,
+        "codeFamilleObjet": null,
+        "gainCEP": null,
+        "dateFinTravaux": null,
+        "bien": {
+            "id": null,
+            "origineCreation": null,
+            "dateCreation": "2024-05-25T16:15:10",
+            "origineModification": null,
+            "dateModification": "2024-05-25T16:15:10",
+            "idBien": null,
+            "codeBatiment": null,
+            "codeNormeThermique": null,
+            "typeBatiment": null,
+            "codeTypeBatiment": null,
+            "numeroVoie": null,
+            "typeVoie": null,
+            "nomRue": null,
+            "etatBien": null,
+            "typeEnergie": null,
+            "codeTypeEnergie": null,
+            "batiment": null,
+            "escalier": null,
+            "etage": null,
+            "porte": null,
+            "codePostal": null,
+            "nomCommune": null,
+            "paysBien": null,
+            "adresseComplete": null,
+            "codeDepartement": null,
+            "codeInseeCommune": null,
+            "numeroLot": null,
+            "numeroNomRue": null,
+            "typeUsage": null,
+            "anneeConstruction": null,
+            "periodeConstruction": null,
+            "dateDepotPc": null,
+            "dateDebutConstruction": null,
+            "surfaceBien": null,
+            "bienFinanceLCL": false,
+            "numeroFiscalLocal": null,
+            "coordonneeCartographiqueX": null,
+            "coordonneeCartographiqueY": null,
+            "prixBien": null,
+            "montantFinanceLCL": 1300000.0,
+            "partLCL": 4400000.0,
+            "dpeActuel": null
+        },
+        "dpeAvantTravaux": null,
+        "dpeApresTravaux": null,
+        "alignement": null,
+        "eligibilite": null,
+        "garantie": null,
+        "piecesJustificatives": null,
+        "statut": 0
+    },
+    "alignement": {
+        "id": null,
+        "origineCreation": null,
+        "dateCreation": "2024-05-25T15:45:26",
+        "origineModification": null,
+        "dateModification": "2024-05-25T15:45:26",
+        "topAlignement": "07",
+        "topAlignementXtra": "07"
+    },
+    "eligibilite": {
+        "id": null,
+        "origineCreation": null,
+        "dateCreation": "2024-05-25T15:45:26",
+        "origineModification": null,
+        "dateModification": "2024-05-25T15:45:26",
+        "topEligibilite": "02"
+    },
+    "eligibleDpe": null,
+    "intervenant": {
+        "id": null,
+        "origineCreation": null,
+        "dateCreation": "2024-04-12T14:21:09",
+        "origineModification": null,
+        "dateModification": "2024-04-12T14:21:09",
+        "idIntervenant": null,
+        "idReper": [
+            "4538872458"
+        ]
+    },
+    "indicateurFinancementDedie": "Y",
+    "indicateurNatureDurable": null,
+    "typeRisqueClimatiqueAttenue": null,
+    "codeApplicatifOrigine": "03",
+    "indicateurReprise": false,
+    "statut": 0,
+    "agenceCompte": "003800000056968N"
 }
+un champs comme numeroNomRue est devenue null alors qu'il devrait garder sa valeur initial 
