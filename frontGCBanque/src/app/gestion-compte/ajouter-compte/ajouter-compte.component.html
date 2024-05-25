@@ -1,127 +1,30 @@
-  public Financement patchFinancementChamps(String idFinancement, Financement financementToUpdate) {
-        Financement existingFinancement = financementRepository.findByidFinancement(idFinancement).orElse(null);
-        if (existingFinancement == null) {
-            throw new FinancementNotFoundException(String.format("Le financement à modifier %s est inexistant", idFinancement));
-        }
+import org.springframework.beans.BeanUtils;
 
-        Class<Financement> financementClass = Financement.class;
-        Field[] fields = financementClass.getDeclaredFields();
-
-        for (Field field : fields) {
-            try {
-                ReflectionUtils.makeAccessible(field);
-                Object value = field.get(financementToUpdate);
-                if (value != null) {
-                    if ("objetFinancement".equals(field.getName())) {
-                        if (existingFinancement.getObjetFinancement() == null) {
-                            existingFinancement.setObjetFinancement((ObjetFinancement) value);
-                        } else {
-                            updateObjetFinancement(existingFinancement.getObjetFinancement(), (ObjetFinancement) value);
-                        }
-                    }
-
-                    if (Constants.ALIGNEMENT.equals(field.getName())) {
-                        if (existingFinancement.getAlignement() == null) {
-                            existingFinancement.setAlignement((Alignement) value);
-                        } else {
-                            updateAlignement(existingFinancement.getAlignement(), (Alignement) value);
-                        }
-                    }
-
-                    if (Constants.ELIGIBILITE.equals(field.getName())) {
-                        if (existingFinancement.getEligibilite() == null) {
-                            existingFinancement.setEligibilite((Eligibilite) value);
-                        } else {
-                            updateEligibilite(existingFinancement.getEligibilite(), (Eligibilite) value);
-                        }
-                    }
-
-                    if ("intervenant".equals(field.getName())) {
-                        if (existingFinancement.getIntervenant() == null) {
-                            existingFinancement.setIntervenant((Intervenant) value);
-                        } else {
-                            updateIntervenant(existingFinancement.getIntervenant(), (Intervenant) value);
-                        }
-                    } else {
-                        field.set(existingFinancement, value);
-                    }
-                }
-
-            } catch (IllegalAccessException e) {
-                commonLogger.eventTyp(EventTyp.APPLICATIVE).secEventTyp(SecEventTyp.METIER).logger().info("erreur lors de l'update du financement causé par: {}", e.getMessage());
-
-            }
-        }
-
-        return financementRepository.save(existingFinancement);
+public Financement patchFinancementChamps(String idFinancement, Financement financementToUpdate) {
+    Financement existingFinancement = financementRepository.findByidFinancement(idFinancement).orElse(null);
+    if (existingFinancement == null) {
+        throw new FinancementNotFoundException(String.format("Le financement à modifier %s est inexistant", idFinancement));
     }
 
-                package com.cl.msofd.model;
+    // Copier les propriétés non nulles de financementToUpdate vers existingFinancement
+    BeanUtils.copyProperties(financementToUpdate, existingFinancement, getNullPropertyNames(financementToUpdate));
 
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
-import lombok.*;
-
-import java.io.Serializable;
-import java.util.Objects;
-
-
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-public class Financement extends BaseEntity implements Serializable {
-
-
-    private String idFinancement;
-    
-    @NotNull(message = "Objet financement est obligatoire")
-    @Valid
-    private ObjetFinancement objetFinancement;
-    
-    private Alignement alignement;
-    private Eligibilite eligibilite;
-    private String eligibleDpe;
-    
-    @NotNull(message = "Intervenant est obligatoire")
-    @Valid
-    private Intervenant intervenant;
-    
-    private String indicateurFinancementDedie;
-    
-    private String indicateurNatureDurable;
-    
-    private String typeRisqueClimatiqueAttenue;
-    @Pattern(regexp = "^(01|02|03|04|05|06|07|08)$", message = "le champs codeApplicatifOrigine doit etre l'une des valeurs" +
-            " 01 (VIC ou NECI) 02 (PI) 03 (CPPE) 04 (SIRIUS) 05 (DPAR) 06 (DPRO) 07 (CRM360) GGAR (08) ")
-    private String codeApplicatifOrigine;
-    
-    private boolean indicateurReprise;
-    private int statut;
-    
-    @Size(min = 16, max = 16, message = "La taille du champs agenceCompte doit etre égale à 16")
-    private String agenceCompte;
-
-    
-    
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
-        Financement that = (Financement) o;
-        return indicateurReprise == that.indicateurReprise && statut == that.statut && Objects.equals(idFinancement, that.idFinancement) && Objects.equals(objetFinancement, that.objetFinancement) && Objects.equals(alignement, that.alignement) && Objects.equals(eligibilite, that.eligibilite) && Objects.equals(intervenant, that.intervenant) && Objects.equals(indicateurFinancementDedie, that.indicateurFinancementDedie) && Objects.equals(indicateurNatureDurable, that.indicateurNatureDurable) && Objects.equals(typeRisqueClimatiqueAttenue, that.typeRisqueClimatiqueAttenue) && Objects.equals(codeApplicatifOrigine, that.codeApplicatifOrigine) && Objects.equals(agenceCompte, that.agenceCompte);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), idFinancement, objetFinancement, alignement, eligibilite, intervenant, indicateurFinancementDedie, indicateurNatureDurable, typeRisqueClimatiqueAttenue, codeApplicatifOrigine, indicateurReprise, statut, agenceCompte);
-    }
+    // Enregistrer les modifications
+    return financementRepository.save(existingFinancement);
 }
-  
 
+// Obtenir les noms des propriétés nulles dans un objet
+private String[] getNullPropertyNames(Object source) {
+    final BeanWrapper src = new BeanWrapperImpl(source);
+    PropertyDescriptor[] pds = src.getPropertyDescriptors();
 
-peut tu m'aider a ajuste la méthode de patch patchFinancementChamps
+    Set<String> emptyNames = new HashSet<>();
+    for (PropertyDescriptor pd : pds) {
+        Object srcValue = src.getPropertyValue(pd.getName());
+        if (srcValue == null) {
+            emptyNames.add(pd.getName());
+        }
+    }
+    String[] result = new String[emptyNames.size()];
+    return emptyNames.toArray(result);
+}
