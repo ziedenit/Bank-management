@@ -1,51 +1,264 @@
+Je prends pas exemple ca comme input pour patche le financement existant
 
-private void updateBien(Bien existingBien, Bien updatedBien) {
-    updateObject(existingBien, updatedBien);
+
+ l'existant est ca 
+ {
+    "id": "661927355e3f0e639f2afa66",
+    "origineCreation": null,
+    "dateCreation": "2024-04-12T14:21:09",
+    "origineModification": null,
+    "dateModification": "2024-04-12T14:21:09",
+    "idFinancement": "F8M2CSEVQ",
+    "objetFinancement": {
+        "id": null,
+        "origineCreation": null,
+        "dateCreation": "2024-05-25T15:48:11",
+        "origineModification": null,
+        "dateModification": "2024-05-25T15:48:11",
+        "idObjetFinancement": "O1F3PB3XH",
+        "codeObjetFinancement": null,
+        "quotePartObjet": 100.0,
+        "codeFamilleObjet": null,
+        "gainCEP": null,
+        "dateFinTravaux": null,
+        "bien": {
+            "id": null,
+            "origineCreation": null,
+            "dateCreation": "2024-05-25T15:48:11",
+            "origineModification": null,
+            "dateModification": "2024-05-25T15:48:11",
+            "idBien": null,
+            "codeBatiment": null,
+            "codeNormeThermique": null,
+            "typeBatiment": null,
+            "codeTypeBatiment": null,
+            "numeroVoie": null,
+            "typeVoie": null,
+            "nomRue": null,
+            "etatBien": null,
+            "typeEnergie": null,
+            "codeTypeEnergie": null,
+            "batiment": null,
+            "escalier": null,
+            "etage": null,
+            "porte": null,
+            "codePostal": null,
+            "nomCommune": null,
+            "paysBien": null,
+            "adresseComplete": null,
+            "codeDepartement": null,
+            "codeInseeCommune": null,
+            "numeroLot": null,
+            "numeroNomRue": "13 bis",
+            "typeUsage": null,
+            "anneeConstruction": null,
+            "periodeConstruction": null,
+            "dateDepotPc": null,
+            "dateDebutConstruction": null,
+            "surfaceBien": null,
+            "bienFinanceLCL": false,
+            "numeroFiscalLocal": null,
+            "coordonneeCartographiqueX": null,
+            "coordonneeCartographiqueY": null,
+            "prixBien": null,
+            "montantFinanceLCL": 5200000.0,
+            "partLCL": 5900000.0,
+            "dpeActuel": null
+        },
+        "dpeAvantTravaux": null,
+        "dpeApresTravaux": null,
+        "alignement": {
+            "id": null,
+            "origineCreation": null,
+            "dateCreation": "2024-05-25T15:45:26",
+            "origineModification": null,
+            "dateModification": "2024-05-25T15:45:26",
+            "topAlignement": "07",
+            "topAlignementXtra": "07"
+        },
+        "eligibilite": {
+            "id": null,
+            "origineCreation": null,
+            "dateCreation": "2024-05-25T15:45:26",
+            "origineModification": null,
+            "dateModification": "2024-05-25T15:45:26",
+            "topEligibilite": "02"
+        },
+        "garantie": null,
+        "piecesJustificatives": [],
+        "statut": 0
+    },
+    "alignement": {
+        "id": null,
+        "origineCreation": null,
+        "dateCreation": "2024-05-25T15:45:26",
+        "origineModification": null,
+        "dateModification": "2024-05-25T15:45:26",
+        "topAlignement": "07",
+        "topAlignementXtra": "07"
+    },
+    "eligibilite": {
+        "id": null,
+        "origineCreation": null,
+        "dateCreation": "2024-05-25T15:45:26",
+        "origineModification": null,
+        "dateModification": "2024-05-25T15:45:26",
+        "topEligibilite": "02"
+    },
+    "eligibleDpe": null,
+    "intervenant": {
+        "id": null,
+        "origineCreation": null,
+        "dateCreation": "2024-04-12T14:21:09",
+        "origineModification": null,
+        "dateModification": "2024-04-12T14:21:09",
+        "idIntervenant": null,
+        "idReper": [
+            "4538872458"
+        ]
+    },
+    "indicateurFinancementDedie": "Y",
+    "indicateurNatureDurable": null,
+    "typeRisqueClimatiqueAttenue": null,
+    "codeApplicatifOrigine": "03",
+    "indicateurReprise": false,
+    "statut": 0,
+    "agenceCompte": "003800000056968N"
 }
-
-private void updateObject(Object existingObject, Object updatedObject) {
-    Class<?> clazz = existingObject.getClass();
-    Field[] fields = clazz.getDeclaredFields();
-
-    for (Field field : fields) {
-        try {
-            ReflectionUtils.makeAccessible(field);
-            if (isFieldPresent(updatedObject, field)) {
-                Object updatedValue = field.get(updatedObject);
-
-                if (updatedValue != null || (updatedValue instanceof String && "".equals(updatedValue))) {
-                    // Update the field value, including setting it to an empty string if specified
-                    field.set(existingObject, updatedValue);
-                } else if (updatedValue == null && !field.getType().isPrimitive()) {
-                    // If the updated value is null and the field is not a primitive type, set it to null
-                    field.set(existingObject, null);
-                } else if (field.getType().isAssignableFrom(updatedObject.getClass())) {
-                    // If the field is a nested object, recursively update it
-                    Object existingNestedValue = field.get(existingObject);
-                    Object updatedNestedValue = field.get(updatedObject);
-                    if (existingNestedValue != null && updatedNestedValue != null) {
-                        updateObject(existingNestedValue, updatedNestedValue);
-                    } else if (existingNestedValue == null) {
-                        field.set(existingObject, updatedNestedValue);
-                    }
-                }
-            }
-        } catch (IllegalAccessException e) {
-            // Log the error
-            commonLogger.eventTyp(EventTyp.APPLICATIVE).secEventTyp(SecEventTyp.METIER)
-                        .logger().info("Erreur lors de l'update du financement dans le bien causé par: {}", e.getMessage());
-        }
+j'ai un champs comme numeroNomRue qui contient une valeur il faut apres l'application du patch il garde sa valeur , mais pour le moment il sera a null en appliquant le patch avec
+ce input 
+{
+ "objetFinancement": {
+    "bien": {
+         "montantFinanceLCL": "5550000",
+          "dateDepotPc":"",
+         "partLCL": "600000"
     }
+ }
+ }
+ la sortie c'est ca pour le moment 
+ {
+    "id": "661927355e3f0e639f2afa66",
+    "origineCreation": null,
+    "dateCreation": "2024-04-12T14:21:09",
+    "origineModification": null,
+    "dateModification": "2024-04-12T14:21:09",
+    "idFinancement": "F8M2CSEVQ",
+    "objetFinancement": {
+        "id": null,
+        "origineCreation": null,
+        "dateCreation": "2024-05-25T15:53:20",
+        "origineModification": null,
+        "dateModification": "2024-05-25T15:53:20",
+        "idObjetFinancement": "O1F3PB3XH",
+        "codeObjetFinancement": null,
+        "quotePartObjet": 100.0,
+        "codeFamilleObjet": null,
+        "gainCEP": null,
+        "dateFinTravaux": null,
+        "bien": {
+            "id": null,
+            "origineCreation": null,
+            "dateCreation": "2024-05-25T15:53:20",
+            "origineModification": null,
+            "dateModification": "2024-05-25T15:53:20",
+            "idBien": null,
+            "codeBatiment": null,
+            "codeNormeThermique": null,
+            "typeBatiment": null,
+            "codeTypeBatiment": null,
+            "numeroVoie": null,
+            "typeVoie": null,
+            "nomRue": null,
+            "etatBien": null,
+            "typeEnergie": null,
+            "codeTypeEnergie": null,
+            "batiment": null,
+            "escalier": null,
+            "etage": null,
+            "porte": null,
+            "codePostal": null,
+            "nomCommune": null,
+            "paysBien": null,
+            "adresseComplete": null,
+            "codeDepartement": null,
+            "codeInseeCommune": null,
+            "numeroLot": null,
+            "numeroNomRue": null,
+            "typeUsage": null,
+            "anneeConstruction": null,
+            "periodeConstruction": null,
+            "dateDepotPc": null,
+            "dateDebutConstruction": null,
+            "surfaceBien": null,
+            "bienFinanceLCL": false,
+            "numeroFiscalLocal": null,
+            "coordonneeCartographiqueX": null,
+            "coordonneeCartographiqueY": null,
+            "prixBien": null,
+            "montantFinanceLCL": 5550000.0,
+            "partLCL": 600000.0,
+            "dpeActuel": null
+        },
+        "dpeAvantTravaux": null,
+        "dpeApresTravaux": null,
+        "alignement": {
+            "id": null,
+            "origineCreation": null,
+            "dateCreation": "2024-05-25T15:45:26",
+            "origineModification": null,
+            "dateModification": "2024-05-25T15:45:26",
+            "topAlignement": "07",
+            "topAlignementXtra": "07"
+        },
+        "eligibilite": {
+            "id": null,
+            "origineCreation": null,
+            "dateCreation": "2024-05-25T15:45:26",
+            "origineModification": null,
+            "dateModification": "2024-05-25T15:45:26",
+            "topEligibilite": "02"
+        },
+        "garantie": null,
+        "piecesJustificatives": [],
+        "statut": 0
+    },
+    "alignement": {
+        "id": null,
+        "origineCreation": null,
+        "dateCreation": "2024-05-25T15:45:26",
+        "origineModification": null,
+        "dateModification": "2024-05-25T15:45:26",
+        "topAlignement": "07",
+        "topAlignementXtra": "07"
+    },
+    "eligibilite": {
+        "id": null,
+        "origineCreation": null,
+        "dateCreation": "2024-05-25T15:45:26",
+        "origineModification": null,
+        "dateModification": "2024-05-25T15:45:26",
+        "topEligibilite": "02"
+    },
+    "eligibleDpe": null,
+    "intervenant": {
+        "id": null,
+        "origineCreation": null,
+        "dateCreation": "2024-04-12T14:21:09",
+        "origineModification": null,
+        "dateModification": "2024-04-12T14:21:09",
+        "idIntervenant": null,
+        "idReper": [
+            "4538872458"
+        ]
+    },
+    "indicateurFinancementDedie": "Y",
+    "indicateurNatureDurable": null,
+    "typeRisqueClimatiqueAttenue": null,
+    "codeApplicatifOrigine": "03",
+    "indicateurReprise": false,
+    "statut": 0,
+    "agenceCompte": "003800000056968N"
 }
-
-// Helper method to check if the field is present in the updated object
-private boolean isFieldPresent(Object updatedObject, Field field) {
-    try {
-        // Check if the field has been explicitly set in the updated object
-        Field updatedField = updatedObject.getClass().getDeclaredField(field.getName());
-        updatedField.setAccessible(true);
-        return updatedField.get(updatedObject) != null || (updatedField.get(updatedObject) instanceof String && "".equals(updatedField.get(updatedObject)));
-    } catch (NoSuchFieldException | IllegalAccessException e) {
-        return false;
-    }
-}
+le champs numeroNomRue est devenue null alors qu'il doit rester inchangable ??? 
+comment je peux adapter le code pour assurer que les champs existant garde leur valeur si je ne passs pas des nouvelles valeurs dans mon input 
