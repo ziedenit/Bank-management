@@ -14,14 +14,16 @@ private void merge(Object target, Object source) {
                         merge(targetValue, value);
                     }
                 } else {
-                    field.set(target, value);
+                    if (field.getType().equals(Date.class)) {
+                        field.set(target, value);
+                    } else {
+                        field.set(target, value);
+                    }
                 }
             } else {
                 // Set Date field to null if value is null
                 if (field.getType().equals(Date.class)) {
                     field.set(target, null);
-                } else {
-                    field.set(target, value);
                 }
             }
         } catch (IllegalAccessException e) {
