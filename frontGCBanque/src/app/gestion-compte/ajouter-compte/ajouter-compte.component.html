@@ -1,37 +1,14 @@
-public void testPatchFinancementChamps() throws ParseException {
-		// Setup initial Financement object
-		// Setup initial Financement object
-		ArrayList<String> idReper = new ArrayList<String>(Arrays.asList("0123456789"));
-		Financement existing = new Financement();
-		existing.setIdFinancement("FZM2CSEVQ");
-		ObjetFinancement objetFinancement = new ObjetFinancement();
-		Bien bien = new Bien();
-		bien.setNumeroNomRue("13 bis");
-		bien.setSurfaceBien(200.0);
-		bien.setDateDepotPc(dateFormat.parse("2024-05-26T07:07:41.000+00:00"));
-		objetFinancement.setBien(bien);
-		existing.setObjetFinancement(objetFinancement);
-		existing.setIntervenant(Intervenant.builder()
-				.idReper(idReper)
-				.build());
-		financementRepository.save(existing);
+org.opentest4j.AssertionFailedError: 
+Expected :null
+Actual   :Sun May 26 09:07:41 CEST 2024
+<Click to see difference>
 
-		// Setup Financement update object
-		Financement update = new Financement();
-		ObjetFinancement updateObjetFinancement = new ObjetFinancement();
-		Bien updateBien = new Bien();
-		updateBien.setMontantFinanceLCL(3300000.0); // Only updating montantFinanceLCL
-		updateBien.setPartLCL(7400000.0); // Only updating partLCL
-		updateObjetFinancement.setBien(updateBien);
-		update.setObjetFinancement(updateObjetFinancement);
 
-		// Call patch method
-		Financement result = financementService.patchFinancementChamps("FZM2CSEVQ", update);
-
-		// Validate the result
-		assertEquals("13 bis", result.getObjetFinancement().getBien().getNumeroNomRue()); // Should not be null or changed
-		assertEquals(200.0, result.getObjetFinancement().getBien().getSurfaceBien(), 0.0); // Should not be changed
-		assertEquals(3300000.0, result.getObjetFinancement().getBien().getMontantFinanceLCL(), 0.0);
-		assertEquals(7400000.0, result.getObjetFinancement().getBien().getPartLCL(), 0.0);
-		assertNull(result.getObjetFinancement().getBien().getDateDepotPc()); // Should be set to null
-	}
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertNull.failNotNull(AssertNull.java:50)
+	at org.junit.jupiter.api.AssertNull.assertNull(AssertNull.java:35)
+	at org.junit.jupiter.api.AssertNull.assertNull(AssertNull.java:30)
+	at org.junit.jupiter.api.Assertions.assertNull(Assertions.java:279)
+	at com.cl.msofd.service.FinancementServiceTest.testPatchFinancementChamps(FinancementServiceTest.java:384)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
