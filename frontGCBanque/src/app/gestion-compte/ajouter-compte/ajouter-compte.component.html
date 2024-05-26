@@ -1,41 +1,37 @@
- public Financement patchFinancementChamps(String idFinancement, Financement financementToUpdate) {
-        Financement existingFinancement = financementRepository.findByidFinancement(idFinancement)
-                .orElseThrow(() -> new FinancementNotFoundException(String.format("Le financement à modifier %s est inexistant", idFinancement)));
+public void testPatchFinancementChamps() throws ParseException {
+		// Setup initial Financement object
+		// Setup initial Financement object
+		ArrayList<String> idReper = new ArrayList<String>(Arrays.asList("0123456789"));
+		Financement existing = new Financement();
+		existing.setIdFinancement("FZM2CSEVQ");
+		ObjetFinancement objetFinancement = new ObjetFinancement();
+		Bien bien = new Bien();
+		bien.setNumeroNomRue("13 bis");
+		bien.setSurfaceBien(200.0);
+		bien.setDateDepotPc(dateFormat.parse("2024-05-26T07:07:41.000+00:00"));
+		objetFinancement.setBien(bien);
+		existing.setObjetFinancement(objetFinancement);
+		existing.setIntervenant(Intervenant.builder()
+				.idReper(idReper)
+				.build());
+		financementRepository.save(existing);
 
-        merge(existingFinancement, financementToUpdate);
+		// Setup Financement update object
+		Financement update = new Financement();
+		ObjetFinancement updateObjetFinancement = new ObjetFinancement();
+		Bien updateBien = new Bien();
+		updateBien.setMontantFinanceLCL(3300000.0); // Only updating montantFinanceLCL
+		updateBien.setPartLCL(7400000.0); // Only updating partLCL
+		updateObjetFinancement.setBien(updateBien);
+		update.setObjetFinancement(updateObjetFinancement);
 
-        // Enregistrer les modifications
-        return financementRepository.save(existingFinancement);
-    }
+		// Call patch method
+		Financement result = financementService.patchFinancementChamps("FZM2CSEVQ", update);
 
-    private void merge(Object target, Object source) {
-        Field[] fields = source.getClass().getDeclaredFields();
-
-        for (Field field : fields) {
-            field.setAccessible(true);
-            try {
-                Object value = field.get(source);
-                if (value != null) {
-                    if (value instanceof String && ((String) value).trim().isEmpty()) {
-                        // If the value is a string and it's empty, set the target field to null
-                        field.set(target, null);
-                    } else if (isComplexObject(field.getType())) {
-                        Object targetValue = field.get(target);
-                        if (targetValue == null) {
-                            field.set(target, value);
-                        } else {
-                            merge(targetValue, value);
-                        }
-                    } else {
-                        field.set(target, value);
-                    }
-                }
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException("Failed to merge field: " + field.getName(), e);
-            }
-        }
-    }
-
-    private boolean isComplexObject(Class<?> type) {
-        return !type.isPrimitive() && !type.getName().startsWith("java.lang") && !type.getName().startsWith("java.util");
-    }
+		// Validate the result
+		assertEquals("13 bis", result.getObjetFinancement().getBien().getNumeroNomRue()); // Should not be null or changed
+		assertEquals(200.0, result.getObjetFinancement().getBien().getSurfaceBien(), 0.0); // Should not be changed
+		assertEquals(3300000.0, result.getObjetFinancement().getBien().getMontantFinanceLCL(), 0.0);
+		assertEquals(7400000.0, result.getObjetFinancement().getBien().getPartLCL(), 0.0);
+		assertNull(result.getObjetFinancement().getBien().getDateDepotPc()); // Should be set to null
+	}
