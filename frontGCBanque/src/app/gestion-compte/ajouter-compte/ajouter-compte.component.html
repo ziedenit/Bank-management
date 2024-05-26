@@ -1,32 +1,27 @@
-private void merge(Object target, Object source) {
-    Field[] fields = source.getClass().getDeclaredFields();
-
-    for (Field field : fields) {
-        field.setAccessible(true);
-        try {
-            Object value = field.get(source);
-            if (value != null) {
-                if (value instanceof String && ((String) value).trim().isEmpty()) {
-                    // If the value is a string and it's empty, set the target field to null
-                    field.set(target, null);
-                } else if (isComplexObject(field.getType())) {
-                    Object targetValue = field.get(target);
-                    if (targetValue == null) {
-                        field.set(target, value);
-                    } else {
-                        merge(targetValue, value);
-                    }
-                } else {
-                    if (field.getType() == Date.class && ((String) value).trim().isEmpty()) {
-                        // If the field is of type Date and the value is an empty string, set the target field to null
-                        field.set(target, null);
-                    } else {
-                        field.set(target, value);
-                    }
-                }
-            }
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException("Failed to merge field: " + field.getName(), e);
-        }
+Avant patch 
+{
+ "objetFinancement": {
+    "bien": {
+         "montantFinanceLCL": "7300000",
+          "dateDepotPc":"2024-05-26T07:07:41.000+00:00",
+          "surfaceBien":"1000",
+          "dateCreation": "2024-05-26T07:07:41.000+00:00",
+         "partLCL": "54000000"
     }
-}
+ }
+ }
+
+
+Souhaité apres patch 
+{
+ "objetFinancement": {
+    "bien": {
+         "montantFinanceLCL": "9300000",
+          "dateDepotPc":" ",
+          "surfaceBien":"8000",
+          "dateCreation": " ",
+         "partLCL": "04000000"
+    }
+ }
+ }
+ tous champs ce patch sauf  toujours la date si je le passe le vide il garde la date existante c'est devenu chiant je dois resoudre ca aidez moi svp
