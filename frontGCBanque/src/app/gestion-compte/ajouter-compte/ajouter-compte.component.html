@@ -8,6 +8,10 @@ public Financement patchFinancementChamps(String idFinancement, Financement fina
 }
 
 private void updateNonNullFields(Object source, Object target) {
+    if (source == null || target == null) {
+        return;
+    }
+
     Class<?> sourceClass = source.getClass();
     Class<?> targetClass = target.getClass();
 
@@ -20,11 +24,32 @@ private void updateNonNullFields(Object source, Object target) {
             if (value != null) {
                 Field targetField = targetClass.getDeclaredField(field.getName());
                 targetField.setAccessible(true);
-                targetField.set(target, value);
+
+                if (isPrimitiveOrWrapper(value.getClass()) || value instanceof String) {
+                    targetField.set(target, value);
+                } else {
+                    Object nestedTargetValue = targetField.get(target);
+                    if (nestedTargetValue == null) {
+                        nestedTargetValue = value.getClass().newInstance();
+                        targetField.set(target, nestedTargetValue);
+                    }
+                    updateNonNullFields(value, nestedTargetValue);
+                }
             }
-        } catch (IllegalAccessException | NoSuchFieldException e) {
-            // Gérer les exceptions
+        } catch (IllegalAccessException | NoSuchFieldException | InstantiationException e) {
             e.printStackTrace();
         }
     }
+}
+
+private boolean isPrimitiveOrWrapper(Class<?> type) {
+    return type.isPrimitive() || 
+           type == Boolean.class || 
+           type == Byte.class || 
+           type == Character.class || 
+           type == Double.class || 
+           type == Float.class || 
+           type == Integer.class || 
+           type == Long.class || 
+           type == Short.class;
 }
