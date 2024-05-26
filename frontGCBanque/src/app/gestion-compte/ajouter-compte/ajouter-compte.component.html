@@ -1,165 +1,62 @@
-public Financement patchFinancementChamps(String idFinancement, Financement financementToUpdate) {
-        Financement existingFinancement = financementRepository.findByidFinancement(idFinancement).orElse(null);
-        if (existingFinancement == null) {
-            throw new FinancementNotFoundException(String.format("Le financement à modifier %s est inexistant", idFinancement));
-        }
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.util.ReflectionUtils;
 
-        Class<Financement> financementClass = Financement.class;
-        Field[] fields = financementClass.getDeclaredFields();
+import java.lang.reflect.Field;
+import java.util.Map;
+import java.util.Objects;
 
-        for (Field field : fields) {
-            try {
-                ReflectionUtils.makeAccessible(field);
-                Object value = field.get(financementToUpdate);
-                if (value != null) {
-                    if ("objetFinancement".equals(field.getName())) {
-                        if (existingFinancement.getObjetFinancement() == null) {
-                            existingFinancement.setObjetFinancement((ObjetFinancement) value);
-                        } else {
-                            updateObjetFinancement(existingFinancement.getObjetFinancement(), (ObjetFinancement) value);
-                        }
-                    }
+@Service
+public class FinancementService {
 
-                    if (Constants.ALIGNEMENT.equals(field.getName())) {
-                        if (existingFinancement.getAlignement() == null) {
-                            existingFinancement.setAlignement((Alignement) value);
-                        } else {
-                            updateAlignement(existingFinancement.getAlignement(), (Alignement) value);
-                        }
-                    }
+    @Autowired
+    private FinancementRepository financementRepository;
 
-                    if (Constants.ELIGIBILITE.equals(field.getName())) {
-                        if (existingFinancement.getEligibilite() == null) {
-                            existingFinancement.setEligibilite((Eligibilite) value);
-                        } else {
-                            updateEligibilite(existingFinancement.getEligibilite(), (Eligibilite) value);
-                        }
-                    }
+    private final ObjectMapper objectMapper;
 
-                    if ("intervenant".equals(field.getName())) {
-                        if (existingFinancement.getIntervenant() == null) {
-                            existingFinancement.setIntervenant((Intervenant) value);
-                        } else {
-                            updateIntervenant(existingFinancement.getIntervenant(), (Intervenant) value);
-                        }
-                    } else {
-                        field.set(existingFinancement, value);
-                    }
-                }
+    public FinancementService() {
+        this.objectMapper = new ObjectMapper();
+        this.objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    }
 
-            } catch (IllegalAccessException e) {
-                commonLogger.eventTyp(EventTyp.APPLICATIVE).secEventTyp(SecEventTyp.METIER).logger().info("erreur lors de l'update du financement causé par: {}", e.getMessage());
+    public Financement patchFinancementChamps(String idFinancement, Financement financementToUpdate) {
+        Financement existingFinancement = financementRepository.findByidFinancement(idFinancement)
+                .orElseThrow(() -> new FinancementNotFoundException(String.format("Le financement à modifier %s est inexistant", idFinancement)));
 
-            }
-        }
+        merge(existingFinancement, financementToUpdate);
 
+        // Enregistrer les modifications
         return financementRepository.save(existingFinancement);
     }
-{
-    "id": "661927355e3f0e639f2afa66",
-    "origineCreation": null,
-    "dateCreation": "2024-05-25T16:23:42",
-    "origineModification": null,
-    "dateModification": "2024-05-25T16:23:42",
-    "idFinancement": "F8M2CSEVQ",
-    "objetFinancement": {
-        "id": null,
-        "origineCreation": null,
-        "dateCreation": "2024-05-26T09:07:41",
-        "origineModification": null,
-        "dateModification": "2024-05-26T09:07:41",
-        "idObjetFinancement": null,
-        "codeObjetFinancement": null,
-        "quotePartObjet": null,
-        "codeFamilleObjet": null,
-        "gainCEP": null,
-        "dateFinTravaux": null,
-        "bien": {
-            "id": null,
-            "origineCreation": null,
-            "dateCreation": "2024-05-26T09:07:41",
-            "origineModification": null,
-            "dateModification": "2024-05-26T09:07:41",
-            "idBien": null,
-            "codeBatiment": null,
-            "codeNormeThermique": null,
-            "typeBatiment": null,
-            "codeTypeBatiment": null,
-            "numeroVoie": "13",
-            "typeVoie": null,
-            "nomRue": null,
-            "etatBien": null,
-            "typeEnergie": null,
-            "codeTypeEnergie": null,
-            "batiment": null,
-            "escalier": null,
-            "etage": null,
-            "porte": null,
-            "codePostal": null,
-            "nomCommune": null,
-            "paysBien": null,
-            "adresseComplete": null,
-            "codeDepartement": null,
-            "codeInseeCommune": null,
-            "numeroLot": null,
-            "numeroNomRue": null,
-            "typeUsage": null,
-            "anneeConstruction": null,
-            "periodeConstruction": null,
-            "dateDepotPc": "2024-05-26T07:07:41.000+00:00",
-            "dateDebutConstruction": null,
-            "surfaceBien": 200.0,
-            "bienFinanceLCL": false,
-            "numeroFiscalLocal": null,
-            "coordonneeCartographiqueX": null,
-            "coordonneeCartographiqueY": null,
-            "prixBien": null,
-            "montantFinanceLCL": 3300000.0,
-            "partLCL": 7400000.0,
-            "dpeActuel": null
-        },
-        "dpeAvantTravaux": null,
-        "dpeApresTravaux": null,
-        "alignement": null,
-        "eligibilite": null,
-        "garantie": null,
-        "piecesJustificatives": null,
-        "statut": 0
-    },
-    "alignement": {
-        "id": null,
-        "origineCreation": null,
-        "dateCreation": "2024-05-25T15:45:26",
-        "origineModification": null,
-        "dateModification": "2024-05-25T15:45:26",
-        "topAlignement": "07",
-        "topAlignementXtra": "07"
-    },
-    "eligibilite": {
-        "id": null,
-        "origineCreation": null,
-        "dateCreation": "2024-05-25T15:45:26",
-        "origineModification": null,
-        "dateModification": "2024-05-25T15:45:26",
-        "topEligibilite": "02"
-    },
-    "eligibleDpe": null,
-    "intervenant": {
-        "id": null,
-        "origineCreation": null,
-        "dateCreation": "2024-04-12T14:21:09",
-        "origineModification": null,
-        "dateModification": "2024-04-12T14:21:09",
-        "idIntervenant": null,
-        "idReper": [
-            "4538872458"
-        ]
-    },
-    "indicateurFinancementDedie": "Y",
-    "indicateurNatureDurable": null,
-    "typeRisqueClimatiqueAttenue": null,
-    "codeApplicatifOrigine": "03",
-    "indicateurReprise": false,
-    "statut": 0,
-    "agenceCompte": "003800000056968N"
+
+    private void merge(Object target, Object source) {
+        Field[] fields = source.getClass().getDeclaredFields();
+
+        for (Field field : fields) {
+            field.setAccessible(true);
+            try {
+                Object value = field.get(source);
+                if (value != null) {
+                    if (isComplexObject(field.getType())) {
+                        Object targetValue = field.get(target);
+                        if (targetValue == null) {
+                            field.set(target, value);
+                        } else {
+                            merge(targetValue, value);
+                        }
+                    } else {
+                        field.set(target, value);
+                    }
+                }
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException("Failed to merge field: " + field.getName(), e);
+            }
+        }
+    }
+
+    private boolean isComplexObject(Class<?> type) {
+        return !type.isPrimitive() && !type.getName().startsWith("java.lang") && !type.getName().startsWith("java.util");
+    }
 }
