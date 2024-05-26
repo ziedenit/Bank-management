@@ -1,127 +1,27 @@
-L'objet exsistant :
-{
-    "id": "661927355e3f0e639f2afa66",
-    "origineCreation": null,
-    "dateCreation": "2024-05-25T16:23:42",
-    "origineModification": null,
-    "dateModification": "2024-05-25T16:23:42",
-    "idFinancement": "F8M2CSEVQ",
-    "objetFinancement": {
-        "id": null,
-        "origineCreation": null,
-        "dateCreation": "2024-05-26T09:07:41",
-        "origineModification": null,
-        "dateModification": "2024-05-26T09:07:41",
-        "idObjetFinancement": null,
-        "codeObjetFinancement": null,
-        "quotePartObjet": null,
-        "codeFamilleObjet": null,
-        "gainCEP": null,
-        "dateFinTravaux": null,
-        "bien": {
-            "id": null,
-            "origineCreation": null,
-            "dateCreation": "2024-05-26T09:07:41",
-            "origineModification": null,
-            "dateModification": "2024-05-26T09:07:41",
-            "idBien": null,
-            "codeBatiment": null,
-            "codeNormeThermique": null,
-            "typeBatiment": null,
-            "codeTypeBatiment": null,
-            "numeroVoie": "13",
-            "typeVoie": null,
-            "nomRue": null,
-            "etatBien": null,
-            "typeEnergie": null,
-            "codeTypeEnergie": null,
-            "batiment": null,
-            "escalier": null,
-            "etage": null,
-            "porte": null,
-            "codePostal": null,
-            "nomCommune": null,
-            "paysBien": null,
-            "adresseComplete": null,
-            "codeDepartement": null,
-            "codeInseeCommune": null,
-            "numeroLot": null,
-            "numeroNomRue": null,
-            "typeUsage": null,
-            "anneeConstruction": null,
-            "periodeConstruction": null,
-            "dateDepotPc": 2024-05-26T09:07:41,
-            "dateDebutConstruction": null,
-            "surfaceBien": 200.0,
-            "bienFinanceLCL": false,
-            "numeroFiscalLocal": null,
-            "coordonneeCartographiqueX": null,
-            "coordonneeCartographiqueY": null,
-            "prixBien": null,
-            "montantFinanceLCL": 3300000.0,
-            "partLCL": 7400000.0,
-            "dpeActuel": null
-        },
-        "dpeAvantTravaux": null,
-        "dpeApresTravaux": null,
-        "alignement": null,
-        "eligibilite": null,
-        "garantie": null,
-        "piecesJustificatives": null,
-        "statut": 0
-    },
-    "alignement": {
-        "id": null,
-        "origineCreation": null,
-        "dateCreation": "2024-05-25T15:45:26",
-        "origineModification": null,
-        "dateModification": "2024-05-25T15:45:26",
-        "topAlignement": "07",
-        "topAlignementXtra": "07"
-    },
-    "eligibilite": {
-        "id": null,
-        "origineCreation": null,
-        "dateCreation": "2024-05-25T15:45:26",
-        "origineModification": null,
-        "dateModification": "2024-05-25T15:45:26",
-        "topEligibilite": "02"
-    },
-    "eligibleDpe": null,
-    "intervenant": {
-        "id": null,
-        "origineCreation": null,
-        "dateCreation": "2024-04-12T14:21:09",
-        "origineModification": null,
-        "dateModification": "2024-04-12T14:21:09",
-        "idIntervenant": null,
-        "idReper": [
-            "4538872458"
-        ]
-    },
-    "indicateurFinancementDedie": "Y",
-    "indicateurNatureDurable": null,
-    "typeRisqueClimatiqueAttenue": null,
-    "codeApplicatifOrigine": "03",
-    "indicateurReprise": false,
-    "statut": 0,
-    "agenceCompte": "003800000056968N"
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.BeanUtils;
+
+public Financement patchFinancementChamps(String idFinancement, Financement financementToUpdate) {
+    Financement existingFinancement = financementRepository.findByidFinancement(idFinancement)
+            .orElseThrow(() -> new FinancementNotFoundException("Le financement à modifier est inexistant"));
+
+    merge(existingFinancement, financementToUpdate);
+
+    // Enregistrer les modifications
+    return financementRepository.save(existingFinancement);
 }
-//////////////////////////:
-le patch input est 
-{
- "objetFinancement": {
-    "bien": {
-         "montantFinanceLCL": "3300000",
-          "dateDepotPc":"",
-         "partLCL": "7400000"
-    }
- }
- }
- je recois cette exception 
- <ErrorResponse>
-    <code>TECHNICAL_EXCEPTION_OCCURED </code>
-    <message>
-        <message>Failed to convert from type [java.lang.String] to type [java.util.Date] for value [2024-05-26T09:07:41]</message>
-    </message>
-</ErrorResponse>
+
+private void merge(Object target, Object source) {
+    ObjectMapper objectMapper = new ObjectMapper();
+    objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+    // Convert source object to a map
+    Map<String, Object> sourceMap = objectMapper.convertValue(source, Map.class);
+
+    // Remove entries with null or empty values
+    sourceMap.values().removeIf(Objects::isNull);
+
+    // Merge source map into target object
+    objectMapper.updateValue(target, sourceMap);
+}
