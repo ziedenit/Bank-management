@@ -1,14 +1,64 @@
-2024-05-26T07:07:41.000+00:00
-je veux appliquer ce patch des champs donc date dateDepotPc en sortie doit etre vide alors que le résultat il attribue une date "2024-05-26T07:07:41.000+00:00" que je comprends pas pourquoi 
-{
- "objetFinancement": {
-    "bien": {
-         "montantFinanceLCL": "1300000",
-          "dateDepotPc":" ",
-          "numeroVoie":"",
-          "surfaceBien":"0",
-         "partLCL": "54000000"
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.lang.reflect.Field;
+import java.util.Map;
+import java.util.Objects;
+
+@Service
+public class FinancementService {
+
+    @Autowired
+    private FinancementRepository financementRepository;
+
+    private final ObjectMapper objectMapper;
+
+    public FinancementService() {
+        this.objectMapper = new ObjectMapper();
+        this.objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
- }
- }
- pourvons nous adapter le code pour  patcher un champs date ayant une valeur  existante vers le  " " 
+
+    public Financement patchFinancementChamps(String idFinancement, Financement financementToUpdate) {
+        Financement existingFinancement = financementRepository.findByidFinancement(idFinancement)
+                .orElseThrow(() -> new FinancementNotFoundException(String.format("Le financement à modifier %s est inexistant", idFinancement)));
+
+        merge(existingFinancement, financementToUpdate);
+
+        // Enregistrer les modifications
+        return financementRepository.save(existingFinancement);
+    }
+
+    private void merge(Object target, Object source) {
+        Field[] fields = source.getClass().getDeclaredFields();
+
+        for (Field field : fields) {
+            field.setAccessible(true);
+            try {
+                Object value = field.get(source);
+                if (value != null) {
+                    if (value instanceof String && ((String) value).trim().isEmpty()) {
+                        // If the value is a string and it's empty, set the target field to null
+                        field.set(target, null);
+                    } else if (isComplexObject(field.getType())) {
+                        Object targetValue = field.get(target);
+                        if (targetValue == null) {
+                            field.set(target, value);
+                        } else {
+                            merge(targetValue, value);
+                        }
+                    } else {
+                        field.set(target, value);
+                    }
+                }
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException("Failed to merge field: " + field.getName(), e);
+            }
+        }
+    }
+
+    private boolean isComplexObject(Class<?> type) {
+        return !type.isPrimitive() && !type.getName().startsWith("java.lang") && !type.getName().startsWith("java.util");
+    }
+}
