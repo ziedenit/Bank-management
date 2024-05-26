@@ -1,32 +1,14 @@
-@Test
-    public void testPatchFinancementChamps() {
-        // Setup initial Financement object
-        Financement existing = new Financement();
-        existing.setIdFinancement("F8M2CSEVQ");
-        ObjetFinancement objetFinancement = new ObjetFinancement();
-        Bien bien = new Bien();
-        bien.setNumeroNomRue("13 bis");
-        bien.setSurfaceBien(200.0);
-        objetFinancement.setBien(bien);
-        existing.setObjetFinancement(objetFinancement);
-        financementRepository.save(existing);
-
-        // Setup Financement update object
-        Financement update = new Financement();
-        ObjetFinancement updateObjetFinancement = new ObjetFinancement();
-        Bien updateBien = new Bien();
-        updateBien.setMontantFinanceLCL(3300000.0); // Only updating montantFinanceLCL
-        updateBien.setPartLCL(7400000.0); // Only updating partLCL
-        updateObjetFinancement.setBien(updateBien);
-        update.setObjetFinancement(updateObjetFinancement);
-
-        // Call patch method
-        Financement result = financementService.patchFinancementChamps("F8M2CSEVQ", update);
-
-        // Validate the result
-        assertEquals("13 bis", result.getObjetFinancement().getBien().getNumeroNomRue()); // Should not be null or changed
-        assertEquals(200.0, result.getObjetFinancement().getBien().getSurfaceBien(), 0.0); // Should not be changed
-        assertEquals(3300000.0, result.getObjetFinancement().getBien().getMontantFinanceLCL(), 0.0);
-        assertEquals(7400000.0, result.getObjetFinancement().getBien().getPartLCL(), 0.0);
+2024-05-26T07:07:41.000+00:00
+je veux appliquer ce patch des champs donc date dateDepotPc en sortie doit etre vide alors que le résultat il attribue une date "2024-05-26T07:07:41.000+00:00" que je comprends pas pourquoi 
+{
+ "objetFinancement": {
+    "bien": {
+         "montantFinanceLCL": "1300000",
+          "dateDepotPc":" ",
+          "numeroVoie":"",
+          "surfaceBien":"0",
+         "partLCL": "54000000"
     }
-}
+ }
+ }
+ pourvons nous adapter le code pour  patcher un champs date ayant une valeur  existante vers le  " " 
