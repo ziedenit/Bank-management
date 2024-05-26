@@ -1,4 +1,32 @@
-org.opentest4j.AssertionFailedError: 
-Expected :null
-Actual   :Sun May 26 09:07:41 CEST 2024
-<Click to see difference>
+private void merge(Object target, Object source) {
+    Field[] fields = source.getClass().getDeclaredFields();
+
+    for (Field field : fields) {
+        field.setAccessible(true);
+        try {
+            Object value = field.get(source);
+            if (value != null) {
+                if (value instanceof String && ((String) value).trim().isEmpty()) {
+                    // If the value is a string and it's empty, set the target field to null
+                    field.set(target, null);
+                } else if (isComplexObject(field.getType())) {
+                    Object targetValue = field.get(target);
+                    if (targetValue == null) {
+                        field.set(target, value);
+                    } else {
+                        merge(targetValue, value);
+                    }
+                } else {
+                    if (field.getType() == Date.class && ((String) value).trim().isEmpty()) {
+                        // If the field is of type Date and the value is an empty string, set the target field to null
+                        field.set(target, null);
+                    } else {
+                        field.set(target, value);
+                    }
+                }
+            }
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException("Failed to merge field: " + field.getName(), e);
+        }
+    }
+}
