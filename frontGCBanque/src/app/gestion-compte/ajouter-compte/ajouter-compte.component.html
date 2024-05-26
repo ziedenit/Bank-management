@@ -1,79 +1,59 @@
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.boot.test.context.SpringBootTest;
 
-import java.lang.reflect.Field;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Map;
-import java.util.Objects;
+import java.util.Arrays;
 
-@Service
-public class FinancementService {
+import static org.junit.jupiter.api.Assertions.*;
+
+@SpringBootTest
+public class FinancementServiceTest {
+
+    @Autowired
+    private FinancementService financementService;
 
     @Autowired
     private FinancementRepository financementRepository;
 
-    private final ObjectMapper objectMapper;
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
 
-    public FinancementService() {
-        this.objectMapper = new ObjectMapper();
-        this.objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-    }
+    @Test
+    public void testPatchFinancementChamps() throws Exception {
+        // Setup initial Financement object
+        ArrayList<String> idReper = new ArrayList<>(Arrays.asList("0123456789"));
+        Financement existing = new Financement();
+        existing.setIdFinancement("FZM2CSEVQ");
+        ObjetFinancement objetFinancement = new ObjetFinancement();
+        Bien bien = new Bien();
+        bien.setNumeroNomRue("13 bis");
+        bien.setSurfaceBien(200.0);
+        bien.setDateDepotPc(dateFormat.parse("2024-05-26T07:07:41.000+00:00"));
+        objetFinancement.setBien(bien);
+        existing.setObjetFinancement(objetFinancement);
+        existing.setIntervenant(Intervenant.builder()
+                .idReper(idReper)
+                .build());
+        financementRepository.save(existing);
 
-    public Financement patchFinancementChamps(String idFinancement, Financement financementToUpdate) {
-        Financement existingFinancement = financementRepository.findByidFinancement(idFinancement)
-                .orElseThrow(() -> new FinancementNotFoundException(String.format("Le financement à modifier %s est inexistant", idFinancement)));
+        // Setup Financement update object
+        Financement update = new Financement();
+        ObjetFinancement updateObjetFinancement = new ObjetFinancement();
+        Bien updateBien = new Bien();
+        updateBien.setMontantFinanceLCL(3300000.0); // Only updating montantFinanceLCL
+        updateBien.setPartLCL(7400000.0); // Only updating partLCL
+        updateBien.setDateDepotPc(" "); // Setting dateDepotPc to empty string
+        updateObjetFinancement.setBien(updateBien);
+        update.setObjetFinancement(updateObjetFinancement);
 
-        merge(existingFinancement, financementToUpdate);
+        // Call patch method
+        Financement result = financementService.patchFinancementChamps("FZM2CSEVQ", update);
 
-        // Enregistrer les modifications
-        return financementRepository.save(existingFinancement);
-    }
-
-    private void merge(Object target, Object source) {
-        Field[] fields = source.getClass().getDeclaredFields();
-
-        for (Field field : fields) {
-            field.setAccessible(true);
-            try {
-                Object value = field.get(source);
-                if (value != null) {
-                    if (value instanceof String && ((String) value).trim().isEmpty()) {
-                        // If the value is a string and it's empty, set the target field to null
-                        field.set(target, null);
-                    } else if (isComplexObject(field.getType())) {
-                        Object targetValue = field.get(target);
-                        if (targetValue == null) {
-                            field.set(target, value);
-                        } else {
-                            merge(targetValue, value);
-                        }
-                    } else if (field.getType().equals(Date.class) && value instanceof String) {
-                        // Handle Date fields explicitly
-                        if (((String) value).trim().isEmpty()) {
-                            field.set(target, null);
-                        } else {
-                            try {
-                                field.set(target, dateFormat.parse((String) value));
-                            } catch (ParseException e) {
-                                throw new RuntimeException("Failed to parse date: " + value, e);
-                            }
-                        }
-                    } else {
-                        field.set(target, value);
-                    }
-                }
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException("Failed to merge field: " + field.getName(), e);
-            }
-        }
-    }
-
-    private boolean isComplexObject(Class<?> type) {
-        return !type.isPrimitive() && !type.getName().startsWith("java.lang") && !type.getName().startsWith("java.util");
+        // Validate the result
+        assertEquals("13 bis", result.getObjetFinancement().getBien().getNumeroNomRue()); // Should not be null or changed
+        assertEquals(200.0, result.getObjetFinancement().getBien().getSurfaceBien(), 0.0); // Should not be changed
+        assertEquals(3300000.0, result.getObjetFinancement().getBien().getMontantFinanceLCL(), 0.0);
+        assertEquals(7400000.0, result.getObjetFinancement().getBien().getPartLCL(), 0.0);
+        assertNull(result.getObjetFinancement().getBien().getDateDepotPc()); // Should be set to null
     }
 }
