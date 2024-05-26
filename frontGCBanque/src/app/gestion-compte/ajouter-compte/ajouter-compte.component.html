@@ -1,27 +1,42 @@
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-public Financement patchFinancementChamps(String idFinancement, Financement financementToUpdate) {
-    Financement existingFinancement = financementRepository.findByidFinancement(idFinancement)
-            .orElseThrow(() -> new FinancementNotFoundException("Le financement à modifier est inexistant"));
+import java.util.Map;
+import java.util.Objects;
 
-    merge(existingFinancement, financementToUpdate);
+@Service
+public class FinancementService {
 
-    // Enregistrer les modifications
-    return financementRepository.save(existingFinancement);
-}
+    @Autowired
+    private FinancementRepository financementRepository;
 
-private void merge(Object target, Object source) {
-    ObjectMapper objectMapper = new ObjectMapper();
-    objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    private final ObjectMapper objectMapper;
 
-    // Convert source object to a map
-    Map<String, Object> sourceMap = objectMapper.convertValue(source, Map.class);
+    public FinancementService() {
+        this.objectMapper = new ObjectMapper();
+        this.objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    }
 
-    // Remove entries with null or empty values
-    sourceMap.values().removeIf(Objects::isNull);
+    public Financement patchFinancementChamps(String idFinancement, Financement financementToUpdate) {
+        Financement existingFinancement = financementRepository.findByidFinancement(idFinancement)
+                .orElseThrow(() -> new FinancementNotFoundException("Le financement à modifier est inexistant"));
 
-    // Merge source map into target object
-    objectMapper.updateValue(target, sourceMap);
+        merge(existingFinancement, financementToUpdate);
+
+        // Enregistrer les modifications
+        return financementRepository.save(existingFinancement);
+    }
+
+    private void merge(Object target, Object source) {
+        // Convert source object to a map
+        Map<String, Object> sourceMap = objectMapper.convertValue(source, Map.class);
+
+        // Remove entries with null or empty values
+        sourceMap.values().removeIf(Objects::isNull);
+
+        // Merge source map into target object
+        objectMapper.readerForUpdating(target).readValue(objectMapper.writeValueAsString(sourceMap));
+    }
 }
