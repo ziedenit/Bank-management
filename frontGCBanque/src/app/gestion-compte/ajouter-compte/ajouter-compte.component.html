@@ -1,25 +1,18 @@
-  @Override
-    public boolean isValid(List<LabelBien> labelBienList, ConstraintValidatorContext constraintValidatorContext) {
+@Override
+public boolean isValid(List<LabelBien> labelBienList, ConstraintValidatorContext constraintValidatorContext) {
+    validLabelList = true;
 
-        validLabelList = true;
-        labelBienList.forEach(label ->
-                {
-                    if (label.getIdentifiantLabel().equals("01")
-                            && !breeamNiveaux.contains(label.getNiveauLabel())) {
-                        validLabelList = false;
-                    } else if (label.getIdentifiantLabel().equals("02") && !leedNiveaux.contains(label.getNiveauLabel())) {
-                        validLabelList = false;
-                    } else if (label.getIdentifiantLabel().equals("03") && !hqeNiveaux.contains(label.getNiveauLabel())) {
-                        validLabelList = false;
-                    }
-                }
-        );
-        return validLabelList;
+    for (LabelBien label : labelBienList) {
+        String identifiant = label.getIdentifiantLabel();
+        String niveau = label.getNiveauLabel();
+
+        if ((identifiant.equals("01") && !breeamNiveaux.contains(niveau)) ||
+            (identifiant.equals("02") && !leedNiveaux.contains(niveau)) ||
+            (identifiant.equals("03") && !hqeNiveaux.contains(niveau))) {
+            validLabelList = false;
+            break; // Exit the loop early if an invalid label is found
+        }
     }
-       else if (label.getIdentifiantLabel().equals("03") && !hqeNiveaux.contains(label.getNiveauLabel()))
-                     {
-                        validLabelList = false;
-                     }
-This branch's code block is the same as the block for the branch on line 39.
 
-     here the method to refactor
+    return validLabelList;
+}
