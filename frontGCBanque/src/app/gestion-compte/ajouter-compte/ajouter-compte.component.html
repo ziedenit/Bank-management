@@ -1,18 +1,33 @@
-else {
+private void merge(Object target, Object source) {
+    Field[] fields = source.getClass().getDeclaredFields();
+
+    for (Field field : fields) {
+        field.setAccessible(true);
+        try {
+            Object value = field.get(source);
+
+            if (value != null) {
+                if (isComplexObject(field.getType())) {
+                    Object targetValue = field.get(target);
+                    if (targetValue == null) {
+                        field.set(target, value);
+                    } else {
+                        merge(targetValue, value);
+                    }
+                } else {
                     if (field.getType().equals(Date.class)) {
-                        field.set(target, null);
-                    }
-
-                    if (bienFields.contains(field.getName())) {
-                        field.set(target, null);
-                    }
-
-                    if (dpeFields.contains(field.getName())) {
-                        field.set(target, null);
+                        field.set(target, value);
+                    } else {
+                        field.set(target, value);
                     }
                 }
-
-                how to fix this 
-                   } else {
-                        if (field.getType().equals(Date.class)) {
-Remove this conditional structure or edit its code blocks so that they're not all the same.
+            } else {
+                if (field.getType().equals(Date.class)) {
+                    field.set(target, null);
+                }
+            }
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException("Failed to merge field: " + field.getName(), e);
+        }
+    }
+}
