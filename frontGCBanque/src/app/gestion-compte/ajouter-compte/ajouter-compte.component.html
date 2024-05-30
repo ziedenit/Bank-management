@@ -1,51 +1,72 @@
-private void merge(Object target, Object source) throws Exception {
-    Field[] fields = source.getClass().getDeclaredFields();
-    Set<String> bienFields = Set.of(
-            "codeBatiment", "typeBatiment", "numeroVoie", "typeVoie", "nomRue", "batiment", "escalier", "etage", "porte", "codePostal", "nomCommune",
-            "paysBien", "adresseComplete", "codeNormeThermique", "etatBien", "typeEnergie", "codeTypeEnergie", "codeDepartement", "codeInseeCommune",
-            "numeroLot", "numeroNomRue", "typeUsage", "anneeConstruction", "periodeConstruction", "dateDepotPc", "dateDebutConstruction", "surfaceBien",
-            "numeroFiscalLocal", "coordonneeCartographiqueX", "coordonneeCartographiqueY", "prixBien", "montantFinanceLCL", "partLCL");
+@Test
+	void testPatchFinancementChamps() throws Exception {
+		// Setup initial Financement object
+		ArrayList<String> idReper = new ArrayList<>(Arrays.asList("0123456780"));
+		Financement existing = new Financement();
+		existing.setIdFinancement("123456XXY");
+		ObjetFinancement objetFinancement = new ObjetFinancement();
+		Bien bien = new Bien();
+		bien.setNumeroNomRue("13 bis");
+		bien.setSurfaceBien(200.0);
+		bien.setDateDepotPc(dateFormat.parse("2024-05-26T07:07:41.000+00:00"));
+		objetFinancement.setBien(bien);
+		existing.setObjetFinancement(objetFinancement);
+		existing.setIntervenant(Intervenant.builder()
+				.idReper(idReper)
+				.build());
+		financementRepository.save(existing);
 
-    Set<String> dpeFields = Set.of(
-            "numeroDpe", "estimationCep", "classeCep", "estimationGes", "classeGes", "dateEtablissementDpe",
-            "dateReceptionDpe", "dateFinValiditeDpe", "sirenDiagnostiqueur");
+		// Setup Financement update object
+		Financement update = new Financement();
+		ObjetFinancement updateObjetFinancement = new ObjetFinancement();
+		Bien updateBien = new Bien();
+		updateBien.setMontantFinanceLCL(3300000.0); // new value after update
+		updateBien.setPartLCL(7400000.0); // // new value after update
+		updateBien.setDateDepotPc(parseDate(" ")); // Setting dateDepotPc to empty string
+		updateObjetFinancement.setBien(updateBien);
+		update.setObjetFinancement(updateObjetFinancement);
+		update.setIntervenant(Intervenant.builder()
+				.idReper(idReper)
+				.build());
 
-    for (Field field : fields) {
-        field.setAccessible(true);
-        try {
-            Object value = field.get(source);
-            if (value != null) {
-                handleNonNullValue(target, field, value);
-            } else {
-                handleNullValue(target, field, bienFields, dpeFields);
-            }
-        } catch (IllegalAccessException e) {
-            throw new PatchFinancementException("Failed to merge field: " + e.getMessage());
-        }
-    }
-}
+		// Call patch method
+		Financement result = financementService.patchFinancementChamps("123456XXY", update);
 
-private void handleNonNullValue(Object target, Field field, Object value) throws IllegalAccessException, Exception {
-    if (isComplexObject(field.getType())) {
-        Object targetValue = field.get(target);
-        if (targetValue == null) {
-            field.set(target, value);
-        } else {
-            merge(targetValue, value);
-        }
-    } else {
-        field.set(target, value);
-    }
-}
+		// Validate the result and check only updated values
+	     assertNull(result.getObjetFinancement().getBien().getNumeroNomRue()); // Should be null
+		assertNull(result.getObjetFinancement().getBien().getSurfaceBien()); // Should be null
+		assertEquals(3300000.0, result.getObjetFinancement().getBien().getMontantFinanceLCL(), 0.0); // new updated value after patch
+		assertEquals(7400000.0, result.getObjetFinancement().getBien().getPartLCL(), 0.0); // new updated value after patch
+		assertNull(result.getObjetFinancement().getBien().getDateDepotPc()); // Should be set to null
+		// delete mocked financement
+		financementService.deleteFinancementByIdFinancement("123456XXY");
+	}
 
-private void handleNullValue(Object target, Field field, Set<String> bienFields, Set<String> dpeFields) throws IllegalAccessException {
-    if (field.getType().equals(Date.class) || bienFields.contains(field.getName()) || dpeFields.contains(field.getName())) {
-        field.set(target, null);
-    }
-}
+	private Date parseDate(String dateStr) {
+		if (dateStr == null || dateStr.trim().isEmpty()) {
+			return null;
+		}
+		try {
+			return dateFormat.parse(dateStr);
+		} catch (ParseException e) {
+			throw new IllegalArgumentException("Invalid date format: " + dateStr, e);
+		}
+	}
+            Java HotSpot(TM) 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
 
-private boolean isComplexObject(Class<?> type) {
-    return !type.isPrimitive() && !type.equals(String.class) && !type.equals(Integer.class) && !type.equals(Long.class)
-            && !type.equals(Double.class) && !type.equals(Float.class) && !type.equals(Boolean.class) && !type.equals(Byte.class)
-            && !type.equals(Character.class) && !type.equals(Short.class) && !type.equals(Date.class);
-}
+java.lang.reflect.InaccessibleObjectException: Unable to make field private static final long java.util.ArrayList.serialVersionUID accessible: module java.base does not "opens java.util" to unnamed module @735b478
+
+	at java.base/java.lang.reflect.AccessibleObject.checkCanSetAccessible(AccessibleObject.java:354)
+	at java.base/java.lang.reflect.AccessibleObject.checkCanSetAccessible(AccessibleObject.java:297)
+	at java.base/java.lang.reflect.Field.checkCanSetAccessible(Field.java:178)
+	at java.base/java.lang.reflect.Field.setAccessible(Field.java:172)
+	at com.cl.msofd.service.FinancementService.merge(FinancementService.java:317)
+	at com.cl.msofd.service.FinancementService.handleNonNullValue(FinancementService.java:337)
+	at com.cl.msofd.service.FinancementService.merge(FinancementService.java:321)
+	at com.cl.msofd.service.FinancementService.handleNonNullValue(FinancementService.java:337)
+	at com.cl.msofd.service.FinancementService.merge(FinancementService.java:321)
+	at com.cl.msofd.service.FinancementService.patchFinancementChamps(FinancementService.java:298)
+	at com.cl.msofd.service.FinancementServiceTest.testPatchFinancementChamps(FinancementServiceTest.java:373)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
