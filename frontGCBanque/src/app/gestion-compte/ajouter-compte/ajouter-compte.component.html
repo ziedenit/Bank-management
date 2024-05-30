@@ -1,17 +1,52 @@
-public static final String NIVEAU_LABEL_BIEN_MESSAGE = """
-        Niveaux du label BREEAM 01:
-        01 - Exceptionnel
-        02 - Excellent
-        03 - Bon
-        04 - Passable
-        05 - non classé
-        Niveaux de label LEED 02:
-        01 - Platinium
-        02 - Or
-        03 - Argent
-        04 - Certifié
-        Niveaux de label HQE 03:
-        01 - Très performant
-        02 - Performant
-        03 - Base
-        """;
+private void merge(Object target, Object source) throws Exception {
+        Field[] fields = source.getClass().getDeclaredFields();
+        ArrayList<String> bienFields = new ArrayList<>(
+                Arrays.asList(
+                        "codeBatiment", "typeBatiment", "numeroVoie", "typeVoie", "nomRue", "batiment", "escalier", "etage", "porte", "codePostal", "nomCommune",
+                        "paysBien", "adresseComplete", "codeNormeThermique", "etatBien", "typeEnergie", "codeTypeEnergie", "codeDepartement", "codeInseeCommune",
+                        "numeroLot", "numeroNomRue", "typeUsage", "anneeConstruction", "periodeConstruction", "dateDepotPc", "dateDebutConstruction", "surfaceBien",
+                        "numeroFiscalLocal", "coordonneeCartographiqueX", "coordonneeCartographiqueY", "prixBien", "montantFinanceLCL", "partLCL"));
+
+
+        ArrayList<String> dpeFields = new ArrayList<>(
+                Arrays.asList("numeroDpe", "estimationCep", "classeCep", "estimationGes", "classeGes", "dateEtablissementDpe",
+                        "dateReceptionDpe", "dateFinValiditeDpe", "sirenDiagnostiqueur"));
+
+        for (Field field : fields) {
+            field.setAccessible(true);
+            try {
+                Object value = field.get(source);
+                if (value != null) {
+                    if (isComplexObject(field.getType())) {
+                        Object targetValue = field.get(target);
+                        if (targetValue == null) {
+                            field.set(target, value);
+                        } else {
+                            merge(targetValue, value);
+                        }
+                    } else {
+                        if (field.getType().equals(Date.class)) {
+                            field.set(target, value);
+                        } else {
+                            field.set(target, value);
+                        }
+                    }
+                } else {
+                    if (field.getType().equals(Date.class)) {
+                        field.set(target, null);
+                    }
+
+                    if (bienFields.contains(field.getName())) {
+                        field.set(target, null);
+                    }
+
+                    if (dpeFields.contains(field.getName())) {
+                        field.set(target, null);
+                    }
+                }
+            } catch (IllegalAccessException e) {
+                throw new PatchFinancementException("Failed to merge field: " +e.getMessage());
+            }
+        }
+    }
+                Refactor this method to reduce its Cognitive Complexity from 29 to the 15 allowed.
