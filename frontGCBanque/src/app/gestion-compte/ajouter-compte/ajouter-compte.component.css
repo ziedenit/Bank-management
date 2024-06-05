@@ -1,5 +1,11 @@
+ <div class="col2">
 
-.container-fluid
-{
-  margin-left: 250px;
-}
+<div class="ajoutFinancement">
+<button mat-stroked-button>
+  <img   src="../../../assets/icons/plus.svg" />
+   &nbsp;  
+  ajouter un objet de financement</button>
+
+</div>
+</div>
+</div>
