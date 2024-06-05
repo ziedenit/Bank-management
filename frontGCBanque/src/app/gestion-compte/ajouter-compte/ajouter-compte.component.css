@@ -1,36 +1,45 @@
 <h2 class="Titre-01">Acquisition des données et des justificatifs</h2>
 
-<!---------------------------------------bloc clients Particuliers---------------------------------------------------------->
-<div *ngIf="clientParticulier == true">
+<div *ngIf="clientParticulier">
   <div class="container-fluid mb-4">
-    <div class="row">
-      <div class="col-12">
+    <div class="row align-items-center">
+      <div class="col">
         <div class="nav">
-          <img *ngIf="hiddenClient == false" src="../../../assets/icons/arrow-up.svg" (click)="hideDataClient()" />
-          <img *ngIf="hiddenClient == true" src="../../../assets/icons/arrow-down.svg" (click)="showDataClient()" />
-          &nbsp; Client ({{idRepers.length}})
+          <img *ngIf="!hiddenClient" src="../../../assets/icons/arrow-up.svg" (click)="hideDataClient()" />
+          <img *ngIf="hiddenClient" src="../../../assets/icons/arrow-down.svg" (click)="showDataClient()" />
+          &nbsp; Client ({{ idRepers.length }})
+        </div>
+      </div>
+      <div class="col-auto">
+        <div class="ajoutFinancement">
+          <button mat-stroked-button (click)="ajouterObjetFinancement()">
+            <img src="../../../assets/icons/plus.svg" />
+            &nbsp;
+            ajouter un objet de financement
+          </button>
         </div>
       </div>
     </div>
+
     <div class="row" *ngIf="elementClient">
       <div class="col-12">
         <ul class="list-group">
           <li class="list-group-item" *ngFor="let client of clientDataList">
             <div class="row">
               <div class="col">
-                Nom &nbsp;&nbsp; <b>{{client.civility}}.&nbsp; {{client.nomUsageClient}} {{client.prenomClient}}</b>
+                Nom &nbsp;&nbsp; <b>{{ client.civility }}.&nbsp; {{ client.nomUsageClient }} {{ client.prenomClient }}</b>
               </div>
               <div class="col">
-                né (e) le : &nbsp;&nbsp; <b>{{client.dateNaissanceClient}}</b>
+                né (e) le : &nbsp;&nbsp; <b>{{ client.dateNaissanceClient }}</b>
               </div>
             </div>
           </li>
         </ul>
       </div>
     </div>
+
     <div class="row">
       <div class="col-lg-12">
-        <!-- Affichage du message d'erreur -->
         <div *ngIf="errorrs.length > 0">
           <div class="error-message">
             <ul class="list-group">
@@ -51,41 +60,52 @@
     </div>
   </div>
 </div>
-<div *ngIf="clientParticulier == false">
+
+<div *ngIf="!clientParticulier">
   <div class="container-fluid mb-4">
-    <div class="row">
-      <div class="col-12">
+    <div class="row align-items-center">
+      <div class="col">
         <div class="nav">
-          <img *ngIf="hiddenClient == false" src="../../../assets/icons/arrow-up.svg" (click)="hideDataClient()" />
-          <img *ngIf="hiddenClient == true" src="../../../assets/icons/arrow-down.svg" (click)="showDataClient()" />
-          &nbsp; Client ({{idRepers.length}})
+          <img *ngIf="!hiddenClient" src="../../../assets/icons/arrow-up.svg" (click)="hideDataClient()" />
+          <img *ngIf="hiddenClient" src="../../../assets/icons/arrow-down.svg" (click)="showDataClient()" />
+          &nbsp; Client ({{ idRepers.length }})
+        </div>
+      </div>
+      <div class="col-auto">
+        <div class="ajoutFinancement">
+          <button mat-stroked-button (click)="ajouterObjetFinancement()">
+            <img src="../../../assets/icons/plus.svg" />
+            &nbsp;
+            ajouter un objet de financement
+          </button>
         </div>
       </div>
     </div>
+
     <div class="row" *ngIf="elementClient">
       <div class="col-12">
         <ul class="list-group">
           <li class="list-group-item" *ngFor="let client of entrepriseData">
             <div class="row">
               <div class="col" *ngIf="!nonraison">
-                Raison Sociale &nbsp; &nbsp; &nbsp; <b>{{client.legalName}}</b>
+                Raison Sociale &nbsp; &nbsp; &nbsp; <b>{{ client.legalName }}</b>
               </div>
             </div>
             <div class="row">
               <div class="col">
-                Nom &nbsp; &nbsp; &nbsp; <b>{{client.civilite}}. &nbsp;{{client.usuaLastName}} {{client.firstName}}</b>
+                Nom &nbsp; &nbsp; &nbsp; <b>{{ client.civilite }}. &nbsp;{{ client.usuaLastName }} {{ client.firstName }}</b>
               </div>
               <div class="col">
-                Siren &nbsp; &nbsp; &nbsp; <b>{{client.siren}}</b>
+                Siren &nbsp; &nbsp; &nbsp; <b>{{ client.siren }}</b>
               </div>
             </div>
           </li>
         </ul>
       </div>
     </div>
+
     <div class="row">
       <div class="col-lg-12">
-        <!-- Affichage du message d'erreur -->
         <div *ngIf="errors.length > 0">
           <div class="error-message">
             <ul class="list-group">
@@ -101,24 +121,6 @@
               </li>
             </ul>
           </div>
-        </div>
-      </div>
-    </div>
-    <div class="row align-items-center">
-      <div class="col">
-        <div class="nav">
-          <img *ngIf="hiddenClient == false" src="../../../assets/icons/arrow-up.svg" (click)="hideDataClient()" />
-          <img *ngIf="hiddenClient == true" src="../../../assets/icons/arrow-down.svg" (click)="showDataClient()" />
-          &nbsp; Client ({{idRepers.length}})
-        </div>
-      </div>
-      <div class="col-auto">
-        <div class="ajoutFinancement">
-          <button mat-stroked-button (click)="ajouterObjetFinancement()">
-            <img src="../../../assets/icons/plus.svg" />
-            &nbsp;
-            ajouter un objet de financement
-          </button>
         </div>
       </div>
     </div>
@@ -150,6 +152,7 @@
 .container-fluid {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .col-auto {
@@ -159,3 +162,14 @@
 .col {
   flex: 1 1 auto;
 }
+
+.row.align-items-center {
+  display: flex;
+  align-items: center;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+}
+//
