@@ -1,92 +1,25 @@
-{
-    "idFinancement": "F11222335",
-    "objetFinancement": [
-        {
-            "idObjetFinancement": null,
-            "codeObjetFinancement": "02",
-            "quotePartObjet": 100.0,
-            "codeFamilleObjet": null,
-            "gainCEP": null,
-            "dateFinTravaux": null,
-            "bien": {
-                "idBien": null,
-                "codeBatiment": "00001",
-                "typeBatiment": "Appartement",
-                "numeroVoie": null,
-                "typeVoie": null,
-                "nomRue": null,
-                "batiment": null,
-                "escalier": null,
-                "etage": null,
-                "porte": null,
-                "codePostal": "75016",
-                "nomCommune": null,
-                "paysBien": null,
-                "adresseComplete": null,
-                "codeNormeThermique": null,
-                "etatBien": null,
-                "typeEnergie": null,
-                "codeTypeEnergie": null,
-                "codeDepartement": null,
-                "codeInseeCommune": null,
-                "numeroLot": null,
-                "numeroNomRue": null,
-                "typeUsage": null,
-                "anneeConstruction": 2000,
-                "periodeConstruction": null,
-                "dateDepotPc": null,
-                "dateDebutConstruction": null,
-                "surfaceBien": 79.0,
-                "bienFinanceLCL": false,
-                "numeroFiscalLocal": null,
-                "eligibleDpe": null,
-                "labelBien": null,
-                "coordonneeCartographiqueX": null,
-                "coordonneeCartographiqueY": null,
-                "prixBien": null,
-                "montantFinanceLCL": 10000.0,
-                "partLCL": null,
-                "dpeActuel": {
-                    "idDpe": null,
-                    "numeroDpe": "2337E1287825F",
-                    "codeModeleDpeType": null,
-                    "estimationCep": 100.0,
-                    "classeCep": "A",
-                    "estimationGes": 60.0,
-                    "classeGes": "B",
-                    "dateEtablissementDpe": null,
-                    "dateReceptionDpe": null,
-                    "dateFinValiditeDpe": null,
-                    "sirenDiagnostiqueur": null,
-                    "modelDpe": null,
-                    "numeroDpeRemplace": null,
-                    "versionDpe": null,
-                    "methodeDpeApplique": null
-                }
-            },
-            "dpeAvantTravaux": null,
-            "dpeApresTravaux": null,
-            "alignement": null,
-            "eligibilite": null,
-            "garantie": null,
-            "piecesJustificatives": null,
-            "statut": 0
+  @Autowired
+    private MongoTemplate mongoTemplate;
+
+    public List<Dpe> findDpeActuelByIdReper(List<String> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return Collections.emptyList();
         }
-    ],
-    "alignement": null,
-    "eligibilite": null,
-    "intervenant": {
-        "idIntervenant": null,
-        "idReper": [
-            "8415595180"
-        ]
-    },
-    "indicateurFinancementDedie": null,
-    "indicateurNatureDurable": null,
-    "typeRisqueClimatiqueAttenue": null,
-    "codeApplicatifOrigine": null,
-    "indicateurReprise": false,
-    "statut": 0,
-    "agenceCompte": null,
-    "valeurTravaux": null
-}
+
+        Query query = new Query();
+        query.addCriteria(Criteria.where("intervenant.idReper").in(ids));
+
+        List<Financement> financements = mongoTemplate.find(query, Financement.class);
+
+        if (financements == null || financements.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        return financements.stream()
+                .filter(financement -> financement.getObjetFinancement() != null && !financement.getObjetFinancement().isEmpty())
+                .flatMap(financement -> financement.getObjetFinancement().stream())
+                .map(ObjetFinancement::getBien)
+                .filter(bien -> bien != null && bien.getDpeActuel() != null)
+                .map(Bien::getDpeActuel)
+                .collect(Collectors.toList());
+    }
