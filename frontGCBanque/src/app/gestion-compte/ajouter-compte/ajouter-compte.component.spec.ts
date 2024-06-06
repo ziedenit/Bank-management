@@ -1,15 +1,4 @@
-      // Construct the query
-        Query query = new Query();
-        query.addCriteria(Criteria.where("Intervenant.idReper").in(ids));
-
-        // Execute the query and retrieve the results
-        List<Financement> financements = mongoTemplate.find(query, Financement.class);
-
-        // Extract DPE objects from the retrieved Financement objects
-        return financements.stream()
-                .map(financement -> {
-                    ObjetFinancement firstObjetFinancement = financement.getObjetFinancement().get(0);
-                    return firstObjetFinancement != null ? firstObjetFinancement.getBien().getDpeActuel() : null;
-                })
-                .collect(Collectors.toList());
-    }
+time=2024-06-06T18:43:42.360+02:00|level=INFO |event_cod=empty|event_typ=TECHNICAL|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=Completed initialization in 1 ms
+time=2024-06-06T18:43:42.512+02:00|level=INFO |event_cod=empty|event_typ=APPLICATIVE|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=dpe : get by idReper [8415595180]
+time=2024-06-06T18:43:42.512+02:00|level=INFO |event_cod=empty|event_typ=APPLICATIVE|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=getDpeActuel By  [8415595180] IdReper :
+time=2024-06-06T18:43:42.990+02:00|level=ERROR|event_cod=empty|event_typ=TECHNICAL|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=Failed to instantiate java.util.List using constructor NO_CONSTRUCTOR with arguments 
