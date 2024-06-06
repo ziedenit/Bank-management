@@ -1,8 +1,5 @@
-"Failed to instantiate java.util.List using constructor NO_CONSTRUCTOR with arguments ",
-	toujours 
-il ne support pas la liste 
-package com.cl.msofd.model;
-
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -20,7 +17,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Financement  implements Serializable {
+public class Financement implements Serializable {
 
     private String idFinancement;
 
@@ -51,11 +48,41 @@ public class Financement  implements Serializable {
     @Min(0)
     private Double valeurTravaux;
 
+    @JsonCreator
+    public Financement(
+        @JsonProperty("idFinancement") String idFinancement,
+        @JsonProperty("objetFinancement") List<ObjetFinancement> objetFinancement,
+        @JsonProperty("alignement") Alignement alignement,
+        @JsonProperty("eligibilite") Eligibilite eligibilite,
+        @JsonProperty("intervenant") Intervenant intervenant,
+        @JsonProperty("indicateurFinancementDedie") String indicateurFinancementDedie,
+        @JsonProperty("indicateurNatureDurable") String indicateurNatureDurable,
+        @JsonProperty("typeRisqueClimatiqueAttenue") String typeRisqueClimatiqueAttenue,
+        @JsonProperty("codeApplicatifOrigine") String codeApplicatifOrigine,
+        @JsonProperty("indicateurReprise") boolean indicateurReprise,
+        @JsonProperty("statut") int statut,
+        @JsonProperty("agenceCompte") String agenceCompte,
+        @JsonProperty("valeurTravaux") Double valeurTravaux
+    ) {
+        this.idFinancement = idFinancement;
+        this.objetFinancement = objetFinancement == null ? new ArrayList<>() : objetFinancement;
+        this.alignement = alignement;
+        this.eligibilite = eligibilite;
+        this.intervenant = intervenant;
+        this.indicateurFinancementDedie = indicateurFinancementDedie;
+        this.indicateurNatureDurable = indicateurNatureDurable;
+        this.typeRisqueClimatiqueAttenue = typeRisqueClimatiqueAttenue;
+        this.codeApplicatifOrigine = codeApplicatifOrigine;
+        this.indicateurReprise = indicateurReprise;
+        this.statut = statut;
+        this.agenceCompte = agenceCompte;
+        this.valeurTravaux = valeurTravaux;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Financement)) return false;
-        if (!super.equals(o)) return false;
         Financement that = (Financement) o;
         return indicateurReprise == that.indicateurReprise &&
                 statut == that.statut &&
@@ -74,31 +101,6 @@ public class Financement  implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), idFinancement, objetFinancement, alignement, eligibilite, intervenant, indicateurFinancementDedie, indicateurNatureDurable, typeRisqueClimatiqueAttenue, codeApplicatifOrigine, indicateurReprise, statut, agenceCompte, valeurTravaux);
+        return Objects.hash(idFinancement, objetFinancement, alignement, eligibilite, intervenant, indicateurFinancementDedie, indicateurNatureDurable, typeRisqueClimatiqueAttenue, codeApplicatifOrigine, indicateurReprise, statut, agenceCompte, valeurTravaux);
     }
-}
-// franchement je ne peux pas changer mon modele , le besoin impose que j'utilise un objet complexe une liste d'objet de financement à l'interieur du financement comment je peux adapter ca pour que le framwork accepte et les api fonctionne surtou mon service package com.cl.msofd.repository;
-findByidFinancement
-
-  public Financement getFinancementByIdFinancement(String idFinancement) {
-
-        return financementRepository.findByidFinancement(idFinancement)
-
-                .orElseThrow(() -> new FinancementNotFoundException(
-
-                        String.format("Le financement %s est inexistant", idFinancement)));
-
-    }
-import java.util.Optional;
-
-import org.springframework.data.mongodb.repository.MongoRepository;
-import com.cl.msofd.model.Financement;
-import org.springframework.stereotype.Repository;
-
-@Repository
-public interface  FinancementRepository extends MongoRepository<Financement, String> {
-	Optional<Financement> findByidFinancement(String idFinancement);
-	Optional<Financement> deleteByIdFinancement(String idFinancement);
-	
-	
 }
