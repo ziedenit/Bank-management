@@ -1,26 +1,61 @@
-time=2024-06-06T17:17:17.959+02:00|level=INFO |event_cod=empty|event_typ=TECHNICAL|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=Started FinancementServiceTest in 10.975 seconds (process running for 13.155)
-Java HotSpot(TM) 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
-{"idFinancement":"testId","objetFinancement":[],"alignement":{"topAlignement":null,"topAlignementXtra":null},"eligibilite":{"topEligibilite":null},"intervenant":{"idIntervenant":null,"idReper":null},"indicateurFinancementDedie":"dedicated","indicateurNatureDurable":"durable","typeRisqueClimatiqueAttenue":"climaticRisk","codeApplicatifOrigine":"01","indicateurReprise":true,"statut":1,"agenceCompte":"1234567890123456","valeurTravaux":1000.0}
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class Financement implements Serializable {
 
-org.opentest4j.AssertionFailedError: 
-Expected :com.cl.msofd.model.Financement@b4ccf305
-Actual   :com.cl.msofd.model.Financement@6723a14b
-<Click to see difference>
+    private String idFinancement;
 
+    @NotNull(message = "Objet financement est obligatoire")
+    @Valid
+    private List<ObjetFinancement> objetFinancement = new ArrayList<>();
 
-	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
-	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
-	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
-	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:182)
-	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:177)
-	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:1145)
-	at com.cl.msofd.service.FinancementServiceTest.testSerializationDeserialization(FinancementServiceTest.java:430)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+    private Alignement alignement;
+    private Eligibilite eligibilite;
 
-time=2024-06-06T17:17:20.978+02:00|level=INFO |event_cod=empty|event_typ=TECHNICAL|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=Closing JPA EntityManagerFactory for persistence unit 'default'
-time=2024-06-06T17:17:20.980+02:00|level=INFO |event_cod=empty|event_typ=TECHNICAL|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=HikariPool-1 - Shutdown initiated...
-time=2024-06-06T17:17:20.982+02:00|level=INFO |event_cod=empty|event_typ=TECHNICAL|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=HikariPool-1 - Shutdown completed.
+    @NotNull(message = "Intervenant est obligatoire")
+    @Valid
+    private Intervenant intervenant;
 
-Process finished with exit code -1
+    private String indicateurFinancementDedie;
+    private String indicateurNatureDurable;
+    private String typeRisqueClimatiqueAttenue;
+
+    @Pattern(regexp = "^(01|02|03|04|05|06|07|08)$", message = "le champs codeApplicatifOrigine doit etre l'une des valeurs 01 (VIC ou NECI) 02 (PI) 03 (CPPE) 04 (SIRIUS) 05 (DPAR) 06 (DPRO) 07 (CRM360) GGAR (08)")
+    private String codeApplicatifOrigine;
+
+    private boolean indicateurReprise;
+    private int statut;
+
+    @Size(min = 16, max = 16, message = "La taille du champs agenceCompte doit etre égale à 16")
+    private String agenceCompte;
+
+    @Min(0)
+    private Double valeurTravaux;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Financement that = (Financement) o;
+        return indicateurReprise == that.indicateurReprise &&
+                statut == that.statut &&
+                Objects.equals(idFinancement, that.idFinancement) &&
+                Objects.equals(objetFinancement, that.objetFinancement) &&
+                Objects.equals(alignement, that.alignement) &&
+                Objects.equals(eligibilite, that.eligibilite) &&
+                Objects.equals(intervenant, that.intervenant) &&
+                Objects.equals(indicateurFinancementDedie, that.indicateurFinancementDedie) &&
+                Objects.equals(indicateurNatureDurable, that.indicateurNatureDurable) &&
+                Objects.equals(typeRisqueClimatiqueAttenue, that.typeRisqueClimatiqueAttenue) &&
+                Objects.equals(codeApplicatifOrigine, that.codeApplicatifOrigine) &&
+                Objects.equals(agenceCompte, that.agenceCompte) &&
+                Objects.equals(valeurTravaux, that.valeurTravaux);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(idFinancement, objetFinancement, alignement, eligibilite, intervenant, indicateurFinancementDedie, indicateurNatureDurable, typeRisqueClimatiqueAttenue, codeApplicatifOrigine, indicateurReprise, statut, agenceCompte, valeurTravaux);
+    }
+}
