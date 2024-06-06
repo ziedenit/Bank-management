@@ -1,6 +1,2 @@
-<ErrorResponse>
-    <code>TECHNICAL_EXCEPTION_OCCURED </code>
-    <message>
-        <message>Failed to instantiate java.util.List using constructor NO_CONSTRUCTOR with arguments </message>
-    </message>
-</ErrorResponse>
+time=2024-06-06T17:50:45.610+02:00|level=INFO |event_cod=empty|event_typ=APPLICATIVE|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=Financement: get by idFinancement F4882BQ0T
+time=2024-06-06T17:50:45.960+02:00|level=ERROR|event_cod=empty|event_typ=TECHNICAL|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=Failed to instantiate java.util.List using constructor NO_CONSTRUCTOR with arguments
