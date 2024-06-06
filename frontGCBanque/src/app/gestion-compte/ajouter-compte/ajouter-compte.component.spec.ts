@@ -1,5 +1,7 @@
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -73,75 +75,37 @@ public class Financement extends BaseEntity implements Serializable {
         return Objects.hash(super.hashCode(), idFinancement, objetFinancement, alignement, eligibilite, intervenant, indicateurFinancementDedie, indicateurNatureDurable, typeRisqueClimatiqueAttenue, codeApplicatifOrigine, indicateurReprise, statut, agenceCompte, valeurTravaux);
     }
 }
-//
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.Pattern;
-import lombok.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+public class FinancementTest {
 
-@Getter
-@Setter
-@ToString
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-public class ObjetFinancement extends BaseEntity implements Serializable {
+    @Test
+    public void testSerializationDeserialization() throws Exception {
+        ObjectMapper objectMapper = new ObjectMapper();
 
-    private String idObjetFinancement;
+        Financement financement = new Financement();
+        financement.setIdFinancement("testId");
+        financement.setObjetFinancement(new ArrayList<>());  // Ajoutez des objets `ObjetFinancement` si nécessaire
+        financement.setAlignement(new Alignement());
+        financement.setEligibilite(new Eligibilite());
+        financement.setIntervenant(new Intervenant());
+        financement.setIndicateurFinancementDedie("dedicated");
+        financement.setIndicateurNatureDurable("durable");
+        financement.setTypeRisqueClimatiqueAttenue("climaticRisk");
+        financement.setCodeApplicatifOrigine("01");
+        financement.setIndicateurReprise(true);
+        financement.setStatut(1);
+        financement.setAgenceCompte("1234567890123456");
+        financement.setValeurTravaux(1000.0);
 
-    @Pattern(regexp = "^$|(02|03|0203|null)$", message = "code objet financement invalide")
-    private String codeObjetFinancement;
+        // Serialization
+        String jsonString = objectMapper.writeValueAsString(financement);
+        System.out.println(jsonString);
 
-    @Min(0)
-    @Max(100)
-    private Double quotePartObjet;
-
-    private String codeFamilleObjet;
-    private Double gainCEP;
-    private Date dateFinTravaux;
-
-    @Valid
-    private Bien bien;
-
-    private Dpe dpeAvantTravaux;
-    private Dpe dpeApresTravaux;
-    private Alignement alignement;
-    private Eligibilite eligibilite;
-    private List<Garantie> garantie = new ArrayList<>();
-    private List<Piece> piecesJustificatives = new ArrayList<>();
-    private int statut;
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof ObjetFinancement)) return false;
-        if (!super.equals(o)) return false;
-        ObjetFinancement that = (ObjetFinancement) o;
-        return statut == that.statut &&
-                Objects.equals(idObjetFinancement, that.idObjetFinancement) &&
-                Objects.equals(codeObjetFinancement, that.codeObjetFinancement) &&
-                Objects.equals(quotePartObjet, that.quotePartObjet) &&
-                Objects.equals(codeFamilleObjet, that.codeFamilleObjet) &&
-                Objects.equals(gainCEP, that.gainCEP) &&
-                Objects.equals(dateFinTravaux, that.dateFinTravaux) &&
-                Objects.equals(bien, that.bien) &&
-                Objects.equals(dpeAvantTravaux, that.dpeAvantTravaux) &&
-                Objects.equals(dpeApresTravaux, that.dpeApresTravaux) &&
-                Objects.equals(alignement, that.alignement) &&
-                Objects.equals(eligibilite, that.eligibilite) &&
-                Objects.equals(garantie, that.garantie) &&
-                Objects.equals(piecesJustificatives, that.piecesJustificatives);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), idObjetFinancement, codeObjetFinancement, quotePartObjet, codeFamilleObjet, gainCEP, dateFinTravaux, bien, dpeAvantTravaux, dpeApresTravaux, alignement, eligibilite, garantie, piecesJustificatives, statut);
+        // Deserialization
+        Financement deserializedFinancement = objectMapper.readValue(jsonString, Financement.class);
+        assertEquals(financement, deserializedFinancement);
     }
 }
