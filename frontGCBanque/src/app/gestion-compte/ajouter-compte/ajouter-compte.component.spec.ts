@@ -1,76 +1,175 @@
-@Autowired
-		private ObjectMapper objectMapper;
+package com.cl.msofd.model;
 
-		@Test
-		public void testSerializationDeserialization() throws Exception {
-			Dpe dpeActuel = Dpe.builder()
-					.classeCep("A")
-					.classeGes("B")
-					.estimationCep(100.0)
-					.estimationGes(60.0)
-					.numeroDpe("2337E1287825F")
-					.build();
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
+import lombok.*;
 
-			Bien firstBien = Bien.builder()
-					.codeBatiment("00001")
-					.typeBatiment("Appartement")
-					.codePostal("75016")
-					.surfaceBien(79.0)
-					.anneeConstruction(2000)
-					.dpeActuel(dpeActuel)
-					.montantFinanceLCL(10000.00)
-					.build();
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
-			ObjetFinancement firstObject = ObjetFinancement.builder()
-					.codeObjetFinancement("02")
-					.quotePartObjet(100.0)
-					.bien(firstBien)
-					.build();
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class Financement implements Serializable {
 
-			List<String> idRepers = new ArrayList<>();
-			idRepers.add("8415595180");
-			Intervenant intervenant = Intervenant.builder()
-					.idReper(idRepers)
-					.build();
-			ArrayList<ObjetFinancement> listObjets = new ArrayList<>();
-			listObjets.add(firstObject);
-			Financement financement = Financement.builder()
-					.idFinancement("F11222333")
-					.objetFinancement(listObjets)
-					.intervenant(intervenant)
-					.build();
-			Financement financementtest = financementService.createFinancement(financement);
+    private String idFinancement;
 
-			// Serialization
-			String jsonString = objectMapper.writeValueAsString(financementtest);
-			System.out.println(jsonString);
+    @NotNull(message = "Objet financement est obligatoire")
+    @Valid
+    private List<ObjetFinancement> objetFinancement = new ArrayList<>();
 
-			// Deserialization
-			Financement deserializedFinancement = objectMapper.readValue(jsonString, Financement.class);
-			assertEquals(financementtest, deserializedFinancement);
-		}
-ava HotSpot(TM) 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
-{"idFinancement":"F11222333","objetFinancement":[{"idObjetFinancement":null,"codeObjetFinancement":"02","quotePartObjet":100.0,"codeFamilleObjet":null,"gainCEP":null,"dateFinTravaux":null,"bien":{"idBien":null,"codeBatiment":"00001","typeBatiment":"Appartement","numeroVoie":null,"typeVoie":null,"nomRue":null,"batiment":null,"escalier":null,"etage":null,"porte":null,"codePostal":"75016","nomCommune":null,"paysBien":null,"adresseComplete":null,"codeNormeThermique":null,"etatBien":null,"typeEnergie":null,"codeTypeEnergie":null,"codeDepartement":null,"codeInseeCommune":null,"numeroLot":null,"numeroNomRue":null,"typeUsage":null,"anneeConstruction":2000,"periodeConstruction":null,"dateDepotPc":null,"dateDebutConstruction":null,"surfaceBien":79.0,"bienFinanceLCL":false,"numeroFiscalLocal":null,"eligibleDpe":null,"labelBien":null,"coordonneeCartographiqueX":null,"coordonneeCartographiqueY":null,"prixBien":null,"montantFinanceLCL":10000.0,"partLCL":null,"dpeActuel":{"idDpe":null,"numeroDpe":"2337E1287825F","codeModeleDpeType":null,"estimationCep":100.0,"classeCep":"A","estimationGes":60.0,"classeGes":"B","dateEtablissementDpe":null,"dateReceptionDpe":null,"dateFinValiditeDpe":null,"sirenDiagnostiqueur":null,"modelDpe":null,"numeroDpeRemplace":null,"versionDpe":null,"methodeDpeApplique":null}},"dpeAvantTravaux":null,"dpeApresTravaux":null,"alignement":null,"eligibilite":null,"garantie":null,"piecesJustificatives":null,"statut":0}],"alignement":null,"eligibilite":null,"intervenant":{"idIntervenant":null,"idReper":["8415595180"]},"indicateurFinancementDedie":null,"indicateurNatureDurable":null,"typeRisqueClimatiqueAttenue":null,"codeApplicatifOrigine":null,"indicateurReprise":false,"statut":0,"agenceCompte":null,"valeurTravaux":null}
+    private Alignement alignement;
+    private Eligibilite eligibilite;
 
-org.opentest4j.AssertionFailedError: 
-Expected :com.cl.msofd.model.Financement@8658594e
-Actual   :com.cl.msofd.model.Financement@5ae28a42
-<Click to see difference>
+    @NotNull(message = "Intervenant est obligatoire")
+    @Valid
+    private Intervenant intervenant;
 
+    private String indicateurFinancementDedie;
+    private String indicateurNatureDurable;
+    private String typeRisqueClimatiqueAttenue;
 
-	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
-	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
-	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
-	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:182)
-	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:177)
-	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:1145)
-	at com.cl.msofd.service.FinancementServiceTest.testSerializationDeserialization(FinancementServiceTest.java:454)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+    @Pattern(regexp = "^(01|02|03|04|05|06|07|08)$", message = "le champs codeApplicatifOrigine doit etre l'une des valeurs 01 (VIC ou NECI) 02 (PI) 03 (CPPE) 04 (SIRIUS) 05 (DPAR) 06 (DPRO) 07 (CRM360) GGAR (08)")
+    private String codeApplicatifOrigine;
 
-time=2024-06-06T17:37:01.912+02:00|level=INFO |event_cod=empty|event_typ=TECHNICAL|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=Closing JPA EntityManagerFactory for persistence unit 'default'
-time=2024-06-06T17:37:01.915+02:00|level=INFO |event_cod=empty|event_typ=TECHNICAL|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=HikariPool-1 - Shutdown initiated...
-time=2024-06-06T17:37:01.917+02:00|level=INFO |event_cod=empty|event_typ=TECHNICAL|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=HikariPool-1 - Shutdown completed.
+    private boolean indicateurReprise;
+    private int statut;
 
-Process finished with exit code -1
+    @Size(min = 16, max = 16, message = "La taille du champs agenceCompte doit etre égale à 16")
+    private String agenceCompte;
+
+    @Min(0)
+    private Double valeurTravaux;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Financement)) return false;
+        Financement that = (Financement) o;
+        return indicateurReprise == that.indicateurReprise &&
+                statut == that.statut &&
+                Objects.equals(idFinancement, that.idFinancement) &&
+                Objects.equals(objetFinancement, that.objetFinancement) &&
+                Objects.equals(alignement, that.alignement) &&
+                Objects.equals(eligibilite, that.eligibilite) &&
+                Objects.equals(intervenant, that.intervenant) &&
+                Objects.equals(indicateurFinancementDedie, that.indicateurFinancementDedie) &&
+                Objects.equals(indicateurNatureDurable, that.indicateurNatureDurable) &&
+                Objects.equals(typeRisqueClimatiqueAttenue, that.typeRisqueClimatiqueAttenue) &&
+                Objects.equals(codeApplicatifOrigine, that.codeApplicatifOrigine) &&
+                Objects.equals(agenceCompte, that.agenceCompte) &&
+                Objects.equals(valeurTravaux, that.valeurTravaux);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(idFinancement, objetFinancement, alignement, eligibilite, intervenant, indicateurFinancementDedie, indicateurNatureDurable, typeRisqueClimatiqueAttenue, codeApplicatifOrigine, indicateurReprise, statut, agenceCompte, valeurTravaux);
+    }
+}
+//
+   public Financement getFinancementByIdFinancement(String idFinancement) {
+
+        return financementRepository.findByidFinancement(idFinancement)
+
+                .orElseThrow(() -> new FinancementNotFoundException(
+
+                        String.format("Le financement %s est inexistant", idFinancement)));
+
+    }
+//
+package com.cl.msofd.repository;
+
+import java.util.Optional;
+
+import org.springframework.data.mongodb.repository.MongoRepository;
+import com.cl.msofd.model.Financement;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface  FinancementRepository extends MongoRepository<Financement, String> {
+	Optional<Financement> findByidFinancement(String idFinancement);
+	Optional<Financement> deleteByIdFinancement(String idFinancement);
+	
+	
+}
+//
+package com.cl.msofd.model;
+
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Pattern;
+import lombok.*;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
+
+@Getter
+@Setter
+@ToString
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class ObjetFinancement  implements Serializable {
+
+    private String idObjetFinancement;
+
+    @Pattern(regexp = "^$|(02|03|0203|null)$", message = "code objet financement invalide")
+    private String codeObjetFinancement;
+
+    @Min(0)
+    @Max(100)
+    private Double quotePartObjet;
+
+    private String codeFamilleObjet;
+    private Double gainCEP;
+    private Date dateFinTravaux;
+
+    @Valid
+    private Bien bien;
+
+    private Dpe dpeAvantTravaux;
+    private Dpe dpeApresTravaux;
+    private Alignement alignement;
+    private Eligibilite eligibilite;
+    private List<Garantie> garantie = new ArrayList<>();
+    private List<Piece> piecesJustificatives = new ArrayList<>();
+    private int statut;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ObjetFinancement)) return false;
+        if (!super.equals(o)) return false;
+        ObjetFinancement that = (ObjetFinancement) o;
+        return statut == that.statut &&
+                Objects.equals(idObjetFinancement, that.idObjetFinancement) &&
+                Objects.equals(codeObjetFinancement, that.codeObjetFinancement) &&
+                Objects.equals(quotePartObjet, that.quotePartObjet) &&
+                Objects.equals(codeFamilleObjet, that.codeFamilleObjet) &&
+                Objects.equals(gainCEP, that.gainCEP) &&
+                Objects.equals(dateFinTravaux, that.dateFinTravaux) &&
+                Objects.equals(bien, that.bien) &&
+                Objects.equals(dpeAvantTravaux, that.dpeAvantTravaux) &&
+                Objects.equals(dpeApresTravaux, that.dpeApresTravaux) &&
+                Objects.equals(alignement, that.alignement) &&
+                Objects.equals(eligibilite, that.eligibilite) &&
+                Objects.equals(garantie, that.garantie) &&
+                Objects.equals(piecesJustificatives, that.piecesJustificatives);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), idObjetFinancement, codeObjetFinancement, quotePartObjet, codeFamilleObjet, gainCEP, dateFinTravaux, bien, dpeAvantTravaux, dpeApresTravaux, alignement, eligibilite, garantie, piecesJustificatives, statut);
+    }
+}
