@@ -1,3 +1,6 @@
-en debuggon 
-  @Value("classpath:arbre.xlsx")
-    private Resource resource; , c'est null
+@Autowired
+private ResourceLoader resourceLoader;
+
+...
+
+Resource resource = resourceLoader.getResource("classpath:arbre.xlsx");
