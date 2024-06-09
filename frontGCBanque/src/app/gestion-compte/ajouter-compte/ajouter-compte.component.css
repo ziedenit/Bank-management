@@ -1,19 +1,31 @@
-<dependencies>
-    <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-batch</artifactId>
-    </dependency>
-    <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-data-mongodb</artifactId>
-    </dependency>
-    <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-web</artifactId>
-    </dependency>
-    <dependency>
-        <groupId>org.apache.poi</groupId>
-        <artifactId>poi-ooxml</artifactId>
-        <version>5.0.0</version>
-    </dependency>
-</dependencies>
+'org.springframework.batch.core.configuration.annotation.StepBuilderFactory' is deprecated since version 5.0.0 and marked for removal 
+package com.cl.msofd.regleProcess;
+
+import org.springframework.batch.core.Job;
+import org.springframework.batch.core.Step;
+import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
+import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
+import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.launch.support.RunIdIncrementer;
+import org.springframework.batch.core.step.tasklet.Tasklet;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+@EnableBatchProcessing
+public class BatchConfiguration {
+
+    @Bean
+    public Job importUserJob(JobBuilderFactory jobBuilderFactory, StepBuilderFactory stepBuilderFactory,
+                             Tasklet step1Tasklet) {
+        Step step1 = stepBuilderFactory.get("step1")
+                .tasklet(step1Tasklet)
+                .build();
+
+        return jobBuilderFactory.get("importUserJob")
+                .incrementer(new RunIdIncrementer())
+                .flow(step1)
+                .end()
+                .build();
+    }
+}
