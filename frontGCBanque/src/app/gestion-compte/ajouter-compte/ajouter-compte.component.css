@@ -1,13 +1,1 @@
-Caused by: java.lang.NullPointerException: Cannot invoke "org.springframework.core.io.ResourceLoader.getResource(String)" because "this.resourceLoader" is null
-	at com.cl.msofd.regleArbre.ExcelReaderTasklet.<init>(ExcelReaderTasklet.java:35)
-	at java.base/jdk.internal.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
-	at java.base/jdk.internal.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:77)
-	at java.base/jdk.internal.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
-	at java.base/java.lang.reflect.Constructor.newInstanceWithCaller(Constructor.java:499)
-	at java.base/java.lang.reflect.Constructor.newInstance(Constructor.java:480)
-	at org.springframework.beans.BeanUtils.instantiateClass(BeanUtils.java:210)
-	... 21 common frames omitted
-
-Disconnected from the target VM, address: '127.0.0.1:55700', transport: 'socket'
-
-Process finished with exit code 1
+Vérifiez si vous avez correctement configuré la classe ExcelReaderTasklet dans votre configuration Spring. Si vous utilisez la configuration Java (@Configuration), assurez-vous que la classe est correctement incluse dans votre configuration.
