@@ -1,5 +1,10 @@
-Caused by: java.lang.NullPointerException: Cannot invoke "org.springframework.core.io.ResourceLoader.getResource(String)" because "this.resourceLoader" is null
-	at com.cl.msofd.regleArbre.ExcelReaderTasklet.<init>(ExcelReaderTasklet.java:34)
-	at java.base/jdk.internal.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
-	at java.base/jdk.internal.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:77)
-	at java.base/jdk.internal.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+import org.springframework.core.io.ResourceLoader;
+
+public class ExcelReaderTasklet {
+
+    private ResourceLoader resourceLoader;
+
+    @Autowired
+    public ExcelReaderTasklet(ResourceLoader resourceLoader) {
+        this.resourceLoader = resourceLoader;
+    }
