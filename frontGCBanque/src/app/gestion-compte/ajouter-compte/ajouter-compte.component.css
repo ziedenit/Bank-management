@@ -1,46 +1,180 @@
 package com.cl.msofd.regleProcess;
 
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.Step;
-import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
-import org.springframework.batch.core.job.builder.JobBuilder;
-import org.springframework.batch.core.job.builder.JobBuilderHelper;
-import org.springframework.batch.core.job.builder.SimpleJobBuilder;
-import org.springframework.batch.core.launch.support.RunIdIncrementer;
-import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.step.builder.StepBuilder;
-import org.springframework.batch.core.step.builder.StepBuilderHelper;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.step.tasklet.Tasklet;
-import org.springframework.batch.core.step.tasklet.TaskletStep;
+import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.stereotype.Component;
 
-@Configuration
-@EnableBatchProcessing
-public class BatchConfiguration {
+import java.io.InputStream;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
-    @Bean
-    public Job importUserJob(JobRepository jobRepository, Step step1) {
-        return new JobBuilder("importUserJob", jobRepository)
-                .incrementer(new RunIdIncrementer())
-                .start(step1)
-                .build();
+@Component
+public class ExcelReaderTasklet implements Tasklet {
+
+    @Value("classpath:your-file.xlsx")
+    private Resource resource;
+
+    private final MongoTemplate mongoTemplate;
+
+    public ExcelReaderTasklet(MongoTemplate mongoTemplate) {
+        this.mongoTemplate = mongoTemplate;
     }
 
-    @Bean
-    public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager, Tasklet step1Tasklet) {
-        return new StepBuilder("step1", jobRepository)
-                .tasklet(step1Tasklet, transactionManager)
-                .build();
+    @Override
+    public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
+        InputStream inputStream = resource.getInputStream();
+        Workbook workbook = new XSSFWorkbook(inputStream);
+        Sheet sheet = workbook.getSheetAt(0);
+
+        for (Row row : sheet) {
+            Map<String, Object> regle = new HashMap<>();
+            regle.put("eligibleDEP", parseEligibleDEP(row.getCell(0).getStringCellValue()));
+            regle.put("dateDepotPc", parseDate(row.getCell(1).getStringCellValue()));
+            regle.put("presenseDateDpeJustif", row.getCell(2).getStringCellValue().equalsIgnoreCase("oui"));
+            regle.put("presenseDpe", row.getCell(3).getStringCellValue().equalsIgnoreCase("oui"));
+            regle.put("dateConstruction", parseDate(row.getCell(4).getStringCellValue()));
+            regle.put("classeCEP", row.getCell(5).getStringCellValue());
+            regle.put("valeurCep", parseDouble(row.getCell(6).getStringCellValue()));
+            regle.put("justifNormeThermique", row.getCell(7).getStringCellValue().equalsIgnoreCase("oui"));
+            regle.put("normeThermique", row.getCell(8).getNumericCellValue());
+            regle.put("xtra248eligible", row.getCell(9).getNumericCellValue());
+            regle.put("xtra249dedie", row.getCell(10).getStringCellValue());
+            regle.put("xtra250Alignement", row.getCell(11).getNumericCellValue());
+            regle.put("xtra251", row.getCell(12).getNumericCellValue());
+            regle.put("xtra275", row.getCell(13).getStringCellValue().equalsIgnoreCase("Y"));
+
+            mongoTemplate.save(regle, "regles");
+        }
+
+        workbook.close();
+        inputStream.close();
+
+        return RepeatStatus.FINISHED;
     }
 
-    @Bean
-    public Tasklet step1Tasklet() {
-        return (contribution, chunkContext) -> {
-            // Implement the tasklet logic here, e.g., reading Excel and saving to MongoDB
-            return RepeatStatus.FINISHED;
-        };
+    private Boolean parseEligibleDEP(String value) {
+        return "Autre bien immobilier".equalsIgnoreCase(value);
+    }
+
+    private Date parseDate(String dateStr) throws ParseException {
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        if (dateStr.contains("au")) {
+            String[] dates = dateStr.split(" au ");
+            return sdf.parse(dates[0].trim()); // Returning the start date for simplicity
+        } else if (dateStr.contains("avant")) {
+            return sdf.parse(dateStr.replace("avant ", "").trim());
+        } else if (dateStr.contains("après")) {
+            return sdf.parse(dateStr.replace("après ", "").trim());
+        }
+        return null;
+    }
+
+    private Double parseDouble(String value) {
+        return Double.parseDouble(value.replace("≤", "").replace(">", "").trim());
     }
 }
+//
+package com.cl.msofd.regleProcess;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.stereotype.Service;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+@Service
+public class RegleService {
+
+    @Autowired
+    private MongoTemplate mongoTemplate;
+
+    public Double findXtra250Alignement(Boolean eligibleDEP, Date dateDepotPc, Boolean presenseDateDpeJustif,
+                                        Boolean presenseDpe, Date dateConstruction, String classeCEP,
+                                        Double valeurCep, Boolean justifNormeThermique, Double normeThermique) {
+
+        Criteria criteria = new Criteria();
+        if (eligibleDEP != null) {
+            criteria.and("eligibleDEP").is(eligibleDEP);
+        }
+        if (dateDepotPc != null) {
+            criteria.and("dateDepotPc").is(dateDepotPc);
+        }
+        if (presenseDateDpeJustif != null) {
+            criteria.and("presenseDateDpeJustif").is(presenseDateDpeJustif);
+        }
+        if (presenseDpe != null) {
+            criteria.and("presenseDpe").is(presenseDpe);
+        }
+        if (dateConstruction != null) {
+            criteria.and("dateConstruction").is(dateConstruction);
+        }
+        if (classeCEP != null && !classeCEP.isEmpty()) {
+            criteria.and("classeCEP").is(classeCEP);
+        }
+        if (valeurCep != null) {
+            criteria.and("valeurCep").is(valeurCep);
+        }
+        if (justifNormeThermique != null) {
+            criteria.and("justifNormeThermique").is(justifNormeThermique);
+        }
+        if (normeThermique != null) {
+            criteria.and("normeThermique").is(normeThermique);
+        }
+
+        Query query = new Query(criteria);
+        List<Map> results = mongoTemplate.find(query, Map.class, "regles");
+
+        if (!results.isEmpty()) {
+            return (Double) results.get(0).get("xtra250Alignement");
+        }
+
+        return null;
+    }
+}
+//
+package com.cl.msofd.regleProcess;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Date;
+
+@RestController
+public class RegleController {
+
+    @Autowired
+    private RegleService regleService;
+
+    @GetMapping("/findXtra250Alignement")
+    public Double findXtra250Alignement(@RequestParam Boolean eligibleDEP,
+                                        @RequestParam @DateTimeFormat(pattern = "dd/MM/yyyy") Date dateDepotPc,
+                                        @RequestParam Boolean presenseDateDpeJustif,
+                                        @RequestParam Boolean presenseDpe,
+                                        @RequestParam @DateTimeFormat(pattern = "dd/MM/yyyy") Date dateConstruction,
+                                        @RequestParam String classeCEP,
+                                        @RequestParam Double valeurCep,
+                                        @RequestParam Boolean justifNormeThermique,
+                                        @RequestParam Double normeThermique) {
+        return regleService.findXtra250Alignement(eligibleDEP, dateDepotPc, presenseDateDpeJustif, presenseDpe, dateConstruction, classeCEP, valeurCep, justifNormeThermique, normeThermique);
+    }
+}
+//
