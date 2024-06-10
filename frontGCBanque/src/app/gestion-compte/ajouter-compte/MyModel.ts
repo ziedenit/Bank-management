@@ -69,15 +69,14 @@ public class FinancementService {
         }
 
         if (targetList == null) {
-            targetList = new ArrayList<>();
+            targetList = new ArrayList<>(sourceList);
             field.set(target, targetList);
+            return;
         }
-
-        List<Object> targetListGeneric = (List<Object>) targetList;
 
         for (Object sourceItem : sourceList) {
             Object sourceId = getId(sourceItem);
-            Optional<?> targetItemOpt = targetListGeneric.stream()
+            Optional<?> targetItemOpt = targetList.stream()
                     .filter(item -> {
                         try {
                             return Objects.equals(getId(item), sourceId);
@@ -90,7 +89,7 @@ public class FinancementService {
             if (targetItemOpt.isPresent()) {
                 merge(targetItemOpt.get(), sourceItem);
             } else {
-                targetListGeneric.add(sourceItem);
+                targetList.add(sourceItem);
             }
         }
     }
