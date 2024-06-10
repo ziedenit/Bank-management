@@ -73,9 +73,11 @@ public class FinancementService {
             field.set(target, targetList);
         }
 
+        List<Object> targetListGeneric = (List<Object>) targetList;
+
         for (Object sourceItem : sourceList) {
             Object sourceId = getId(sourceItem);
-            Optional<?> targetItemOpt = targetList.stream()
+            Optional<?> targetItemOpt = targetListGeneric.stream()
                     .filter(item -> {
                         try {
                             return Objects.equals(getId(item), sourceId);
@@ -88,7 +90,7 @@ public class FinancementService {
             if (targetItemOpt.isPresent()) {
                 merge(targetItemOpt.get(), sourceItem);
             } else {
-                ((List<Object>) targetList).add(sourceItem);
+                targetListGeneric.add(sourceItem);
             }
         }
     }
