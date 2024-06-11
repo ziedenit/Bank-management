@@ -3,28 +3,29 @@ public Financement patchFinancementChamps(String idFinancement, Financement fina
     Financement existingFinancement = financementRepository.findByidFinancement(idFinancement)
             .orElseThrow(() -> new FinancementNotFoundException(String.format("Le financement à modifier %s est inexistant", idFinancement)));
 
-    // Met à jour chaque ObjetFinancement dans la liste
+    // Met à jour les objets de financement
     if (financementToUpdate.getObjetFinancement() != null) {
         for (ObjetFinancement updatedObjet : financementToUpdate.getObjetFinancement()) {
-            updateObjetFinancement(existingFinancement.getObjetFinancement(), updatedObjet);
+            boolean found = false;
+            for (ObjetFinancement existingObjet : existingFinancement.getObjetFinancement()) {
+                if (existingObjet.getIdObjetFinancement().equals(updatedObjet.getIdObjetFinancement())) {
+                    merge(existingObjet, updatedObjet);
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                // Si l'objet de financement à mettre à jour n'existe pas, ajoute-le à la liste existante
+                existingFinancement.getObjetFinancement().add(updatedObjet);
+            }
         }
     }
 
-    // Met à jour les autres champs
+    // Met à jour les autres champs de financement
     merge(existingFinancement, financementToUpdate);
 
-    // Sauvegarde le Financement mis à jour
+    // Sauvegarde le financement mis à jour
     return financementRepository.save(existingFinancement);
-}
-
-private void updateObjetFinancement(List<ObjetFinancement> existingList, ObjetFinancement updatedObjet) throws Exception {
-    for (ObjetFinancement existingObjet : existingList) {
-        if (existingObjet.getIdObjetFinancement().equals(updatedObjet.getIdObjetFinancement())) {
-            merge(existingObjet, updatedObjet);
-            return;
-        }
-    }
-    throw new Exception("ObjetFinancement avec ID " + updatedObjet.getIdObjetFinancement() + " non trouvé.");
 }
 
 private void merge(Object target, Object source) throws Exception {
