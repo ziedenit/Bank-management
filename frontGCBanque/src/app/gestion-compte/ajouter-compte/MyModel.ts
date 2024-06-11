@@ -1,14 +1,16 @@
 public Financement patchFinancementChamps(String idFinancement, Financement financementToUpdate) throws Exception {
-    // Récupère le financement existant
-    Financement existingFinancement = financementRepository.findByidFinancement(idFinancement)
+    // Récupérer le financement existant
+    Financement existingFinancement = financementRepository.findById(idFinancement)
             .orElseThrow(() -> new FinancementNotFoundException(String.format("Le financement à modifier %s est inexistant", idFinancement)));
 
-    // Met à jour les objets de financement
+    // Log l'état initial
+    System.out.println("Financement initial: " + existingFinancement);
+
+    // Mettre à jour les objets de financement
     if (financementToUpdate.getObjetFinancement() != null) {
         for (ObjetFinancement updatedObjet : financementToUpdate.getObjetFinancement()) {
             boolean found = false;
-            for (int i = 0; i < existingFinancement.getObjetFinancement().size(); i++) {
-                ObjetFinancement existingObjet = existingFinancement.getObjetFinancement().get(i);
+            for (ObjetFinancement existingObjet : existingFinancement.getObjetFinancement()) {
                 if (existingObjet.getIdObjetFinancement().equals(updatedObjet.getIdObjetFinancement())) {
                     merge(existingObjet, updatedObjet);
                     found = true;
@@ -21,33 +23,17 @@ public Financement patchFinancementChamps(String idFinancement, Financement fina
         }
     }
 
-    // Met à jour les autres champs de financement
+    // Mettre à jour les autres champs du financement
     mergeNonListFields(existingFinancement, financementToUpdate);
 
-    // Sauvegarde le financement mis à jour
-    return financementRepository.save(existingFinancement);
-}
+    // Log l'état final avant la sauvegarde
+    System.out.println("Financement mis à jour: " + existingFinancement);
 
-private void merge(Object target, Object source) throws Exception {
-    Field[] fields = source.getClass().getDeclaredFields();
-    for (Field field : fields) {
-        field.setAccessible(true);
-        Object value = field.get(source);
-        if (value != null) {
-            field.set(target, value);
-        }
-    }
-}
+    // Sauvegarder le financement mis à jour
+    Financement savedFinancement = financementRepository.save(existingFinancement);
 
-private void mergeNonListFields(Object target, Object source) throws Exception {
-    Field[] fields = source.getClass().getDeclaredFields();
-    for (Field field : fields) {
-        if (!field.getName().equals("objetFinancement")) { // Ignore the objetFinancement field
-            field.setAccessible(true);
-            Object value = field.get(source);
-            if (value != null) {
-                field.set(target, value);
-            }
-        }
-    }
+    // Log l'état final après la sauvegarde
+    System.out.println("Financement sauvegardé: " + savedFinancement);
+
+    return savedFinancement;
 }
