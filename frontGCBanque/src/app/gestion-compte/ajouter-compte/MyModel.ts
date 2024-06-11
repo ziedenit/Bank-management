@@ -23,7 +23,7 @@ public Financement patchFinancementChamps(String idFinancement, Financement fina
     return financementRepository.save(existingFinancement);
 }
 
-private void mergeNonListFields(Object target, Object source) throws Exception {
+private void merge(Object target, Object source) throws Exception {
     Field[] fields = source.getClass().getDeclaredFields();
     ArrayList<String> bienFields = new ArrayList<>(
             Arrays.asList(
@@ -47,7 +47,7 @@ private void mergeNonListFields(Object target, Object source) throws Exception {
                         if (targetValue == null) {
                             field.set(target, value);
                         } else {
-                            mergeNonListFields(targetValue, value);
+                            merge(targetValue, value);
                         }
                     } else {
                         field.set(target, value);
@@ -56,6 +56,34 @@ private void mergeNonListFields(Object target, Object source) throws Exception {
                     if (field.getType().equals(Date.class) || bienFields.contains(field.getName()) || dpeFields.contains(field.getName())) {
                         field.set(target, null);
                     }
+                }
+            } catch (IllegalAccessException e) {
+                throw new Exception("Impossible de fusionner le champ: " + e.getMessage());
+            }
+        }
+    }
+}
+
+private void mergeNonListFields(Object target, Object source) throws Exception {
+    Field[] fields = source.getClass().getDeclaredFields();
+    for (Field field : fields) {
+        if (!field.getName().equals("objetFinancement")) { // Ignore the objetFinancement field
+            field.setAccessible(true);
+            try {
+                Object value = field.get(source);
+                if (value != null) {
+                    if (isComplexObject(field.getType())) {
+                        Object targetValue = field.get(target);
+                        if (targetValue == null) {
+                            field.set(target, value);
+                        } else {
+                            mergeNonListFields(targetValue, value);
+                        }
+                    } else {
+                        field.set(target, value);
+                    }
+                } else {
+                    field.set(target, null);
                 }
             } catch (IllegalAccessException e) {
                 throw new Exception("Impossible de fusionner le champ: " + e.getMessage());
