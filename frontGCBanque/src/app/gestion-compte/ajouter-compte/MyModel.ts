@@ -1,15 +1,19 @@
 public Financement patchFinancementChamps(String idFinancement, Financement financementToUpdate) throws Exception {
+    // Récupère le financement existant
     Financement existingFinancement = financementRepository.findByidFinancement(idFinancement)
             .orElseThrow(() -> new FinancementNotFoundException(String.format("Le financement à modifier %s est inexistant", idFinancement)));
 
+    // Met à jour chaque ObjetFinancement dans la liste
     if (financementToUpdate.getObjetFinancement() != null) {
         for (ObjetFinancement updatedObjet : financementToUpdate.getObjetFinancement()) {
             updateObjetFinancement(existingFinancement.getObjetFinancement(), updatedObjet);
         }
     }
 
+    // Met à jour les autres champs
     merge(existingFinancement, financementToUpdate);
 
+    // Sauvegarde le Financement mis à jour
     return financementRepository.save(existingFinancement);
 }
 
@@ -20,7 +24,7 @@ private void updateObjetFinancement(List<ObjetFinancement> existingList, ObjetFi
             return;
         }
     }
-    throw new Exception("ObjetFinancement with ID " + updatedObjet.getIdObjetFinancement() + " not found.");
+    throw new Exception("ObjetFinancement avec ID " + updatedObjet.getIdObjetFinancement() + " non trouvé.");
 }
 
 private void merge(Object target, Object source) throws Exception {
@@ -57,7 +61,7 @@ private void merge(Object target, Object source) throws Exception {
                 }
             }
         } catch (IllegalAccessException e) {
-            throw new Exception("Failed to merge field: " + e.getMessage());
+            throw new Exception("Impossible de fusionner le champ: " + e.getMessage());
         }
     }
 }
