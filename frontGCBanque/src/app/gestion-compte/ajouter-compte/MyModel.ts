@@ -6,29 +6,24 @@ public Financement patchFinancementChamps(String idFinancement, Financement fina
     // Met à jour les objets de financement
     if (financementToUpdate.getObjetFinancement() != null) {
         for (ObjetFinancement updatedObjet : financementToUpdate.getObjetFinancement()) {
-            boolean found = false;
-            for (ObjetFinancement existingObjet : existingFinancement.getObjetFinancement()) {
+            for (int i = 0; i < existingFinancement.getObjetFinancement().size(); i++) {
+                ObjetFinancement existingObjet = existingFinancement.getObjetFinancement().get(i);
                 if (existingObjet.getIdObjetFinancement().equals(updatedObjet.getIdObjetFinancement())) {
                     merge(existingObjet, updatedObjet);
-                    found = true;
                     break;
                 }
-            }
-            if (!found) {
-                // Si l'objet de financement à mettre à jour n'existe pas, ajoute-le à la liste existante
-                existingFinancement.getObjetFinancement().add(updatedObjet);
             }
         }
     }
 
     // Met à jour les autres champs de financement
-    merge(existingFinancement, financementToUpdate);
+    mergeNonListFields(existingFinancement, financementToUpdate);
 
     // Sauvegarde le financement mis à jour
     return financementRepository.save(existingFinancement);
 }
 
-private void merge(Object target, Object source) throws Exception {
+private void mergeNonListFields(Object target, Object source) throws Exception {
     Field[] fields = source.getClass().getDeclaredFields();
     ArrayList<String> bienFields = new ArrayList<>(
             Arrays.asList(
@@ -42,27 +37,29 @@ private void merge(Object target, Object source) throws Exception {
                     "dateReceptionDpe", "dateFinValiditeDpe", "sirenDiagnostiqueur"));
 
     for (Field field : fields) {
-        field.setAccessible(true);
-        try {
-            Object value = field.get(source);
-            if (value != null) {
-                if (isComplexObject(field.getType())) {
-                    Object targetValue = field.get(target);
-                    if (targetValue == null) {
-                        field.set(target, value);
+        if (!field.getName().equals("objetFinancement")) { // Ignore the objetFinancement field
+            field.setAccessible(true);
+            try {
+                Object value = field.get(source);
+                if (value != null) {
+                    if (isComplexObject(field.getType())) {
+                        Object targetValue = field.get(target);
+                        if (targetValue == null) {
+                            field.set(target, value);
+                        } else {
+                            mergeNonListFields(targetValue, value);
+                        }
                     } else {
-                        merge(targetValue, value);
+                        field.set(target, value);
                     }
                 } else {
-                    field.set(target, value);
+                    if (field.getType().equals(Date.class) || bienFields.contains(field.getName()) || dpeFields.contains(field.getName())) {
+                        field.set(target, null);
+                    }
                 }
-            } else {
-                if (field.getType().equals(Date.class) || bienFields.contains(field.getName()) || dpeFields.contains(field.getName())) {
-                    field.set(target, null);
-                }
+            } catch (IllegalAccessException e) {
+                throw new Exception("Impossible de fusionner le champ: " + e.getMessage());
             }
-        } catch (IllegalAccessException e) {
-            throw new Exception("Impossible de fusionner le champ: " + e.getMessage());
         }
     }
 }
