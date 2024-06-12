@@ -1,1 +1,4 @@
-Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'writer' defined in class path resource [com/cl/msofd/utility/BatchConfig.class]: A MongoOperations implementation is required.
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-data-mongodb</artifactId>
+</dependency>
