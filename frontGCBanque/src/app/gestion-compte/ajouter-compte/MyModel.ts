@@ -1,7 +1,22 @@
+import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobParametersBuilder;
+import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
+
 @SpringBootApplication
-public class MsofdApplication extends SpringBootServletInitializer {
+public class MsofdApplication extends SpringBootServletInitializer implements CommandLineRunner {
+
     @Autowired
     private JobLauncher jobLauncher;
+
+    @Autowired
+    private Job job;
+
     public static void main(String[] args) {
         SpringApplication.run(MsofdApplication.class, args);
     }
@@ -11,14 +26,8 @@ public class MsofdApplication extends SpringBootServletInitializer {
         return builder.sources(MsofdApplication.class);
     }
 
-    @Autowired
-    private Job job;
-
     @Override
     public void run(String... args) throws Exception {
         jobLauncher.run(job, new JobParametersBuilder().toJobParameters());
     }
-
 }
-c'est la classe boot de mon appli mais j'ai ce probleme 
-Method does not override method from its superclass pour la méthode run
