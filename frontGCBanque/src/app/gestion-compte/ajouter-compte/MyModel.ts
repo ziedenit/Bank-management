@@ -1,50 +1,34 @@
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.Step;
-import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
-import org.springframework.batch.core.job.builder.JobBuilder;
-import org.springframework.batch.core.step.builder.StepBuilder;
-import org.springframework.batch.item.Chunk;
-import org.springframework.batch.item.ItemProcessor;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.transaction.PlatformTransactionManager;
 
-@Configuration
-@EnableBatchProcessing
-public class BatchConfig {
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Iterator;
 
-    @Bean
-    public ItemReader<Row> reader() throws Exception {
-        return new ExcelItemReader("/mnt/data/240506_OFD_Abres de décision_Version travail.xlsx");
+public class ExcelItemReader implements ItemReader<Row> {
+
+    private Iterator<Row> rowIterator;
+
+    public ExcelItemReader(String filePath) throws IOException {
+        FileInputStream fis = new FileInputStream(filePath);
+        Workbook workbook = new XSSFWorkbook(fis);
+        Sheet sheet = workbook.getSheetAt(0);
+        this.rowIterator = sheet.iterator();
+        // Skip header row
+        if (this.rowIterator.hasNext()) {
+            this.rowIterator.next();
+        }
     }
 
-    @Bean
-    public ItemProcessor<Row, Rule> processor() {
-        return new RuleItemProcessor();
-    }
-
-    @Bean
-    public ItemWriter<Chunk<? extends Rule>> writer() {
-        return new MongoItemWriter();
-    }
-
-    @Bean
-    public Job importUserJob(JobRepository jobRepository, Step s1) {
-        return new JobBuilder("importUserJob", jobRepository)
-                .start(s1)
-                .build();
-    }
-
-    @Bean
-    public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager) throws Exception {
-        return new StepBuilder("step1", jobRepository)
-                .<Row, Rule>chunk(10, transactionManager)
-                .reader(reader())
-                .processor(processor())
-                .writer(writer())
-                .build();
+    @Override
+    public Row read() {
+        if (this.rowIterator != null && this.rowIterator.hasNext()) {
+            return this.rowIterator.next();
+        } else {
+            return null;
+        }
     }
 }
