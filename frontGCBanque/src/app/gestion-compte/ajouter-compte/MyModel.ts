@@ -1,3 +1,4 @@
+Mon ancien code html pour un seul objet sans file ariane est le suivant 
 <div class="container-fluid  ">
   <div class="row">
     <div class="col-12">
@@ -246,3 +247,183 @@
   </div>
 </div> 
 </div>
+// Je veux modifier le code ci bas pour l'affichage du meme objet ci dessus meme format html meme bloc mais dans le cas de plusieurs objet a afficher sous forme de file ariane
+                  mais je voudrais garder meme dispotion pour le bloc objet je vous envoie ci bas le bloc que j'obtiens 
+<div class="container-fluid">
+  
+  <div class="row mt-3">
+    <div class="col-12 breadcrumb-container">
+      <div class="breadcrumb-item" *ngFor="let objet of objetsDeFinancement; let i = index" (click)="selectObjetFinancement(objet)">
+        <div class="breadcrumb-content">
+          <h3 class="d-inline-block font-weight-bold">Objet {{i + 1}}</h3>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mt-3" *ngIf="selectedObjetFinancement">
+    <div class="col-12">
+      <div class="details" >
+        <div class="row">
+          <div class="col-lg-4" *ngIf="!selectedObjetFinancement.selectedFamilleObjet">
+            <div class="form-group">
+              <label for="familleObjet">Famille objet de financement</label>
+              <span class="required">*</span>
+              <select class="form-control form-control-sm" id="familleObjet" [(ngModel)]="selectedObjetFinancement.selectedFamilleObjet">
+                <option value="option0" selected></option>
+                <option value="option1">Immobilier</option>
+                <option value="option2">Installation, maintenance et réparation d'équipement/technologie liés aux bâtiments</option>
+                <option value="option3">Énergies renouvelables</option>
+                <option value="option4">Transport</option>
+                <option value="option5">Autres</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-lg-4" *ngIf="selectedObjetFinancement.selectedFamilleObjet && !selectedObjetFinancement.selectedObjetFinancement">
+            <label for="familleContext">Famille objet de financement</label>
+            <span class="required">*</span>
+            <input type="text" class="form-control form-control-sm" [(ngModel)]="selectedObjetFinancement.familleObjetText" id="familleContext">
+          </div>
+          <div class="col-lg-4" *ngIf="!selectedObjetFinancement.selectedObjetFinancement">
+            <div class="form-group">
+              <label for="objetFinancementType">Objet de financement</label>
+              <span class="required">*</span>
+              <select [(ngModel)]="selectedObjetFinancement.selectedObjetFinancement" class="form-control form-control-sm" id="objetFinancementType">
+                <option value="option0" selected></option>
+                <option value="option1" *ngIf="selectedObjetFinancement.selectedFamilleObjet === 'option1'">Construction de bâtiment</option>
+                <option value="option2" *ngIf="selectedObjetFinancement.selectedFamilleObjet === 'option1'">Acquisition de bâtiment</option>
+                <option value="option3" *ngIf="selectedObjetFinancement.selectedFamilleObjet === 'option1'">Rénovation de bâtiment</option>
+                <option value="option4" *ngIf="selectedObjetFinancement.selectedFamilleObjet === 'option1'">Acquisition de bâtiment + Rénovation de bâtiment</option>
+                <option value="option5" *ngIf="selectedObjetFinancement.selectedFamilleObjet === 'option1' || selectedObjetFinancement.selectedFamilleObjet === 'option2'">Equipements favorisant l'efficacité énergétique et performance énergétique du bâtiment</option>
+                <option value="option6" *ngIf="selectedObjetFinancement.selectedFamilleObjet === 'option1' || selectedObjetFinancement.selectedFamilleObjet === 'option2' || selectedObjetFinancement.selectedFamilleObjet === 'option4'">Stations de recharge pour véhicules électriques</option>
+                <option value="option7" *ngIf="selectedObjetFinancement.selectedFamilleObjet === 'option3' || selectedObjetFinancement.selectedFamilleObjet === 'option2'">Technologies liées aux énergies renouvelables</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-lg-4" *ngIf="selectedObjetFinancement.selectedObjetFinancement">
+            <div class="form-group">
+              <label for="input1">Object financé</label>
+              <input type="text" class="form-control form-control-sm" id="input1" placeholder="Renovation ou aquisition" [(ngModel)]="selectedObjetFinancement.objetFinance">
+            </div>
+          </div>
+          <div class="col-lg-4">
+            <div class="form-group">
+              <label for="categorieBatiment">Nature du bien</label>
+              <span class="required">*</span>
+              <select class="form-control form-control-sm" [(ngModel)]="selectedObjetFinancement.codeBatimentSelected" id="categorieBatiment">
+                <option value="option0" selected></option>
+                <option value="option1">Résidentiel</option>
+                <option value="option2">Bureaux</option>
+                <option value="option3">Bureaux IGH (hauteur >28 m)</option>
+                <option value="option4">Hôtels</option>
+                <option value="option5">Santé (centres hospitaliers, EHPAD, Etabl. Médicaux sociaux…)</option>
+                <option value="option6">Centres commerciaux</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-lg-4">
+            <div class="form-group">
+              <label for="select2">Eligibilité au DPE</label>
+              <select class="form-control form-control-sm" (mouseenter)="showDescription($event)" id="select2" [(ngModel)]="selectedObjetFinancement.selectedType">
+                <option *ngFor="let option of options" [value]="option.value" [title]="option.description">{{ option.label }}</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-lg-4">
+            <div class="form-group">
+              <label for="natureBien">Etat du bien</label>
+              <span class="required">*</span>
+              <select class="form-control form-control-sm" [(ngModel)]="selectedObjetFinancement.selectedNatBatiment" id="natureBien">
+                <option value="option0" selected></option>
+                <option value="option1">Ancien</option>
+                <option value="option2">Neuf</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-lg-4">
+            <div class="form-group">
+              <label for="dateDepot">Date de dépôt de PC</label>
+              <span class="required" *ngIf="selectedObjetFinancement.selectedNatBatiment === 'option2'">*</span>
+              <input type="date" class="form-control form-control-sm" id="dateDepot" [(ngModel)]="selectedObjetFinancement.dateDepot" placeholder="yyyy/MM/dd">
+            </div>
+          </div>
+          <div class="col-lg-4">
+            <div class="form-group">
+              <label for="prixAquisitionBien">Prix du bien (en euro)</label>
+              <span class="required">*</span>
+              <input type="number" class="form-control form-control-sm" id="prixAquisitionBien" [(ngModel)]="selectedObjetFinancement.prixAquisitionBien">
+            </div>
+          </div>
+          <div class="col-lg-4">
+            <div class="form-group">
+              <label for="montantLclFinance">Montant financé par LCL</label>
+              <span class="required">*</span>
+              <input type="number" class="form-control form-control-sm" id="montantLclFinance" [(ngModel)]="selectedObjetFinancement.montantLclFinance">
+            </div>
+          </div>
+          <div class="col-lg-4">
+            <div class="form-group">
+              <label for="partLcl">Part de LCL dans l'acquisition</label>
+              <span class="required">*</span>
+              <input type="number" class="form-control form-control-sm" id="partLcl" [(ngModel)]="selectedObjetFinancement.partLcl">
+            </div>
+          </div>
+          <div class="col-lg-4">
+            <div class="form-group">
+              <label for="normeThermique">Norme thermique</label>
+              <select class="form-control form-control-sm" id="normeThermique" [(ngModel)]="selectedObjetFinancement.normeThermique">
+                <option value="option0" selected></option>
+                <option value="option1">RT 2005</option>
+                <option value="option2">RT 2012</option>
+                <option value="option3">RT 2012 - 10%</option>
+                <option value="option4">RT 2012 - 20%</option>
+                <option value="option5">BBC rénovation</option>
+                <option value="option6">THPE</option>
+                <option value="option7">NF HABITAT HQE</option>
+                <option value="option8">NF HABITAT HQE - 10%</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-lg-4">
+            <div class="form-group">
+              <label for="addresseBien">Adresse du bien</label>
+              <input type="text" class="form-control form-control-sm" id="addresseBien" placeholder="Address" [(ngModel)]="selectedObjetFinancement.addresseBien">
+            </div>
+          </div>
+          <div class="col-lg-4">
+            <div class="form-group">
+              <label for="addresseBienCodePostal">Code postal du bien</label>
+              <input type="text" class="form-control form-control-sm" id="addresseBienCodePostal" placeholder="Code Postal" [(ngModel)]="selectedObjetFinancement.addresseBienCodePostal">
+            </div>
+          </div>
+          <div class="col-lg-4">
+            <div class="form-group">
+              <label for="addresseBienVille">Ville du bien</label>
+              <input type="text" class="form-control form-control-sm" id="addresseBienVille" placeholder="Ville" [(ngModel)]="selectedObjetFinancement.addresseBienVille">
+            </div>
+          </div>
+          <div class="col-lg-4">
+            <div class="form-group">
+              <label for="SirenDPE">N° Siren du diagnostiqueur DPE</label>
+              <input type="text" class="form-control form-control-sm" id="SirenDPE" [(ngModel)]="selectedObjetFinancement.SirenDPE">
+            </div>
+          </div>
+          <div class="col-lg-4">
+            <div class="form-group">
+              <label for="numeroDpeAdeme">N° DPE ADEME</label>
+              <input type="text" class="form-control form-control-sm" id="numeroDpeAdeme" [(ngModel)]="selectedObjetFinancement.numeroDpeAdeme">
+              <button class="btn btn-primary" (click)="showAdemeResult(selectedObjetFinancement.numeroDpeAdeme)">Chercher</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  </div>
