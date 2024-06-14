@@ -1,84 +1,81 @@
-Maintenant j'ai ce service qui permet de recupere la liste des objets financement a afficher et je veux a chaque fois ou je point sur un service j'afficher sur le formulaire
-les données du objet financement et les objets imbriqué
-getListObjetFinancementbyId(id: string): Observable<Array<ObjetFinancement>> {
-    return this.http.get<Array<ObjetFinancement>>(this.financementURL+id,this.httpOptions);
-  }
-le model est le suivant 
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-12">
+      <div class="ajoutFinancement">
+        <button mat-stroked-button (click)="ajouterObjetFinancement()">
+          <img src="../../../assets/icons/plus.svg" />
+          &nbsp; ajouter un objet de financement
+        </button>
+      </div>
+    </div>
+  </div>
 
-export class ObjetFinancement {
-
-    idObjetFinancement:string;
-	codeObjetFinancement:string;// 02=Acquisition  03=Travaux
-	quotePartObjet:number;
-	gainCEP:number;
-	dateFinTravaux: Date;
-	bien:Bien;
-	dpeAvantTravaux: Dpe;
-	dpeApresTravaux: Dpe;
-	alignement: Alignement;
-    eligibilite: Eligibilite;
-	piecesJustificatives : Piece [] ;
-	codeFamilleObjet: string;	
-	garantie: Garantie[]; 
-
-}
-//
-import { Dpe } from './dpe';
-export class Bien {
-    idBien:string;
-    codeBatiment:string;
-    codeNormeThermique:string;
-    typeBatiment:string;
-    codePostal:string;
-    nomCommune:string;
-    adresseComplete:string;
-    anneeConstruction:string;
-    dateDepotPc:string;
-    surfaceBien:number;
-    bienFinanceLCL:boolean;
-    dpeActuel:Dpe;
-    etatBien:string;
-    numeroVoie:string;
-    nomRue:string;
-    prixBien: number;
-    montantFinanceLCL:number;
-    partLCL:number;
-    typeUsage:string;
-    numeroNomRue:string;
-
-    typeEnergie:string;
-    batiment:string;
-    escalier:string;
-    etage: string;
-    porte:string;
-
-    typeVoie:string;
-    codeDepartement:string;
-    codeInseeCommune:string;
-    numeroLot:string;
-    periodeConstruction:string;
-    coordonneeCartographiqueX:number;
-    coordonneeCartographiqueY:number;
-    dateDebutConstruction:Date;
-
-    eligibleDpe:string;
-
-
-
-
-
-
-
-
-
+  <div class="breadcrumb-container">
+    <div class="breadcrumb-item" *ngFor="let objet of objetsDeFinancement; let i = index" (click)="selectObjetFinancement(objet)">
+      <div class="breadcrumb-content">
+        <h3 class="d-inline-block font-weight-bold">Objet {{i + 1}}</h3>
+      </div>
+      <div *ngIf="selectedObjetFinancement === objet && !hiddenObjetfinancement" class="details">
+        <div class="row">
+          <!-- Afficher les champs de selectedObjetFinancement -->
+          <div class="col-lg-4">
+            <div class="form-group">
+              <label for="codeObjetFinancement{{i}}">Code Objet Financement</label>
+              <input type="text" class="form-control form-control-sm" [(ngModel)]="selectedObjetFinancement.codeObjetFinancement" id="codeObjetFinancement{{i}}">
+            </div>
+          </div>
+          <div class="col-lg-4">
+            <div class="form-group">
+              <label for="quotePartObjet{{i}}">Quote Part Objet</label>
+              <input type="number" class="form-control form-control-sm" [(ngModel)]="selectedObjetFinancement.quotePartObjet" id="quotePartObjet{{i}}">
+            </div>
+          </div>
+          <!-- Ajoutez les autres champs du modèle ici -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+	  //
+	  .ajoutFinancement button {
+  margin-top: 20px;
 }
 
-// la code actuel traite un seul objet je veux que le modifier pour traiter l'ensemble des objets financement recuperer et chaque selection d'objet de la file 
-je sette les valeur en TS et je les affiches sur le formulaire 
+.breadcrumb-container {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  padding: 10px 0;
+}
 
+.breadcrumb-item {
+  display: flex;
+  align-items: center;
+  margin-right: 20px;
+  cursor: pointer;
+}
 
+.breadcrumb-item .breadcrumb-content {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #f8f9fa;
+  text-align: center;
+}
 
+.breadcrumb-item .details {
+  margin-top: 10px;
+}
 
+.required {
+  color: red;
+}
 
+img {
+  cursor: pointer;
+}
 
+.breadcrumb-item h3 {
+  margin: 0;
+}
 
