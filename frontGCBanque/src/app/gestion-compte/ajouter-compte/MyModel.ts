@@ -47,7 +47,22 @@
                       </select>
                     </div>
                   </div>
-               //
+                  <!-- autres champs... -->
+                  <div class="col-lg-12" *ngIf="!objet.hideFieldForm && objet.presenceFamilleObjet && !objet.presenceObjet">
+                    <label for="familleContext{{i}}">Famille objet de financement</label>&nbsp;<span class="required">*</span>
+                    <input type="text" class="form-control form-control-sm" [(ngModel)]="objet.familleObjetText" id="familleObjetText{{i}}" name="ObjectFinance"/> 
+                  </div>
+                  <!-- autres champs... -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 
     export class YourComponent {
   objetsFinancement: any[] = [
