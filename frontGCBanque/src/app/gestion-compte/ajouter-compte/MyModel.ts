@@ -1,43 +1,3 @@
-export class YourComponent {
-  objetsFinancement: any[] = [
-    // Vos objets de financement ici
-  ];
-  selectedObjetIndex: number | null = null;
-
-  ajouterObjetFinancement() {
-    const nouvelObjet = {
-      selectedFamilleObjet: '',
-      familleObjetText: '',
-      selectedObjetFinancement: '',
-      objetFinance: '',
-      prixAquisitionBien: '',
-      dateDepot: '',
-      selectedType: '',
-      montantLclFinance: '',
-      normeThermique: '',
-      selectedNatBatiment: '',
-      partLcl: '',
-      SirenDPE: '',
-      addresseBien: '',
-      addresseBienCodePostal: '',
-      addresseBienVille: '',
-      codeBatimentSelected: '',
-      numeroDpeAdeme: '',
-      hideFieldForm: false,
-      presenceFamilleObjet: false,
-      presenceObjet: false,
-      hiddenObjetfinancement: false
-    };
-
-    this.objetsFinancement.push(nouvelObjet);
-    this.selectedObjetIndex = this.objetsFinancement.length - 1; // Sélectionner le nouvel objet ajouté
-  }
-
-  onBreadcrumbClick(index: number) {
-    this.selectedObjetIndex = index;
-  }
-}
-//
 <div class="container-fluid">
   <!-- File d'Ariane pour les objets de financement -->
   <nav aria-label="breadcrumb">
@@ -87,18 +47,44 @@ export class YourComponent {
                       </select>
                     </div>
                   </div>
-                  <!-- autres champs... -->
-                  <div class="col-lg-12" *ngIf="!objet.hideFieldForm && objet.presenceFamilleObjet && !objet.presenceObjet">
-                    <label for="familleContext{{i}}">Famille objet de financement</label>&nbsp;<span class="required">*</span>
-                    <input type="text" class="form-control form-control-sm" [(ngModel)]="objet.familleObjetText" id="familleObjetText{{i}}" name="ObjectFinance"/> 
-                  </div>
-                  <!-- autres champs... -->
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+               //
+
+    export class YourComponent {
+  objetsFinancement: any[] = [
+    // Vos objets de financement ici
+  ];
+  selectedObjetIndex: number | null = null;
+
+  ajouterObjetFinancement() {
+    const nouvelObjet = {
+      selectedFamilleObjet: '',
+      familleObjetText: '',
+      selectedObjetFinancement: '',
+      objetFinance: '',
+      prixAquisitionBien: '',
+      dateDepot: '',
+      selectedType: '',
+      montantLclFinance: '',
+      normeThermique: '',
+      selectedNatBatiment: '',
+      partLcl: '',
+      SirenDPE: '',
+      addresseBien: '',
+      addresseBienCodePostal: '',
+      addresseBienVille: '',
+      codeBatimentSelected: '',
+      numeroDpeAdeme: '',
+      hideFieldForm: false,
+      presenceFamilleObjet: false,
+      presenceObjet: false,
+      hiddenObjetfinancement: false
+    };
+
+    this.objetsFinancement.push(nouvelObjet);
+    this.selectedObjetIndex = this.objetsFinancement.length - 1; // Sélectionner le nouvel objet ajouté
+  }
+
+  onBreadcrumbClick(index: number) {
+    this.selectedObjetIndex = index;
+  }
+}
