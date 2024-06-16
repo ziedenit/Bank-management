@@ -1,105 +1,296 @@
-<div class="container-fluid">
-  <!-- File d'Ariane pour les objets de financement -->
-  <nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-      <li class="breadcrumb-item" *ngFor="let objet of objetsFinancement; let i = index">
-        <a href="#" (click)="onBreadcrumbClick(i)">Objet de financement {{ i + 1 }}</a>
-      </li>
-    </ol>
-  </nav>
+controlleur a tester 
 
-  <div class="row">
-    <div class="col-auto">
-      <div class="ajoutFinancement">
-        <button mat-stroked-button (click)="ajouterObjetFinancement()">
-          <img src="../../../assets/icons/plus.svg" />
-          &nbsp; ajouter un objet de financement
-        </button>
-      </div>
-    </div>
-  </div>
+@Operation(summary = "get a list of financement object", description = "Return a list of object financement based on idFinancement")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successful operation"),
+            @ApiResponse(responseCode = "404", description = "Not Found", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema())),
+            @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+    })
+    @GetMapping("listObjetFinancement/{idFinancement}")
+    public ResponseEntity<List<ObjetFinancement>> getListObjetsFinancementByIdFinancement(
+            @Parameter(description = "id of the financement ", required = true)
+            @PathVariable("idFinancement") String idFinancement) {
 
-  <div class="row">
-    <div class="col-12 d-flex flex-wrap">
-      <div *ngFor="let objet of objetsFinancement; let i = index" style="width: 100%;">
-        <div class="card border-0 m-2" style="width: 100%;" *ngIf="selectedObjetIndex === i">
-          <div class="card-body">
-            <!-- Le contenu de l'objet sélectionné -->
-            <div class="blockSize">
-              <h3 class="d-inline-block font-weight-bold">Objet de financement {{ i + 1 }}</h3>
-              <span class="float-right">
-                <img *ngIf="!objet.hiddenObjetfinancement" src="../../../assets/icons/arrow-up.svg" alt="Fleche haut" (click)="objet.hiddenObjetfinancement = !objet.hiddenObjetfinancement">
-                <img *ngIf="objet.hiddenObjetfinancement" src="../../../assets/icons/arrow-down.svg" alt="Fleche bas" (click)="objet.hiddenObjetfinancement = !objet.hiddenObjetfinancement">
-              </span>
-              <div *ngIf="!objet.hiddenObjetfinancement">
-                <div class="row">
-                  <!-- champs famille non envoyé dans le context -->
-                  <div class="col-lg-12" *ngIf="!objet.hideFieldForm && !objet.presenceFamilleObjet && !objet.presenceObjet">
-                    <div class="form-group">
-                      <label for="familleObjet{{i}}">Famille objet de financement </label>&nbsp;<span class="required">*</span>
-                      <select class="form-control form-control-sm" id="familleObjet{{i}}" [(ngModel)]="objet.selectedFamilleObjet">
-                        <option value='option0' selected> </option>
-                        <option value='option1'>Immobilier </option>
-                        <option value='option2'>Installation, maintenance et réparation d'équipement/technologie liés aux bâtiments</option>
-                        <option value='option3'>Énergies renouvelables </option>
-                        <option value='option4'>Transport </option>
-                        <option value='option5'>Autres </option>
-                      </select>
-                    </div>
-                  </div>
-                  <!-- autres champs... -->
-                  <div class="col-lg-12" *ngIf="!objet.hideFieldForm && objet.presenceFamilleObjet && !objet.presenceObjet">
-                    <label for="familleContext{{i}}">Famille objet de financement</label>&nbsp;<span class="required">*</span>
-                    <input type="text" class="form-control form-control-sm" [(ngModel)]="objet.familleObjetText" id="familleObjetText{{i}}" name="ObjectFinance"/> 
-                  </div>
-                  <!-- autres champs... -->
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+        commonLogger.eventTyp(EventTyp.APPLICATIVE).secEventTyp(SecEventTyp.METIER).logger().info("List Objets Financement: get by idFinancement {}", idFinancement);
+        List<ObjetFinancement> listObjetsFinancement = financementService.getListObjectFinancementByIdFinancement(idFinancement);
+        return new ResponseEntity<>(listObjetsFinancement, HttpStatus.OK);
 
+    }
+//
+service a tester 
+ public List<ObjetFinancement> getListObjectFinancementByIdFinancement(String idFinancement) {
 
-    export class YourComponent {
-  objetsFinancement: any[] = [
-    // Vos objets de financement ici
-  ];
-  selectedObjetIndex: number | null = null;
+        commonLogger.eventTyp(EventTyp.APPLICATIVE).secEventTyp(SecEventTyp.METIER).logger().info("recherche de la liste de objets...");
 
-  ajouterObjetFinancement() {
-    const nouvelObjet = {
-      selectedFamilleObjet: '',
-      familleObjetText: '',
-      selectedObjetFinancement: '',
-      objetFinance: '',
-      prixAquisitionBien: '',
-      dateDepot: '',
-      selectedType: '',
-      montantLclFinance: '',
-      normeThermique: '',
-      selectedNatBatiment: '',
-      partLcl: '',
-      SirenDPE: '',
-      addresseBien: '',
-      addresseBienCodePostal: '',
-      addresseBienVille: '',
-      codeBatimentSelected: '',
-      numeroDpeAdeme: '',
-      hideFieldForm: false,
-      presenceFamilleObjet: false,
-      presenceObjet: false,
-      hiddenObjetfinancement: false
-    };
+        List<ObjetFinancement> listObjetsFinancement = financementRepository.findByidFinancement(idFinancement).get().getObjetFinancement();
 
-    this.objetsFinancement.push(nouvelObjet);
-    this.selectedObjetIndex = this.objetsFinancement.length - 1; // Sélectionner le nouvel objet ajouté
-  }
+        if (listObjetsFinancement==null||listObjetsFinancement.isEmpty()) {
+            throw new ListObjetNotFoundException(
+                    String.format("Pas de liste d'objet financement pour ce le financement ayant comme id {} ", idFinancement));
 
-  onBreadcrumbClick(index: number) {
-    this.selectedObjetIndex = index;
-  }
+        }
+        return listObjetsFinancement;
+    }
+//
+les modeles des objets sont ci bas 
+package com.cl.msofd.model;
+
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Pattern;
+import lombok.*;
+
+import java.io.Serializable;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
+
+@Getter
+@Setter
+@ToString
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class ObjetFinancement implements Serializable {
+
+    private String idObjetFinancement;
+
+    @Pattern(regexp = "^$|(02|03|0203|null)$", message = "code objet financement invalide")
+    private String codeObjetFinancement;
+
+    @Min(0)
+    @Max(100)
+    private Double quotePartObjet;
+
+    private String codeFamilleObjet;
+    private Double gainCEP;
+    private Date dateFinTravaux;
+
+    @Valid
+    private Bien bien;
+
+    private Dpe dpeAvantTravaux;
+    private Dpe dpeApresTravaux;
+    private Alignement alignement;
+    private Eligibilite eligibilite;
+    private List<Garantie> garantie;
+    private List<Piece> piecesJustificatives;
+    private int statut;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ObjetFinancement)) return false;
+        if (!super.equals(o)) return false;
+        ObjetFinancement that = (ObjetFinancement) o;
+        return statut == that.statut &&
+                Objects.equals(idObjetFinancement, that.idObjetFinancement) &&
+                Objects.equals(codeObjetFinancement, that.codeObjetFinancement) &&
+                Objects.equals(quotePartObjet, that.quotePartObjet) &&
+                Objects.equals(codeFamilleObjet, that.codeFamilleObjet) &&
+                Objects.equals(gainCEP, that.gainCEP) &&
+                Objects.equals(dateFinTravaux, that.dateFinTravaux) &&
+                Objects.equals(bien, that.bien) &&
+                Objects.equals(dpeAvantTravaux, that.dpeAvantTravaux) &&
+                Objects.equals(dpeApresTravaux, that.dpeApresTravaux) &&
+                Objects.equals(alignement, that.alignement) &&
+                Objects.equals(eligibilite, that.eligibilite) &&
+                Objects.equals(garantie, that.garantie) &&
+                Objects.equals(piecesJustificatives, that.piecesJustificatives);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), idObjetFinancement, codeObjetFinancement, quotePartObjet, codeFamilleObjet, gainCEP, dateFinTravaux, bien, dpeAvantTravaux, dpeApresTravaux, alignement, eligibilite, garantie, piecesJustificatives, statut);
+    }
 }
+//
+package com.cl.msofd.model;
+
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Pattern;
+import lombok.*;
+
+import java.io.Serializable;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+
+public class Bien  implements Serializable {
+
+
+    private String idBien;
+
+    @Pattern(regexp = "^(00001|00002|00003|00004|00005|00006|99999)$", message = "le champ codeBatiment doit etre l'une des valeurs" +
+            " 00001 00002 00003 00004 00005 00006 99999")
+    private String codeBatiment;
+
+    private String typeBatiment; // Maison individuelle     Appartement
+
+    //adresse Bien
+    private String numeroVoie;
+    private String typeVoie;
+    private String nomRue;
+    private String batiment;
+    private String escalier;
+    private String etage;
+    private String porte;
+    private String codePostal;
+    private String nomCommune;
+    private String paysBien;
+    private String adresseComplete;
+
+    private String codeNormeThermique; //   01: RT2012     02: RE2020    99: Autre
+
+    private String etatBien;
+
+    private String typeEnergie;
+    private String codeTypeEnergie;
+
+    private String codeDepartement;
+    private String codeInseeCommune;
+    private String numeroLot;
+    private String numeroNomRue;
+
+    private String typeUsage; //0: Non applicable    1: Immobilier résidentiel    2: Immobilier professionnel
+
+    @Min(1700)
+    @Max(2024)
+    private Integer anneeConstruction;
+
+    private String periodeConstruction;
+    private Date dateDepotPc;
+    private Date dateDebutConstruction;
+
+    @Min(0)
+    private Double surfaceBien;
+    private boolean bienFinanceLCL;
+    private String numeroFiscalLocal;
+    private String eligibleDpe;
+
+    private List<LabelBien> labelBien;
+    @Min(0)
+    private Double coordonneeCartographiqueX;
+
+    @Min(0)
+    private Double coordonneeCartographiqueY;
+
+    @Min(0)
+    private Double prixBien;
+
+    @Min(0)
+    private Double montantFinanceLCL;
+
+    @Min(0)
+    private Double partLCL;
+
+    @Valid
+    private Dpe dpeActuel;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        Bien bien = (Bien) o;
+        return bienFinanceLCL == bien.bienFinanceLCL && Objects.equals(idBien, bien.idBien)
+                && Objects.equals(codeBatiment, bien.codeBatiment) && Objects.equals(codeNormeThermique, bien.codeNormeThermique)
+                && Objects.equals(typeBatiment, bien.typeBatiment) && Objects.equals(numeroVoie, bien.numeroVoie) && Objects.equals(typeVoie, bien.typeVoie) && Objects.equals(nomRue, bien.nomRue) && Objects.equals(etatBien, bien.etatBien) && Objects.equals(typeEnergie, bien.typeEnergie) && Objects.equals(codeTypeEnergie, bien.codeTypeEnergie) && Objects.equals(batiment, bien.batiment) && Objects.equals(escalier, bien.escalier) && Objects.equals(etage, bien.etage) && Objects.equals(porte, bien.porte) && Objects.equals(codePostal, bien.codePostal) && Objects.equals(nomCommune, bien.nomCommune) && Objects.equals(paysBien, bien.paysBien) && Objects.equals(adresseComplete, bien.adresseComplete) && Objects.equals(codeDepartement, bien.codeDepartement) && Objects.equals(codeInseeCommune, bien.codeInseeCommune) && Objects.equals(numeroLot, bien.numeroLot) && Objects.equals(numeroNomRue, bien.numeroNomRue) && Objects.equals(typeUsage, bien.typeUsage) && Objects.equals(anneeConstruction, bien.anneeConstruction) && Objects.equals(periodeConstruction, bien.periodeConstruction) && Objects.equals(dateDepotPc, bien.dateDepotPc) && Objects.equals(dateDebutConstruction, bien.dateDebutConstruction) && Objects.equals(surfaceBien, bien.surfaceBien) && Objects.equals(numeroFiscalLocal, bien.numeroFiscalLocal) && Objects.equals(coordonneeCartographiqueX, bien.coordonneeCartographiqueX) && Objects.equals(coordonneeCartographiqueY, bien.coordonneeCartographiqueY) && Objects.equals(prixBien, bien.prixBien) && Objects.equals(montantFinanceLCL, bien.montantFinanceLCL) && Objects.equals(partLCL, bien.partLCL) && Objects.equals(dpeActuel, bien.dpeActuel);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), idBien, codeBatiment, codeNormeThermique, typeBatiment, numeroVoie, typeVoie, nomRue, etatBien, typeEnergie, codeTypeEnergie, batiment, escalier, etage, porte, codePostal, nomCommune, paysBien, adresseComplete, codeDepartement, codeInseeCommune, numeroLot, numeroNomRue, typeUsage, anneeConstruction, periodeConstruction, dateDepotPc, dateDebutConstruction, surfaceBien, bienFinanceLCL, numeroFiscalLocal, coordonneeCartographiqueX, coordonneeCartographiqueY, prixBien, montantFinanceLCL, partLCL, dpeActuel);
+    }
+
+
+}
+
+//
+package com.cl.msofd.model;
+
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
+import lombok.*;
+
+import java.io.Serializable;
+import java.util.List;
+import java.util.Objects;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class Financement implements Serializable {
+
+    private String idFinancement;
+
+    @NotNull(message = "Objet financement est obligatoire")
+    @Valid
+    private List<ObjetFinancement> objetFinancement;
+
+    private Alignement alignement;
+    private Eligibilite eligibilite;
+
+
+    private Intervenant intervenant;
+
+    private String indicateurFinancementDedie;
+    private String indicateurNatureDurable;
+    private String typeRisqueClimatiqueAttenue;
+
+    @Pattern(regexp = "^(01|02|03|04|05|06|07|08)$", message = "le champs codeApplicatifOrigine doit etre l'une des valeurs 01 (VIC ou NECI) 02 (PI) 03 (CPPE) 04 (SIRIUS) 05 (DPAR) 06 (DPRO) 07 (CRM360) GGAR (08)")
+    private String codeApplicatifOrigine;
+
+    private boolean indicateurReprise;
+    private int statut;
+
+    @Size(min = 16, max = 16, message = "La taille du champs agenceCompte doit etre égale à 16")
+    private String agenceCompte;
+
+    @Min(0)
+    private Double valeurTravaux;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Financement)) return false;
+        Financement that = (Financement) o;
+        return indicateurReprise == that.indicateurReprise &&
+                statut == that.statut &&
+                Objects.equals(idFinancement, that.idFinancement) &&
+                Objects.equals(objetFinancement, that.objetFinancement) &&
+                Objects.equals(alignement, that.alignement) &&
+                Objects.equals(eligibilite, that.eligibilite) &&
+                Objects.equals(intervenant, that.intervenant) &&
+                Objects.equals(indicateurFinancementDedie, that.indicateurFinancementDedie) &&
+                Objects.equals(indicateurNatureDurable, that.indicateurNatureDurable) &&
+                Objects.equals(typeRisqueClimatiqueAttenue, that.typeRisqueClimatiqueAttenue) &&
+                Objects.equals(codeApplicatifOrigine, that.codeApplicatifOrigine) &&
+                Objects.equals(agenceCompte, that.agenceCompte) &&
+                Objects.equals(valeurTravaux, that.valeurTravaux);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(idFinancement, objetFinancement, alignement, eligibilite, intervenant, indicateurFinancementDedie, indicateurNatureDurable, typeRisqueClimatiqueAttenue, codeApplicatifOrigine, indicateurReprise, statut, agenceCompte, valeurTravaux);
+    }
+}
+//
+
+Si vous plait j'ai besoin d'un test d'integration pour le controlleur ci dessus et un test unitaire pour le service merci
