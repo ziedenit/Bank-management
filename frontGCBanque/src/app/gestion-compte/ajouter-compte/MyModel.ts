@@ -30,6 +30,7 @@ export class YourComponent {
     };
 
     this.objetsFinancement.push(nouvelObjet);
+    this.selectedObjetIndex = this.objetsFinancement.length - 1; // Sélectionner le nouvel objet ajouté
   }
 
   onBreadcrumbClick(index: number) {
@@ -61,7 +62,7 @@ export class YourComponent {
   <div class="row">
     <div class="col-12 d-flex flex-wrap">
       <div *ngFor="let objet of objetsFinancement; let i = index" style="width: 100%;">
-        <div class="card border-0 m-2" style="width: 100%;" (click)="selectedObjetIndex = i" *ngIf="selectedObjetIndex === i">
+        <div class="card border-0 m-2" style="width: 100%;" *ngIf="selectedObjetIndex === i">
           <div class="card-body">
             <!-- Le contenu de l'objet sélectionné -->
             <div class="blockSize">
@@ -95,12 +96,6 @@ export class YourComponent {
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-        <div class="card border-0 m-2" style="width: 100%;" (click)="selectedObjetIndex = i" *ngIf="selectedObjetIndex !== i">
-          <div class="card-body">
-            <!-- Le contenu de l'objet résumé -->
-            <h3 class="d-inline-block font-weight-bold">Objet de financement {{ i + 1 }}</h3>
           </div>
         </div>
       </div>
