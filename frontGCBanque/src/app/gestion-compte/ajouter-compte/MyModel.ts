@@ -1,10 +1,12 @@
-import org.apache.poi.ss.usermodel.*;
+
+ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
-import java.io.FileInputStream;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -14,41 +16,44 @@ import java.util.List;
 @Service
 public class ExcelToDroolsService {
 
+    @Value("${arbre.rules}")
+    private Resource excelResource;
+
     private static final String RULES_TEMPLATE = 
         "package com.example.rules;\n" +
         "import com.example.Acquisition;\n" +
         "import com.example.AcquisitionResponse;\n\n";
 
-    public List<Acquisition> readAcquisitionData(String filePath) throws IOException, ParseException {
+    public List<Acquisition> readAcquisitionData() throws IOException, ParseException {
         List<Acquisition> acquisitions = new ArrayList<>();
-        FileInputStream excelFile = new FileInputStream(filePath);
-        Workbook workbook = new XSSFWorkbook(excelFile);
-        Sheet sheet = workbook.getSheet("ACQUISITION");
+        try (InputStream excelFile = excelResource.getInputStream()) {
+            Workbook workbook = new XSSFWorkbook(excelFile);
+            Sheet sheet = workbook.getSheet("ACQUISITION");
 
-        for (Row row : sheet) {
-            if (row.getRowNum() == 0) continue; // Skip header row
+            for (Row row : sheet) {
+                if (row.getRowNum() == 0) continue; // Skip header row
 
-            Acquisition acquisition = new Acquisition();
-            acquisition.setEligibileDPE("Autre bien immobilier".equals(row.getCell(0).getStringCellValue()));
-            acquisition.setDateDepotPc(parseDate(row.getCell(1).getStringCellValue()));
-            acquisition.setPresenceDpe("oui".equalsIgnoreCase(row.getCell(2).getStringCellValue()));
-            acquisition.setPresenceDpeJustificatif("oui".equalsIgnoreCase(row.getCell(3).getStringCellValue()));
-            acquisition.setDateConstructionDpe(parseDate(row.getCell(4).getStringCellValue()));
-            acquisition.setEtiquetteDpe(row.getCell(5).getStringCellValue());
-            acquisition.setValeurCep(parseDouble(row.getCell(6).getStringCellValue()));
-            acquisition.setNormeThermique(row.getCell(7).getStringCellValue());
-            acquisition.setPresenceNormeThermiqueJustificatif("oui".equalsIgnoreCase(row.getCell(8).getStringCellValue()));
-            acquisition.setXtra248(row.getCell(9).getStringCellValue());
-            acquisition.setXtra249(row.getCell(10).getStringCellValue());
-            acquisition.setXtra250(row.getCell(11).getStringCellValue());
-            acquisition.setXtra251(row.getCell(12).getStringCellValue());
-            acquisition.setXtra275(row.getCell(13).getStringCellValue());
+                Acquisition acquisition = new Acquisition();
+                acquisition.setEligibileDPE("Autre bien immobilier".equals(row.getCell(0).getStringCellValue()));
+                acquisition.setDateDepotPc(parseDate(row.getCell(1).getStringCellValue()));
+                acquisition.setPresenceDpe("oui".equalsIgnoreCase(row.getCell(2).getStringCellValue()));
+                acquisition.setPresenceDpeJustificatif("oui".equalsIgnoreCase(row.getCell(3).getStringCellValue()));
+                acquisition.setDateConstructionDpe(parseDate(row.getCell(4).getStringCellValue()));
+                acquisition.setEtiquetteDpe(row.getCell(5).getStringCellValue());
+                acquisition.setValeurCep(parseDouble(row.getCell(6).getStringCellValue()));
+                acquisition.setNormeThermique(row.getCell(7).getStringCellValue());
+                acquisition.setPresenceNormeThermiqueJustificatif("oui".equalsIgnoreCase(row.getCell(8).getStringCellValue()));
+                acquisition.setXtra248(row.getCell(9).getStringCellValue());
+                acquisition.setXtra249(row.getCell(10).getStringCellValue());
+                acquisition.setXtra250(row.getCell(11).getStringCellValue());
+                acquisition.setXtra251(row.getCell(12).getStringCellValue());
+                acquisition.setXtra275(row.getCell(13).getStringCellValue());
 
-            acquisitions.add(acquisition);
+                acquisitions.add(acquisition);
+            }
+
+            workbook.close();
         }
-
-        workbook.close();
-        excelFile.close();
 
         return acquisitions;
     }
@@ -70,8 +75,8 @@ public class ExcelToDroolsService {
         return Double.parseDouble(doubleStr);
     }
 
-    public void generateDroolsFile(String filePath, String outputDroolsFile) throws IOException, ParseException {
-        List<Acquisition> acquisitions = readAcquisitionData(filePath);
+    public void generateDroolsFile(String outputDroolsFile) throws IOException, ParseException {
+        List<Acquisition> acquisitions = readAcquisitionData();
         StringBuilder rulesContent = new StringBuilder(RULES_TEMPLATE);
 
         int ruleNumber = 1;
@@ -126,11 +131,15 @@ public class ExcelToDroolsService {
 import org.kie.api.KieServices;
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class DroolsConfig {
+
+    @Value("${spring.drools.rules-file}")
+    private String droolsFile;
 
     @Bean
     public KieContainer kieContainer() {
@@ -139,31 +148,7 @@ public class DroolsConfig {
 
     @Bean
     public KieSession kieSession() {
-        return kieContainer().newKieSession();
-    }
-}
-//
-import org.kie.api.runtime.KieSession;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.List;
-
-@Service
-public class DroolsService {
-
-    @Autowired
-    private KieSession kieSession;
-
-    public AcquisitionResponse applyRules(Acquisition acquisition) {
-        List<AcquisitionResponse> responses = new ArrayList<>();
-
-        kieSession.insert(acquisition);
-        kieSession.setGlobal("responses", responses);
-        kieSession.fireAllRules();
-
-        return responses.isEmpty() ? null : responses.get(0);
+        return kieContainer().newKieSession(droolsFile);
     }
 }
 //
@@ -186,7 +171,8 @@ public class AcquisitionController {
     @GetMapping("/generate-rules")
     public String generateRules() {
         try {
-            excelToDroolsService.generateDroolsFile("chemin/vers/votre/fichier.xlsx", "chemin/vers/votre/rules.drl");
+            // Utilisez un chemin temporaire ou un emplacement spécifique pour stocker le fichier rules.drl généré
+            excelToDroolsService.generateDroolsFile("target/classes/rules.drl");
             return "Rules generated successfully!";
         } catch (IOException | ParseException e) {
             e.printStackTrace();
@@ -200,76 +186,5 @@ public class AcquisitionController {
     }
 }
 //
-spring.drools.rules-file=classpath:rules.drl
-//
-public class AcquisitionResponse {
-    private String xtra248;
-    private String xtra249;
-    private String xtra250;
-    private String xtra251;
-    private String xtra275;
-
-    // Constructors, getters, and setters
-    public AcquisitionResponse() {}
-
-    public AcquisitionResponse(String xtra248, String xtra249, String xtra250, String xtra251, String xtra275) {
-        this.xtra248 = xtra248;
-        this.xtra249 = xtra249;
-        this.xtra250 = xtra250;
-        this.xtra251 = xtra251;
-        this.xtra275 = xtra275;
-    }
-
-    // Getters and Setters
-    public String getXtra248() { return xtra248; }
-    public void setXtra248(String xtra248) { this.xtra248 = xtra248; }
-
-    public String getXtra249() { return xtra249; }
-    public void setXtra249(String xtra249) { this.xtra249 = xtra249; }
-
-    public String getXtra250() { return xtra250; }
-    public void setXtra250(String xtra250) { this.xtra250 = xtra250; }
-
-    public String getXtra251() { return xtra251; }
-    public void setXtra251(String xtra251) { this.xtra251 = xtra251; }
-
-    public String getXtra275() { return xtra275; }
-    public void setXtra275(String xtra275) { this.xtra275 = xtra275; }
-}
-//
-<dependency>
-    <groupId>org.kie</groupId>
-    <artifactId>kie-spring</artifactId>
-    <version>7.60.0.Final</version>
-</dependency>
-<dependency>
-    <groupId>org.drools</groupId>
-    <artifactId>drools-decisiontables</artifactId>
-    <version>7.60.0.Final</version>
-</dependency>
-<dependency>
-    <groupId>org.apache.poi</groupId>
-    <artifactId>poi-ooxml</artifactId>
-    <version>5.0.0</version>
-</dependency>
-//
-  import java.util.Date;
-
-public class Acquisition {
-    private boolean eligibileDPE;
-    private Date dateDepotPc;
-    private boolean presenceDpe;
-    private boolean presenceDpeJustificatif;
-    private Date dateConstructionDpe;
-    private String etiquetteDpe;
-    private double valeurCep;
-    private String normeThermique;
-    private boolean presenceNormeThermiqueJustificatif;
-    private String xtra248;
-    private String xtra249;
-    private String xtra250;
-    private String xtra251;
-    private String xtra275;
-
-    // Getters and setters
-}
+spring.drools.rules-file=rules.drl
+arbre.rules=classpath:fichier.xlsx
