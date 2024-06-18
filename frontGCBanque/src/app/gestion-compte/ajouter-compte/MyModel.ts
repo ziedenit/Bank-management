@@ -1,24 +1,40 @@
-        // Initialize the global variable
-        List<AcquisitionResponse> responses = new ArrayList<>();
-        kSession.setGlobal("responses", responses);
+import org.kie.api.runtime.KieSession;
+import org.kie.api.runtime.KieServices;
+import org.kie.api.runtime.KieContainer;
+import org.kie.api.runtime.rule.FactHandle;
+import java.util.ArrayList;
+import java.util.List;
 
-        // Insert facts into the session
-        Acquisition acquisition = new Acquisition();
-        // Set properties of acquisition
+public class DroolsTest {
+    public static void main(String[] args) {
+        try {
+            // Load the KIE services
+            KieServices ks = KieServices.Factory.get();
+            KieContainer kContainer = ks.getKieClasspathContainer();
+            KieSession kSession = kContainer.newKieSession("ksession-rules");
 
-        FactHandle fact1 = kSession.insert(acquisition);
+            // Initialize the global variable
+            List<AcquisitionResponse> responses = new ArrayList<>();
+            kSession.setGlobal("responses", responses);
 
-        // Fire all rules
-        kSession.fireAllRules();
+            // Insert facts into the session
+            Acquisition acquisition = new Acquisition();
+            // Set properties of acquisition
 
-        // Retrieve the results
-        for (AcquisitionResponse response : responses) {
-            System.out.println(response);
+            FactHandle fact1 = kSession.insert(acquisition);
+
+            // Fire all rules
+            kSession.fireAllRules();
+
+            // Retrieve the results
+            for (AcquisitionResponse response : responses) {
+                System.out.println(response);
+            }
+
+            // Dispose the session
+            kSession.dispose();
+        } catch (Throwable t) {
+            t.printStackTrace();
         }
-
-        // Dispose the session
-        kSession.dispose();
-    } catch (Throwable t) {
-        t.printStackTrace();
     }
 }
