@@ -1,33 +1,66 @@
-time=2024-06-18T02:16:02.699+02:00|level=ERROR|event_cod=empty|event_typ=TECHNICAL|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=Unknown KieSession name: rules.drl
-time=2024-06-18T02:16:02.701+02:00|level=WARN |event_cod=empty|event_typ=TECHNICAL|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'acquisitionController': Unsatisfied dependency expressed through field 'droolsService': Error creating bean with name 'droolsService': Unsatisfied dependency expressed through field 'kieSession': No qualifying bean of type 'org.kie.api.runtime.KieSession' available: expected at least 1 bean which qualifies as autowire candidate. Dependency annotations: {@org.springframework.beans.factory.annotation.Autowired(required=true)}
-time=2024-06-18T02:16:02.766+02:00|level=INFO |event_cod=empty|event_typ=TECHNICAL|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=Closing JPA EntityManagerFactory for persistence unit 'default'
-time=2024-06-18T02:16:02.770+02:00|level=INFO |event_cod=empty|event_typ=TECHNICAL|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=HikariPool-1 - Shutdown initiated...
-time=2024-06-18T02:16:02.773+02:00|level=INFO |event_cod=empty|event_typ=TECHNICAL|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=HikariPool-1 - Shutdown completed.
-time=2024-06-18T02:16:02.775+02:00|level=INFO |event_cod=empty|event_typ=TECHNICAL|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=Stopping service [Tomcat]
-time=2024-06-18T02:16:02.794+02:00|level=INFO |event_cod=empty|event_typ=TECHNICAL|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=
+j'ai de problemes de pars commencant par ca 
 
-Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
-time=2024-06-18T02:16:02.824+02:00|level=ERROR|event_cod=empty|event_typ=TECHNICAL|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=Unknown KieSession name: rules.drl
-time=2024-06-18T02:16:02.826+02:00|level=ERROR|event_cod=empty|event_typ=TECHNICAL|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=
+je me base sur un fichier xls et je parse un string un peu particulier qui represente une date en format DATE comme indiqué niveau code mais j'ai cette exception
+Error generating rules: Unparseable date: "Date de dépôt de PC"
+	java.text.ParseException: Unparseable date: "Date de dépôt de PC"
+	at java.base/java.text.DateFormat.parse(DateFormat.java:399)
+	at com.cl.msofd.engineRules.ExcelToDroolsService.parseDate(ExcelToDroolsService.java:70)
+	at com.cl.msofd.engineRules.ExcelToDroolsService.readAcquisitionData(ExcelToDroolsService.java:40)
+	at com.cl.msofd.engineRules.ExcelToDroolsService.generateDroolsFile(ExcelToDroolsService.java:81)
+	at com.cl.msofd.engineRules.AcquisitionController.generateRules(AcquisitionController.java:23)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:259)
+	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:192)
+	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:118)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:920)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:830)
+	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87)
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1089)
+	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:979)
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1014)
+public List<Acquisition> readAcquisitionData() throws IOException, ParseException {
+        List<Acquisition> acquisitions = new ArrayList<>();
+        try (InputStream excelFile = excelResource.getInputStream()) {
+            Workbook workbook = new XSSFWorkbook(excelFile);
+            Sheet sheet = workbook.getSheet("ACQUISITION");
 
-***************************
-APPLICATION FAILED TO START
-***************************
+            for (Row row : sheet) {
+                if (row.getRowNum() == 0) continue; // Skip header row
 
-Description:
+                Acquisition acquisition = new Acquisition();
+                acquisition.setEligibileDPE("Autre bien immobilier".equals(row.getCell(0).getStringCellValue()));
+               acquisition.setDateDepotPc(parseDate(row.getCell(1).getStringCellValue()));
+                acquisition.setPresenceDpe("oui".equalsIgnoreCase(row.getCell(2).getStringCellValue()));
+                acquisition.setPresenceDpeJustificatif("oui".equalsIgnoreCase(row.getCell(3).getStringCellValue()));
+              acquisition.setDateConstructionDpe(parseDate(row.getCell(4).getStringCellValue()));
+                acquisition.setEtiquetteDpe(row.getCell(5).getStringCellValue());
+           acquisition.setValeurCep(parseDouble(row.getCell(6).getStringCellValue()));
+                acquisition.setNormeThermique(row.getCell(7).getStringCellValue());
+                acquisition.setPresenceNormeThermiqueJustificatif("oui".equalsIgnoreCase(row.getCell(8).getStringCellValue()));
+                acquisition.setXtra248(row.getCell(9).getStringCellValue());
+                acquisition.setXtra249(row.getCell(10).getStringCellValue());
+                acquisition.setXtra250(row.getCell(11).getStringCellValue());
+                acquisition.setXtra251(row.getCell(12).getStringCellValue());
+                acquisition.setXtra275(row.getCell(13).getStringCellValue());
 
-Field kieSession in com.cl.msofd.engineRules.DroolsService required a bean of type 'org.kie.api.runtime.KieSession' that could not be found.
+                acquisitions.add(acquisition);
+            }
 
-The injection point has the following annotations:
-	- @org.springframework.beans.factory.annotation.Autowired(required=true)
+            workbook.close();
+        }
 
-The following candidates were found but could not be injected:
-	- User-defined bean method 'kieSession' in 'AppConfiguration' ignored as the bean value is null
+        return acquisitions;
+    }
 
-
-Action:
-
-Consider revisiting the entries above or defining a bean of type 'org.kie.api.runtime.KieSession' in your configuration.
-
-
-Process finished with exit code 1
+    private Date parseDate(String dateStr) throws ParseException {
+        if (dateStr == null || dateStr.isEmpty()) {
+            return null;
+        }
+        if (dateStr.toLowerCase().contains("avant")) {
+            return new SimpleDateFormat("yyyy-MM-dd").parse("2012-12-31");
+        }
+        return new SimpleDateFormat("dd/MM/yyyy").parse(dateStr);
+    }
