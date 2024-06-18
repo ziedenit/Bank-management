@@ -1,688 +1,151 @@
-package com.example.rules;
-import com.example.Acquisition;
-import com.example.AcquisitionResponse;
+package com.cl.msofd.engineRules;
 
-rule "Rule 1"
-when
-    $acquisition : Acquisition(
-        eligibileDPE == false,
-        dateDepotPc == "",
-        presenceDpe == false,
-        presenceDpeJustificatif == false,
-        (dateConstructionDpe == null || dateConstructionDpe == ""),
-        etiquetteDpe == "",
-        (valeurCep == 0.0 || valeurCep == 0.0),
-        normeThermique == "",
-        presenceNormeThermiqueJustificatif == false
-    )
-then
-    AcquisitionResponse response = new AcquisitionResponse("02", "Y", "07", "02", "N");
-    insert(response);
-end
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.stereotype.Service;
 
-rule "Rule 2"
-when
-    $acquisition : Acquisition(
-        eligibileDPE == false,
-        dateDepotPc == "",
-        presenceDpe == false,
-        presenceDpeJustificatif == false,
-        (dateConstructionDpe == null || dateConstructionDpe == ""),
-        etiquetteDpe == "",
-        (valeurCep == 0.0 || valeurCep == 0.0),
-        normeThermique == "",
-        presenceNormeThermiqueJustificatif == false
-    )
-then
-    AcquisitionResponse response = new AcquisitionResponse("02", "Y", "07", "02", "N");
-    insert(response);
-end
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
-rule "Rule 3"
-when
-    $acquisition : Acquisition(
-        eligibileDPE == false,
-        dateDepotPc == "",
-        presenceDpe == false,
-        presenceDpeJustificatif == false,
-        (dateConstructionDpe == null || dateConstructionDpe == ""),
-        etiquetteDpe == "",
-        (valeurCep == 0.0 || valeurCep == 0.0),
-        normeThermique == "",
-        presenceNormeThermiqueJustificatif == false
-    )
-then
-    AcquisitionResponse response = new AcquisitionResponse("02", "Y", "07", "02", "N");
-    insert(response);
-end
+@Service
+public class ExcelToDroolsService {
 
-rule "Rule 4"
-when
-    $acquisition : Acquisition(
-        eligibileDPE == false,
-        dateDepotPc == "",
-        presenceDpe == false,
-        presenceDpeJustificatif == false,
-        (dateConstructionDpe == null || dateConstructionDpe == ""),
-        etiquetteDpe == "",
-        (valeurCep == 0.0 || valeurCep == 0.0),
-        normeThermique == "",
-        presenceNormeThermiqueJustificatif == false
-    )
-then
-    AcquisitionResponse response = new AcquisitionResponse("02", "Y", "07", "02", "N");
-    insert(response);
-end
+    @Value("${arbre.rules}")
+    private Resource excelResource;
 
-rule "Rule 5"
-when
-    $acquisition : Acquisition(
-        eligibileDPE == false,
-        dateDepotPc == "",
-        presenceDpe == false,
-        presenceDpeJustificatif == false,
-        (dateConstructionDpe == null || dateConstructionDpe == ""),
-        etiquetteDpe == "",
-        (valeurCep == 0.0 || valeurCep == 0.0),
-        normeThermique == "",
-        presenceNormeThermiqueJustificatif == false
-    )
-then
-    AcquisitionResponse response = new AcquisitionResponse("02", "Y", "07", "02", "N");
-    insert(response);
-end
+    private static final String RULES_TEMPLATE =
+            "package com.example.rules;\n" +
+                    "import com.example.Acquisition;\n" +
+                    "import com.example.AcquisitionResponse;\n\n";
 
-rule "Rule 6"
-when
-    $acquisition : Acquisition(
-        eligibileDPE == false,
-        dateDepotPc == "",
-        presenceDpe == false,
-        presenceDpeJustificatif == false,
-        (dateConstructionDpe == null || dateConstructionDpe == ""),
-        etiquetteDpe == "",
-        (valeurCep == 0.0 || valeurCep == 0.0),
-        normeThermique == "",
-        presenceNormeThermiqueJustificatif == false
-    )
-then
-    AcquisitionResponse response = new AcquisitionResponse("02", "Y", "07", "02", "N");
-    insert(response);
-end
+    public List<Acquisition> readAcquisitionData() throws IOException, ParseException {
+        List<Acquisition> acquisitions = new ArrayList<>();
+        try (InputStream excelFile = excelResource.getInputStream()) {
+            Workbook workbook = new XSSFWorkbook(excelFile);
+            Sheet sheet = workbook.getSheet("ACQUISITION");
 
-rule "Rule 7"
-when
-    $acquisition : Acquisition(
-        eligibileDPE == false,
-        dateDepotPc == "",
-        presenceDpe == false,
-        presenceDpeJustificatif == false,
-        (dateConstructionDpe == null || dateConstructionDpe == ""),
-        etiquetteDpe == "",
-        (valeurCep == 0.0 || valeurCep == 0.0),
-        normeThermique == "",
-        presenceNormeThermiqueJustificatif == false
-    )
-then
-    AcquisitionResponse response = new AcquisitionResponse("02", "Y", "07", "02", "N");
-    insert(response);
-end
+            for (Row row : sheet) {
+                if (row.getRowNum() == 0) continue; // Skip header row
+                Acquisition acquisition = new Acquisition();
+                acquisition.setEligibileDPE("Autre bien immobilier".equals(getStringValue(row, 0)));
+                acquisition.setDateDepotPc(parseDate(getStringValue(row, 1)));
+                acquisition.setPresenceDpe("Oui".equalsIgnoreCase(getStringValue(row, 2)));
+                acquisition.setPresenceDpeJustificatif("Oui".equalsIgnoreCase(getStringValue(row, 3)));
+                acquisition.setDateConstructionDpe(parseDate(getStringValue(row, 4)));
+                acquisition.setClasseCep(getStringValue(row, 5));
+                //acquisition.setValeurCep(getStringValue(row, 6).isEmpty() ? Double.parseDouble("0") : Double.parseDouble(getStringValue(row, 6)));
+                acquisition.setPresenceNormeThermiqueJustificatif("Oui".equalsIgnoreCase(getStringValue(row, 7)));
+                acquisition.setNormeThermique(getStringValue(row, 8));
+                acquisition.setXtra248(getStringValue(row, 9));
+                acquisition.setXtra249(getStringValue(row, 10));
+                acquisition.setXtra250(getStringValue(row, 11));
+                acquisition.setXtra251(getStringValue(row, 12));
+                acquisition.setXtra275(getStringValue(row, 13));
 
-rule "Rule 8"
-when
-    $acquisition : Acquisition(
-        eligibileDPE == false,
-        dateDepotPc == "",
-        presenceDpe == false,
-        presenceDpeJustificatif == false,
-        (dateConstructionDpe == null || dateConstructionDpe == ""),
-        etiquetteDpe == "",
-        (valeurCep == 0.0 || valeurCep == 0.0),
-        normeThermique == "",
-        presenceNormeThermiqueJustificatif == false
-    )
-then
-    AcquisitionResponse response = new AcquisitionResponse("02", "Y", "07", "02", "N");
-    insert(response);
-end
+                acquisitions.add(acquisition);
+            }
 
-rule "Rule 9"
-when
-    $acquisition : Acquisition(
-        eligibileDPE == false,
-        dateDepotPc == "",
-        presenceDpe == false,
-        presenceDpeJustificatif == false,
-        (dateConstructionDpe == null || dateConstructionDpe == ""),
-        etiquetteDpe == "",
-        (valeurCep == 0.0 || valeurCep == 0.0),
-        normeThermique == "",
-        presenceNormeThermiqueJustificatif == false
-    )
-then
-    AcquisitionResponse response = new AcquisitionResponse("02", "Y", "07", "02", "N");
-    insert(response);
-end
+            workbook.close();
+        }
 
-rule "Rule 10"
-when
-    $acquisition : Acquisition(
-        eligibileDPE == true,
-        dateDepotPc == "31/12/2012",
-        presenceDpe == true,
-        presenceDpeJustificatif == true,
-        (dateConstructionDpe == null || dateConstructionDpe == ""),
-        etiquetteDpe == "A",
-        (valeurCep == 0.0 || valeurCep == 0.0),
-        normeThermique == "",
-        presenceNormeThermiqueJustificatif == false
-    )
-then
-    AcquisitionResponse response = new AcquisitionResponse("02", "Y", "06", "02", "Y");
-    insert(response);
-end
+        return acquisitions;
+    }
 
-rule "Rule 11"
-when
-    $acquisition : Acquisition(
-        eligibileDPE == true,
-        dateDepotPc == "31/12/2012",
-        presenceDpe == true,
-        presenceDpeJustificatif == true,
-        (dateConstructionDpe == null || dateConstructionDpe == ""),
-        etiquetteDpe == "<> A",
-        (valeurCep == 0.0 || valeurCep == 0.0),
-        normeThermique == "",
-        presenceNormeThermiqueJustificatif == false
-    )
-then
-    AcquisitionResponse response = new AcquisitionResponse("02", "Y", "06", "02", "Y");
-    insert(response);
-end
 
-rule "Rule 12"
-when
-    $acquisition : Acquisition(
-        eligibileDPE == true,
-        dateDepotPc == "31/12/2012",
-        presenceDpe == true,
-        presenceDpeJustificatif == true,
-        (dateConstructionDpe == null || dateConstructionDpe == ""),
-        etiquetteDpe == "<> A",
-        (valeurCep == 0.0 || valeurCep == 0.0),
-        normeThermique == "",
-        presenceNormeThermiqueJustificatif == false
-    )
-then
-    AcquisitionResponse response = new AcquisitionResponse("02", "Y", "06", "02", "N");
-    insert(response);
-end
+    public void generateDroolsFile(String outputDroolsFile) throws IOException, ParseException {
+        List<Acquisition> acquisitions = readAcquisitionData();
+        StringBuilder rulesContent = new StringBuilder(RULES_TEMPLATE);
 
-rule "Rule 13"
-when
-    $acquisition : Acquisition(
-        eligibileDPE == true,
-        dateDepotPc == "01/01/2013",
-        presenceDpe == true,
-        presenceDpeJustificatif == true,
-        (dateConstructionDpe == null || dateConstructionDpe == ""),
-        etiquetteDpe == "A",
-        (valeurCep == 0.0 || valeurCep == 0.0),
-        normeThermique == "",
-        presenceNormeThermiqueJustificatif == false
-    )
-then
-    AcquisitionResponse response = new AcquisitionResponse("02", "Y", "06", "02", "Y");
-    insert(response);
-end
+        int ruleNumber = 1;
+        for (Acquisition acquisition : acquisitions) {
+            String rule = generateRule(acquisition, ruleNumber++);
+            rulesContent.append(rule).append("\n");
+        }
 
-rule "Rule 14"
-when
-    $acquisition : Acquisition(
-        eligibileDPE == true,
-        dateDepotPc == "01/01/2013",
-        presenceDpe == true,
-        presenceDpeJustificatif == true,
-        (dateConstructionDpe == null || dateConstructionDpe == ""),
-        etiquetteDpe == "<> A",
-        (valeurCep == 0.0 || valeurCep == 0.0),
-        normeThermique == "",
-        presenceNormeThermiqueJustificatif == false
-    )
-then
-    AcquisitionResponse response = new AcquisitionResponse("02", "Y", "06", "02", "Y");
-    insert(response);
-end
+        try (FileWriter writer = new FileWriter(outputDroolsFile)) {
+            writer.write(rulesContent.toString());
+        }
+    }
 
-rule "Rule 15"
-when
-    $acquisition : Acquisition(
-        eligibileDPE == true,
-        dateDepotPc == "01/01/2013",
-        presenceDpe == true,
-        presenceDpeJustificatif == true,
-        (dateConstructionDpe == null || dateConstructionDpe == ""),
-        etiquetteDpe == "<> A",
-        (valeurCep == 0.0 || valeurCep == 0.0),
-        normeThermique == "",
-        presenceNormeThermiqueJustificatif == false
-    )
-then
-    AcquisitionResponse response = new AcquisitionResponse("02", "Y", "06", "02", "N");
-    insert(response);
-end
+    private String generateRule(Acquisition acquisition, int ruleNumber) {
+        return String.format(
+                "rule \"Rule %d\"\n" +
+                        "when\n" +
+                        "    $acquisition : Acquisition(\n" +
+                        "        eligibileDPE == %s,\n" +
+                        "        dateDepotPc == \"%s\",\n" +
+                        "        presenceDpe == %s,\n" +
+                        "        presenceDpeJustificatif == %s,\n" +
+                        "        (dateConstructionDpe == null || dateConstructionDpe == \"%s\"),\n" +
+                        "        etiquetteDpe == \"%s\",\n" +
+                        "        (valeurCep == 0.0 || valeurCep == %s),\n" +
+                        "        normeThermique == \"%s\",\n" +
+                        "        presenceNormeThermiqueJustificatif == %s\n" +
+                        "    )\n" +
+                        "then\n" +
+                        "    AcquisitionResponse response = new AcquisitionResponse(\"%s\", \"%s\", \"%s\", \"%s\", \"%s\");\n" +
+                        "    insert(response);\n" +                   
+                        "end\n",
+                ruleNumber,
+                acquisition.isEligibileDPE(),
+                acquisition.getDateDepotPc() != null ? new SimpleDateFormat("dd/MM/yyyy").format(acquisition.getDateDepotPc()) : "",
+                acquisition.isPresenceDpe(),
+                acquisition.isPresenceDpeJustificatif(),
+                acquisition.getDateConstructionDpe() != null ? new SimpleDateFormat("dd/MM/yyyy").format(acquisition.getDateConstructionDpe()) : "",
+                acquisition.getClasseCep(),
+                acquisition.getValeurCep() != 0.0 ? acquisition.getValeurCep() : "0.0",
+                acquisition.getNormeThermique(),
+                acquisition.isPresenceNormeThermiqueJustificatif(),
+                acquisition.getXtra248(),
+                acquisition.getXtra249(),
+                acquisition.getXtra250(),
+                acquisition.getXtra251(),
+                acquisition.getXtra275()
+        );
+    }
 
-rule "Rule 16"
-when
-    $acquisition : Acquisition(
-        eligibileDPE == true,
-        dateDepotPc == "01/01/2021",
-        presenceDpe == true,
-        presenceDpeJustificatif == true,
-        (dateConstructionDpe == null || dateConstructionDpe == ""),
-        etiquetteDpe == "",
-        (valeurCep == 0.0 || valeurCep == 0.0),
-        normeThermique == "",
-        presenceNormeThermiqueJustificatif == false
-    )
-then
-    AcquisitionResponse response = new AcquisitionResponse("02", "Y", "06", "02", "Y");
-    insert(response);
-end
 
-rule "Rule 17"
-when
-    $acquisition : Acquisition(
-        eligibileDPE == true,
-        dateDepotPc == "01/01/2021",
-        presenceDpe == true,
-        presenceDpeJustificatif == true,
-        (dateConstructionDpe == null || dateConstructionDpe == ""),
-        etiquetteDpe == "",
-        (valeurCep == 0.0 || valeurCep == 0.0),
-        normeThermique == "",
-        presenceNormeThermiqueJustificatif == false
-    )
-then
-    AcquisitionResponse response = new AcquisitionResponse("02", "Y", "06", "02", "N");
-    insert(response);
-end
+    private Date parseDate(String dateStr) throws ParseException {
+        if (dateStr == null || dateStr.isEmpty() || "Inconnu".equals(dateStr.trim())) {
+            return null;
+        }
 
-rule "Rule 18"
-when
-    $acquisition : Acquisition(
-        eligibileDPE == true,
-        dateDepotPc == "01/01/2022",
-        presenceDpe == true,
-        presenceDpeJustificatif == true,
-        (dateConstructionDpe == null || dateConstructionDpe == ""),
-        etiquetteDpe == "",
-        (valeurCep == 0.0 || valeurCep == 0.0),
-        normeThermique == "",
-        presenceNormeThermiqueJustificatif == false
-    )
-then
-    AcquisitionResponse response = new AcquisitionResponse("02", "Y", "06", "02", "Y");
-    insert(response);
-end
+        // Gestion des valeurs spéciales
+        if (dateStr.startsWith("avant")) {
+            String datePart = dateStr.substring("avant ".length()).trim();
+            return new SimpleDateFormat("dd/MM/yyyy").parse(datePart);
+        } else if (dateStr.startsWith("du")) {
+            // Exemple: "du 01/01/2013 au 31/12/2020"
+            String[] parts = dateStr.split(" au ");
+            String startDateStr = parts[0].substring("du ".length()).trim();
+            return new SimpleDateFormat("dd/MM/yyyy").parse(startDateStr);
+            // Vous pouvez également gérer la fin de la période si nécessaire
+        } else if (dateStr.startsWith("> au")) {
+            // Exemple: "> au 01/01/2022"
+            String datePart = dateStr.substring("> au ".length()).trim();
+            return new SimpleDateFormat("dd/MM/yyyy").parse(datePart);
+        } else {
+            // Gestion par défaut pour les autres cas
+            throw new ParseException("Unparseable date: " + dateStr, 0);
+        }
+    }
 
-rule "Rule 19"
-when
-    $acquisition : Acquisition(
-        eligibileDPE == true,
-        dateDepotPc == "",
-        presenceDpe == false,
-        presenceDpeJustificatif == true,
-        (dateConstructionDpe == null || dateConstructionDpe == "31/12/2012"),
-        etiquetteDpe == "A",
-        (valeurCep == 0.0 || valeurCep == 0.0),
-        normeThermique == "",
-        presenceNormeThermiqueJustificatif == false
-    )
-then
-    AcquisitionResponse response = new AcquisitionResponse("02", "Y", "06", "02", "Y");
-    insert(response);
-end
+    private String getStringValue(Row row, int cellIndex) {
+        Cell cell = row.getCell(cellIndex, Row.MissingCellPolicy.RETURN_BLANK_AS_NULL);
+        if (cell == null) {
+            return ""; // or handle null case as per your requirement
+        } else {
+            cell.setCellType(CellType.STRING); // Ensure the cell type is String
+            return cell.getStringCellValue().trim(); // Get string value and trim whitespace
+        }
+    }
 
-rule "Rule 20"
-when
-    $acquisition : Acquisition(
-        eligibileDPE == true,
-        dateDepotPc == "",
-        presenceDpe == false,
-        presenceDpeJustificatif == true,
-        (dateConstructionDpe == null || dateConstructionDpe == "31/12/2012"),
-        etiquetteDpe == "<> A",
-        (valeurCep == 0.0 || valeurCep == 0.0),
-        normeThermique == "",
-        presenceNormeThermiqueJustificatif == false
-    )
-then
-    AcquisitionResponse response = new AcquisitionResponse("02", "Y", "06", "02", "Y");
-    insert(response);
-end
-
-rule "Rule 21"
-when
-    $acquisition : Acquisition(
-        eligibileDPE == true,
-        dateDepotPc == "",
-        presenceDpe == false,
-        presenceDpeJustificatif == true,
-        (dateConstructionDpe == null || dateConstructionDpe == "31/12/2012"),
-        etiquetteDpe == "<> A",
-        (valeurCep == 0.0 || valeurCep == 0.0),
-        normeThermique == "",
-        presenceNormeThermiqueJustificatif == false
-    )
-then
-    AcquisitionResponse response = new AcquisitionResponse("02", "Y", "06", "02", "N");
-    insert(response);
-end
-
-rule "Rule 22"
-when
-    $acquisition : Acquisition(
-        eligibileDPE == true,
-        dateDepotPc == "",
-        presenceDpe == false,
-        presenceDpeJustificatif == true,
-        (dateConstructionDpe == null || dateConstructionDpe == "31/12/2012"),
-        etiquetteDpe == "",
-        (valeurCep == 0.0 || valeurCep == 0.0),
-        normeThermique == "RT2012",
-        presenceNormeThermiqueJustificatif == true
-    )
-then
-    AcquisitionResponse response = new AcquisitionResponse("02", "Y", "06", "02", "Y");
-    insert(response);
-end
-
-rule "Rule 23"
-when
-    $acquisition : Acquisition(
-        eligibileDPE == true,
-        dateDepotPc == "",
-        presenceDpe == false,
-        presenceDpeJustificatif == true,
-        (dateConstructionDpe == null || dateConstructionDpe == "31/12/2012"),
-        etiquetteDpe == "",
-        (valeurCep == 0.0 || valeurCep == 0.0),
-        normeThermique == "",
-        presenceNormeThermiqueJustificatif == false
-    )
-then
-    AcquisitionResponse response = new AcquisitionResponse("02", "Y", "07", "02", "");
-    insert(response);
-end
-
-rule "Rule 24"
-when
-    $acquisition : Acquisition(
-        eligibileDPE == true,
-        dateDepotPc == "",
-        presenceDpe == false,
-        presenceDpeJustificatif == true,
-        (dateConstructionDpe == null || dateConstructionDpe == "01/01/2013"),
-        etiquetteDpe == "A",
-        (valeurCep == 0.0 || valeurCep == 0.0),
-        normeThermique == "",
-        presenceNormeThermiqueJustificatif == false
-    )
-then
-    AcquisitionResponse response = new AcquisitionResponse("02", "Y", "06", "02", "Y");
-    insert(response);
-end
-
-rule "Rule 25"
-when
-    $acquisition : Acquisition(
-        eligibileDPE == true,
-        dateDepotPc == "",
-        presenceDpe == false,
-        presenceDpeJustificatif == true,
-        (dateConstructionDpe == null || dateConstructionDpe == "01/01/2013"),
-        etiquetteDpe == "<> A",
-        (valeurCep == 0.0 || valeurCep == 0.0),
-        normeThermique == "",
-        presenceNormeThermiqueJustificatif == false
-    )
-then
-    AcquisitionResponse response = new AcquisitionResponse("02", "Y", "06", "02", "Y");
-    insert(response);
-end
-
-rule "Rule 26"
-when
-    $acquisition : Acquisition(
-        eligibileDPE == true,
-        dateDepotPc == "",
-        presenceDpe == false,
-        presenceDpeJustificatif == true,
-        (dateConstructionDpe == null || dateConstructionDpe == "01/01/2013"),
-        etiquetteDpe == "<> A",
-        (valeurCep == 0.0 || valeurCep == 0.0),
-        normeThermique == "",
-        presenceNormeThermiqueJustificatif == false
-    )
-then
-    AcquisitionResponse response = new AcquisitionResponse("02", "Y", "06", "02", "N");
-    insert(response);
-end
-
-rule "Rule 27"
-when
-    $acquisition : Acquisition(
-        eligibileDPE == true,
-        dateDepotPc == "",
-        presenceDpe == false,
-        presenceDpeJustificatif == true,
-        (dateConstructionDpe == null || dateConstructionDpe == "01/01/2013"),
-        etiquetteDpe == "",
-        (valeurCep == 0.0 || valeurCep == 0.0),
-        normeThermique == "RT2012",
-        presenceNormeThermiqueJustificatif == true
-    )
-then
-    AcquisitionResponse response = new AcquisitionResponse("02", "Y", "06", "02", "Y");
-    insert(response);
-end
-
-rule "Rule 28"
-when
-    $acquisition : Acquisition(
-        eligibileDPE == true,
-        dateDepotPc == "",
-        presenceDpe == false,
-        presenceDpeJustificatif == true,
-        (dateConstructionDpe == null || dateConstructionDpe == "01/01/2013"),
-        etiquetteDpe == "",
-        (valeurCep == 0.0 || valeurCep == 0.0),
-        normeThermique == "",
-        presenceNormeThermiqueJustificatif == false
-    )
-then
-    AcquisitionResponse response = new AcquisitionResponse("02", "Y", "07", "02", "");
-    insert(response);
-end
-
-rule "Rule 29"
-when
-    $acquisition : Acquisition(
-        eligibileDPE == true,
-        dateDepotPc == "",
-        presenceDpe == false,
-        presenceDpeJustificatif == true,
-        (dateConstructionDpe == null || dateConstructionDpe == "01/01/2021"),
-        etiquetteDpe == "",
-        (valeurCep == 0.0 || valeurCep == 0.0),
-        normeThermique == "",
-        presenceNormeThermiqueJustificatif == false
-    )
-then
-    AcquisitionResponse response = new AcquisitionResponse("02", "Y", "06", "02", "Y");
-    insert(response);
-end
-
-rule "Rule 30"
-when
-    $acquisition : Acquisition(
-        eligibileDPE == true,
-        dateDepotPc == "",
-        presenceDpe == false,
-        presenceDpeJustificatif == true,
-        (dateConstructionDpe == null || dateConstructionDpe == "01/01/2021"),
-        etiquetteDpe == "",
-        (valeurCep == 0.0 || valeurCep == 0.0),
-        normeThermique == "",
-        presenceNormeThermiqueJustificatif == false
-    )
-then
-    AcquisitionResponse response = new AcquisitionResponse("02", "Y", "06", "02", "N");
-    insert(response);
-end
-
-rule "Rule 31"
-when
-    $acquisition : Acquisition(
-        eligibileDPE == true,
-        dateDepotPc == "",
-        presenceDpe == false,
-        presenceDpeJustificatif == true,
-        (dateConstructionDpe == null || dateConstructionDpe == "01/01/2022"),
-        etiquetteDpe == "",
-        (valeurCep == 0.0 || valeurCep == 0.0),
-        normeThermique == "RE2020",
-        presenceNormeThermiqueJustificatif == true
-    )
-then
-    AcquisitionResponse response = new AcquisitionResponse("02", "Y", "06", "02", "Y");
-    insert(response);
-end
-
-rule "Rule 32"
-when
-    $acquisition : Acquisition(
-        eligibileDPE == true,
-        dateDepotPc == "",
-        presenceDpe == false,
-        presenceDpeJustificatif == true,
-        (dateConstructionDpe == null || dateConstructionDpe == "01/01/2022"),
-        etiquetteDpe == "",
-        (valeurCep == 0.0 || valeurCep == 0.0),
-        normeThermique == "",
-        presenceNormeThermiqueJustificatif == false
-    )
-then
-    AcquisitionResponse response = new AcquisitionResponse("02", "Y", "07", "02", "");
-    insert(response);
-end
-
-rule "Rule 33"
-when
-    $acquisition : Acquisition(
-        eligibileDPE == true,
-        dateDepotPc == "",
-        presenceDpe == false,
-        presenceDpeJustificatif == true,
-        (dateConstructionDpe == null || dateConstructionDpe == "01/01/2022"),
-        etiquetteDpe == "",
-        (valeurCep == 0.0 || valeurCep == 0.0),
-        normeThermique == "",
-        presenceNormeThermiqueJustificatif == false
-    )
-then
-    AcquisitionResponse response = new AcquisitionResponse("02", "Y", "06", "02", "Y");
-    insert(response);
-end
-
-rule "Rule 34"
-when
-    $acquisition : Acquisition(
-        eligibileDPE == true,
-        dateDepotPc == "",
-        presenceDpe == false,
-        presenceDpeJustificatif == true,
-        (dateConstructionDpe == null || dateConstructionDpe == "01/01/2022"),
-        etiquetteDpe == "",
-        (valeurCep == 0.0 || valeurCep == 0.0),
-        normeThermique == "",
-        presenceNormeThermiqueJustificatif == false
-    )
-then
-    AcquisitionResponse response = new AcquisitionResponse("02", "Y", "06", "02", "N");
-    insert(response);
-end
-
-rule "Rule 35"
-when
-    $acquisition : Acquisition(
-        eligibileDPE == true,
-        dateDepotPc == "",
-        presenceDpe == false,
-        presenceDpeJustificatif == false,
-        (dateConstructionDpe == null || dateConstructionDpe == ""),
-        etiquetteDpe == "",
-        (valeurCep == 0.0 || valeurCep == 0.0),
-        normeThermique == "",
-        presenceNormeThermiqueJustificatif == false
-    )
-then
-    AcquisitionResponse response = new AcquisitionResponse("02", "Y", "07", "02", "");
-    insert(response);
-end
-
-rule "Rule 36"
-when
-    $acquisition : Acquisition(
-        eligibileDPE == false,
-        dateDepotPc == "",
-        presenceDpe == false,
-        presenceDpeJustificatif == false,
-        (dateConstructionDpe == null || dateConstructionDpe == ""),
-        etiquetteDpe == "",
-        (valeurCep == 0.0 || valeurCep == 0.0),
-        normeThermique == "",
-        presenceNormeThermiqueJustificatif == false
-    )
-then
-    AcquisitionResponse response = new AcquisitionResponse("", "", "", "", "");
-    insert(response);
-end
-
-rule "Rule 37"
-when
-    $acquisition : Acquisition(
-        eligibileDPE == false,
-        dateDepotPc == "",
-        presenceDpe == false,
-        presenceDpeJustificatif == false,
-        (dateConstructionDpe == null || dateConstructionDpe == ""),
-        etiquetteDpe == "",
-        (valeurCep == 0.0 || valeurCep == 0.0),
-        normeThermique == "",
-        presenceNormeThermiqueJustificatif == false
-    )
-then
-    AcquisitionResponse response = new AcquisitionResponse("", "", "", "", "");
-    insert(response);
-end
-
-rule "Rule 38"
-when
-    $acquisition : Acquisition(
-        eligibileDPE == false,
-        dateDepotPc == "",
-        presenceDpe == false,
-        presenceDpeJustificatif == false,
-        (dateConstructionDpe == null || dateConstructionDpe == ""),
-        etiquetteDpe == "",
-        (valeurCep == 0.0 || valeurCep == 0.0),
-        normeThermique == "",
-        presenceNormeThermiqueJustificatif == false
-    )
-then
-    AcquisitionResponse response = new AcquisitionResponse("", "", "", "", "");
-    insert(response);
-end
-
+}
