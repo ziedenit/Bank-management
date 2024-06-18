@@ -1,58 +1,79 @@
-public List<Acquisition> readAcquisitionData() throws IOException, ParseException {
-    List<Acquisition> acquisitions = new ArrayList<>();
-    try (InputStream excelFile = excelResource.getInputStream()) {
-        Workbook workbook = new XSSFWorkbook(excelFile);
-        Sheet sheet = workbook.getSheet("ACQUISITION");
+Exemple des valeurs Date de construction a parser en Date 
 
-        for (Row row : sheet) {
-            if (row.getRowNum() == 0) continue; // Skip header row
+avant 31/12/2012 
+avant 31/12/2012 
+avant 31/12/2012 
+avant 31/12/2012 
+avant 31/12/2012 
+du 01/01/2013 au 31/12/2020 
+du 01/01/2013 au 31/12/2020 
+du 01/01/2013 au 31/12/2020 
+du 01/01/2013 au 31/12/2020 
+du 01/01/2013 au 31/12/2020 
+du 01/01/2021 au 31/12/2021
+du 01/01/2021 au 31/12/2021
+> au 01/01/2022
+> au 01/01/2022
+> au 01/01/2022
+> au 01/01/2022
 
-            Acquisition acquisition = new Acquisition();
-            acquisition.setEligibileDPE("Autre bien immobilier".equals(row.getCell(0).getStringCellValue()));
-            acquisition.setDateDepotPc(parseDate(row.getCell(1).getStringCellValue()));
-            acquisition.setPresenceDpe("oui".equalsIgnoreCase(row.getCell(2).getStringCellValue()));
-            acquisition.setPresenceDpeJustificatif("oui".equalsIgnoreCase(row.getCell(3).getStringCellValue()));
-            acquisition.setDateConstructionDpe(parseDate(row.getCell(4).getStringCellValue()));
-            acquisition.setEtiquetteDpe(row.getCell(5).getStringCellValue());
-            acquisition.setValeurCep(parseDouble(row.getCell(6).getStringCellValue()));
-            acquisition.setNormeThermique(row.getCell(7).getStringCellValue());
-            acquisition.setPresenceNormeThermiqueJustificatif("oui".equalsIgnoreCase(row.getCell(8).getStringCellValue()));
-            acquisition.setXtra248(row.getCell(9).getStringCellValue());
-            acquisition.setXtra249(row.getCell(10).getStringCellValue());
-            acquisition.setXtra250(row.getCell(11).getStringCellValue());
-            acquisition.setXtra251(row.getCell(12).getStringCellValue());
-            acquisition.setXtra275(row.getCell(13).getStringCellValue());
-
-            acquisitions.add(acquisition);
-        }
-
-        workbook.close();
-    }
-
-    return acquisitions;
-}
-
-private Date parseDate(String dateStr) throws ParseException {
-    if (dateStr == null || dateStr.isEmpty()) {
-        return null;
-    }
-    
-    // Traitement des valeurs spéciales
-    if (dateStr.toLowerCase().contains("avant")) {
-        return new SimpleDateFormat("yyyy-MM-dd").parse("2012-12-31");
-    }
-    
-    // Exemple de gestion d'une chaîne non parsable
-    if (dateStr.equals("Date de dépôt de PC")) {
-        // Traitement spécifique si nécessaire
-        return null; // Ou une autre valeur par défaut
-    }
-    
-    // Tentative de parser la date avec le format attendu
-    try {
-        return new SimpleDateFormat("dd/MM/yyyy").parse(dateStr);
-    } catch (ParseException e) {
-        // Gestion des erreurs de format de date
-        throw new ParseException("Unparseable date: " + dateStr, e.getErrorOffset());
-    }
-}
+Exemple des valeurs de date de depot de pc a parser en Date 
+avant 31/12/2012 
+avant 31/12/2012 
+avant 31/12/2012 
+du 01/01/2013 au 31/12/2020 
+du 01/01/2013 au 31/12/2020 
+du 01/01/2013 au 31/12/2020 
+du 01/01/2021 au 31/12/2021
+du 01/01/2021 au 31/12/2021
+> au 01/01/2022
+Inconnu
+Inconnu
+Inconnu
+Inconnu
+Inconnu
+Inconnu
+Inconnu
+Inconnu
+Inconnu
+Inconnu
+Inconnu
+Inconnu
+Inconnu
+Inconnu
+Inconnu
+Inconnu
+Inconnu
+java.text.ParseException: Unparseable date: Date de construction (DPE)
+	at com.cl.msofd.engineRules.ExcelToDroolsService.parseDate(ExcelToDroolsService.java:141)
+	at com.cl.msofd.engineRules.ExcelToDroolsService.readAcquisitionData(ExcelToDroolsService.java:45)
+	at com.cl.msofd.engineRules.ExcelToDroolsService.generateDroolsFile(ExcelToDroolsService.java:68)
+	at com.cl.msofd.engineRules.AcquisitionController.generateRules(AcquisitionController.java:23)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:259)
+	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:192)
+	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:118)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:920)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:830)
+	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87)
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1089)
+	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:979)
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1014)
+	at org.springframework.web.servlet.FrameworkServlet.doGet(FrameworkServlet.java:903)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:564)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:885)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:658)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:205)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149)
+	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:51)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:174)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149)
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:108)
+	at org.springframework.security.web.FilterChainProxy.lambda$doFilterInternal$3(FilterChainProxy.java:231)
+	at org.springframework.security.web.ObservationFilterChainDecorator$FilterObservation$SimpleFilterObservation.lambda$wrap$1(ObservationFilterChainDecorator.java:479)
+	at org.springframework.security.web.ObservationFilterChainDecorator$AroundFilterObservation$SimpleAroundFilterObservation.lambda$wrap$1(ObservationFilterChainDecorator.java:340)
+	at org.springframework.security.web.ObservationFilterChainDecorator.lambda$wrapSecured$0(ObservationFilterChainDecorator.java:82)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:128)
