@@ -7,10 +7,9 @@ import com.cl.logs.types.SecEventTyp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import java.io.IOException;
 import java.nio.file.*;
+import java.text.ParseException;
 
 @Service
 public class ExcelFileWatcherService {
@@ -27,8 +26,7 @@ public class ExcelFileWatcherService {
     private Thread watcherThread;
     private Path pathToWatch;
 
-    @PostConstruct
-    public void init() {
+    public void startWatching() {
         try {
             watchService = FileSystems.getDefault().newWatchService();
             pathToWatch = Paths.get("path/to/your/excel/file"); // Remplacez par le chemin vers votre fichier Excel
@@ -50,10 +48,11 @@ public class ExcelFileWatcherService {
         }
     }
 
-    @PreDestroy
-    public void cleanup() {
+    public void stopWatching() {
         try {
-            watchService.close();
+            if (watchService != null) {
+                watchService.close();
+            }
             if (watcherThread != null) {
                 watcherThread.interrupt();
             }
@@ -107,5 +106,50 @@ public class ExcelFileWatcherService {
         kieBuilder.buildAll();
         KieModule kieModule = kieBuilder.getKieModule();
         kieContainer.updateToVersion(kieModule.getReleaseId());
+    }
+}
+//
+package com.cl.msofd.engineRules;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
+import org.springframework.stereotype.Component;
+
+@Component
+public class RulesGeneratorRunner implements ApplicationRunner {
+
+    @Autowired
+    private ExcelToDroolsService excelToDroolsService;
+
+    @Autowired
+    private ExcelFileWatcherService excelFileWatcherService;
+
+    @Override
+    public void run(ApplicationArguments args) throws Exception {
+        // Générer les règles initialement
+        excelToDroolsService.generateDroolsFile("src/main/resources/rules.drl");
+
+        // Démarrer le watcher
+        excelFileWatcherService.startWatching();
+    }
+}
+//
+package com.cl.msofd.engineRules;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.PreDestroy;
+
+@Component
+public class ShutdownHook {
+
+    @Autowired
+    private ExcelFileWatcherService excelFileWatcherService;
+
+    @PreDestroy
+    public void onDestroy() {
+        excelFileWatcherService.stopWatching();
     }
 }
