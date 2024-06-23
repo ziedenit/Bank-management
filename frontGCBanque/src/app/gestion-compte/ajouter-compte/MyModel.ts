@@ -4,6 +4,12 @@ import com.cl.logs.commun.CommonLogger;
 import com.cl.logs.commun.CommonLoggerFactory;
 import com.cl.logs.types.EventTyp;
 import com.cl.logs.types.SecEventTyp;
+import org.kie.api.KieServices;
+import org.kie.api.builder.KieBuilder;
+import org.kie.api.builder.KieFileSystem;
+import org.kie.api.builder.KieModule;
+import org.kie.api.runtime.KieContainer;
+import org.kie.internal.io.ResourceFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -29,7 +35,7 @@ public class ExcelFileWatcherService {
     public void startWatching() {
         try {
             watchService = FileSystems.getDefault().newWatchService();
-            pathToWatch = Paths.get("path/to/your/excel/file"); // Remplacez par le chemin vers votre fichier Excel
+            pathToWatch = Paths.get("path/to/your/excel/file.xlsx"); // Remplacez par le chemin vers votre fichier Excel
             pathToWatch.getParent().register(watchService, StandardWatchEventKinds.ENTRY_MODIFY);
 
             watcherThread = new Thread(this::watchFile);
@@ -83,7 +89,7 @@ public class ExcelFileWatcherService {
 
                         // Recharger les règles
                         excelToDroolsService.generateDroolsFile("src/main/resources/rules.drl");
-                        reloadKieContainer("src/main/resources/rules.drl");
+                        reloadKieContainer();
                     }
                 }
                 key.reset();
@@ -99,10 +105,11 @@ public class ExcelFileWatcherService {
         }
     }
 
-    private void reloadKieContainer(String rulesFilePath) {
-        KieFileSystem kieFileSystem = KieServices.Factory.get().newKieFileSystem();
-        kieFileSystem.write(ResourceFactory.newFileResource(rulesFilePath));
-        KieBuilder kieBuilder = KieServices.Factory.get().newKieBuilder(kieFileSystem);
+    private void reloadKieContainer() {
+        KieServices kieServices = KieServices.Factory.get();
+        KieFileSystem kieFileSystem = kieServices.newKieFileSystem();
+        kieFileSystem.write(ResourceFactory.newClassPathResource("rules.drl"));
+        KieBuilder kieBuilder = kieServices.newKieBuilder(kieFileSystem);
         kieBuilder.buildAll();
         KieModule kieModule = kieBuilder.getKieModule();
         kieContainer.updateToVersion(kieModule.getReleaseId());
@@ -134,6 +141,7 @@ public class RulesGeneratorRunner implements ApplicationRunner {
         excelFileWatcherService.startWatching();
     }
 }
+
 //
 package com.cl.msofd.engineRules;
 
