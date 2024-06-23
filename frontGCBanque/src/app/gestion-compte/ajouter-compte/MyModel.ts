@@ -1,7 +1,2 @@
-    private final KieContainer kieContainer;
 
-    @Autowired
-    public ExcelToDroolsService(MongoTemplate mongoTemplate, KieContainer kieContainer) {
-        this.mongoTemplate = mongoTemplate;
-        this.kieContainer = kieContainer;
-    
+Cannot resolve method 'getKieServices' in 'KieContainer'
