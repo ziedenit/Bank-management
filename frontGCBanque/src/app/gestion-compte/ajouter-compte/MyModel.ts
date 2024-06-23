@@ -3,7 +3,6 @@ package com.cl.msofd.engineRules;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.nio.file.*;
 
@@ -13,7 +12,6 @@ public class FileWatcherService {
     @Autowired
     private ExcelToDroolsService excelToDroolsService;
 
-    @PostConstruct
     public void watchFile() throws IOException, InterruptedException {
         Path path = Paths.get("path/to/your/xls/directory");
         WatchService watchService = FileSystems.getDefault().newWatchService();
@@ -40,7 +38,7 @@ public class FileWatcherService {
                     WatchEvent<Path> ev = (WatchEvent<Path>) event;
                     Path fileName = ev.context();
 
-                    if (fileName.toString().equals("240506_OFD_Abres de décision_Version travail.xlsx")) {
+                    if (fileName.toString().equals("arbreAcquisition.xlsx")) {
                         System.out.println("File modified: " + fileName);
                         try {
                             excelToDroolsService.generateDroolsFile("src/main/resources/rules.drl");
