@@ -1,29 +1,30 @@
-@Configuration
-public class DroolsConfig {
+@RestController
+@RequestMapping("/acquisition")
+public class AcquisitionController {
 
-    @Value("${spring.drools.rules-file}")
-    private String rulesFile;
+    @Autowired
+    private ExcelToDroolsService excelToDroolsService;
 
-    private static final KieServices kieServices = KieServices.Factory.get();
+    @Autowired
+    private DroolsService droolsService;
 
-    private KieContainer kieContainer;
+    @Autowired
+    private DroolsConfig droolsConfig;
 
-    @Bean
-    public KieContainer kieContainer() {
-        loadContainer();
-        return kieContainer;
+    @GetMapping("/generate-rules")
+    public String generateRules() {
+        try {
+            excelToDroolsService.generateDroolsFile("src/main/resources/rules.drl");
+            droolsConfig.reloadContainer(); // Reload the KieContainer after generating the rules
+            return "Rules generated successfully!";
+        } catch (IOException | ParseException e) {
+            e.printStackTrace();
+            return "Error generating rules: " + e.getMessage();
+        }
     }
 
-    public void reloadContainer() {
-        loadContainer();
-    }
-
-    private void loadContainer() {
-        KieFileSystem kieFileSystem = kieServices.newKieFileSystem();
-        kieFileSystem.write(ResourceFactory.newClassPathResource(rulesFile));
-        KieBuilder kieBuilder = kieServices.newKieBuilder(kieFileSystem);
-        kieBuilder.buildAll();
-        KieModule kieModule = kieBuilder.getKieModule();
-        this.kieContainer = kieServices.newKieContainer(kieModule.getReleaseId());
+    @PostMapping("/apply-rules")
+    public AcquisitionResponse applyRules(@RequestBody Acquisition acquisition) {
+        return droolsService.applyRules(acquisition);
     }
 }
