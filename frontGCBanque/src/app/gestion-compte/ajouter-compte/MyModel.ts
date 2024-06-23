@@ -2,26 +2,61 @@ package com.cl.msofd.engineRules;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.boot.ApplicationRunner;
-import org.springframework.boot.ApplicationArguments;
 
+import javax.annotation.PostConstruct;
 import java.io.IOException;
-import java.text.ParseException;
+import java.nio.file.*;
 
 @Component
-public class RulesGeneratorRunner implements ApplicationRunner {
+public class FileWatcherService {
 
     @Autowired
     private ExcelToDroolsService excelToDroolsService;
 
-    @Override
-    public void run(ApplicationArguments args) throws Exception {
-        try {
-            excelToDroolsService.generateDroolsFile("src/main/resources/rules.drl");
-            System.out.println("Rules generated successfully on startup!");
-        } catch (IOException | ParseException e) {
-            e.printStackTrace();
-            System.err.println("Error generating rules on startup: " + e.getMessage());
-        }
+    @PostConstruct
+    public void watchFile() throws IOException, InterruptedException {
+        Path path = Paths.get("path/to/your/xls/directory");
+        WatchService watchService = FileSystems.getDefault().newWatchService();
+        path.register(watchService, StandardWatchEventKinds.ENTRY_MODIFY);
+
+        System.out.println("Watching directory: " + path);
+
+        new Thread(() -> {
+            while (true) {
+                WatchKey key;
+                try {
+                    key = watchService.take();
+                } catch (InterruptedException ex) {
+                    return;
+                }
+
+                for (WatchEvent<?> event : key.pollEvents()) {
+                    WatchEvent.Kind<?> kind = event.kind();
+
+                    if (kind == StandardWatchEventKinds.OVERFLOW) {
+                        continue;
+                    }
+
+                    WatchEvent<Path> ev = (WatchEvent<Path>) event;
+                    Path fileName = ev.context();
+
+                    if (fileName.toString().equals("240506_OFD_Abres de décision_Version travail.xlsx")) {
+                        System.out.println("File modified: " + fileName);
+                        try {
+                            excelToDroolsService.generateDroolsFile("src/main/resources/rules.drl");
+                            System.out.println("Rules generated successfully after file modification!");
+                        } catch (IOException | ParseException e) {
+                            e.printStackTrace();
+                            System.err.println("Error generating rules after file modification: " + e.getMessage());
+                        }
+                    }
+                }
+
+                boolean valid = key.reset();
+                if (!valid) {
+                    break;
+                }
+            }
+        }).start();
     }
 }
