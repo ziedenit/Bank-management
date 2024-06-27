@@ -1,6 +1,3 @@
-Je veux ameliorer la méthode patch d'un Financement ci bas ( Financement et un objet mongo qui contient plusieurs objets imbriqué je veux faire un patch par champs) sans creer des doublant la méthode ci bas fonctionne mais j'aimerai bien l'ameliorer
-
-
 package com.cl.msofd.model;
 
 import jakarta.validation.Valid;
@@ -11,8 +8,10 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.io.Serializable;
+import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Getter
 @Setter
@@ -29,8 +28,6 @@ public class Financement implements Serializable {
 
     private Alignement alignement;
     private Eligibilite eligibilite;
-
-
     private Intervenant intervenant;
 
     private String indicateurFinancementDedie;
@@ -75,32 +72,17 @@ public class Financement implements Serializable {
     }
 }
 
+public class FinancementService {
 
-public Financement patchFinancementChamps(String idFinancement, Financement financementToUpdate) throws Exception {
+    private FinancementRepository financementRepository;
+
+    public Financement patchFinancementChamps(String idFinancement, Financement financementToUpdate) throws Exception {
         // Récupère le financement existant
-        Financement existingFinancement = financementRepository.findByidFinancement(idFinancement)
+        Financement existingFinancement = financementRepository.findByIdFinancement(idFinancement)
                 .orElseThrow(() -> new FinancementNotFoundException(String.format("Le financement à modifier %s est inexistant", idFinancement)));
 
-        // Mise à jour les objets de financement
-        if (financementToUpdate.getObjetFinancement() != null) {
-            for (ObjetFinancement updatedObjet : financementToUpdate.getObjetFinancement()) {
-                boolean found = false;
-                for (int i = 0; i < existingFinancement.getObjetFinancement().size(); i++) {
-                    ObjetFinancement existingObjet = existingFinancement.getObjetFinancement().get(i);
-                    if (existingObjet.getIdObjetFinancement().equals(updatedObjet.getIdObjetFinancement())) {
-                        merge(existingObjet, updatedObjet);
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found) {
-                    existingFinancement.getObjetFinancement().add(updatedObjet);
-                }
-            }
-        }
-
-        // Mise à jour les autres champs de financement
-        mergeNonListFields(existingFinancement, financementToUpdate);
+        // Mise à jour des champs de financement
+        mergeFields(existingFinancement, financementToUpdate);
 
         // Sauvegarder le financement mis à jour
         Financement savedFinancement = financementRepository.save(existingFinancement);
@@ -111,7 +93,53 @@ public Financement patchFinancementChamps(String idFinancement, Financement fina
         return savedFinancement;
     }
 
-    private void merge(Object target, Object source) throws Exception {
+    private void mergeFields(Financement target, Financement source) throws Exception {
+        Field[] fields = Financement.class.getDeclaredFields();
+        for (Field field : fields) {
+            field.setAccessible(true);
+            Object value = field.get(source);
+            if (value != null) {
+                if (value instanceof List) {
+                    mergeListFields((List<?>) field.get(target), (List<?>) value);
+                } else {
+                    field.set(target, value);
+                }
+            }
+        }
+    }
+
+    private void mergeListFields(List<?> targetList, List<?> sourceList) throws Exception {
+        for (Object sourceItem : sourceList) {
+            boolean found = false;
+            for (Object targetItem : targetList) {
+                Field idField = findIdField(sourceItem.getClass());
+                if (idField != null) {
+                    idField.setAccessible(true);
+                    Object sourceId = idField.get(sourceItem);
+                    Object targetId = idField.get(targetItem);
+                    if (sourceId != null && sourceId.equals(targetId)) {
+                        merge(sourceItem, targetItem);
+                        found = true;
+                        break;
+                    }
+                }
+            }
+            if (!found) {
+                targetList.add(sourceItem);
+            }
+        }
+    }
+
+    private Field findIdField(Class<?> clazz) {
+        for (Field field : clazz.getDeclaredFields()) {
+            if (field.getName().toLowerCase().contains("id")) {
+                return field;
+            }
+        }
+        return null;
+    }
+
+    private void merge(Object source, Object target) throws Exception {
         Field[] fields = source.getClass().getDeclaredFields();
         for (Field field : fields) {
             field.setAccessible(true);
@@ -121,16 +149,4 @@ public Financement patchFinancementChamps(String idFinancement, Financement fina
             }
         }
     }
-
-    private void mergeNonListFields(Object target, Object source) throws Exception {
-        Field[] fields = source.getClass().getDeclaredFields();
-        for (Field field : fields) {
-            if (!field.getName().equals("objetFinancement")) { // Ignore the objetFinancement field
-                field.setAccessible(true);
-                Object value = field.get(source);
-                if (value != null) {
-                    field.set(target, value);
-                }
-            }
-        }
-    }
+}
