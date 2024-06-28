@@ -1,38 +1,52 @@
- private static final String RULES_TEMPLATE =
-            "package com.cl.msofd.enginerules.rules;\n" +
-                    "import com.cl.msofd.enginerules.Acquisition;\n" +
-                    "import com.cl.msofd.enginerules.AcquisitionResponse;\n" +
-                    "global java.util.List responses;\n\n";
+// 1. Replace RULES_TEMPLATE String concatenation with Text block
+private static final String RULES_TEMPLATE = """
+        package com.cl.msofd.enginerules.rules;
+        import com.cl.msofd.enginerules.Acquisition;
+        import com.cl.msofd.enginerules.AcquisitionResponse;
+        global java.util.List responses;
 
-Replace this String concatenation with Text block.
+        """;
 
-         return String.format(
-                "rule \"Rule %d\"\n" +
-                        "when\n" +
-                        "    $acquisition : Acquisition(\n" +
-                        "        eligibileDPE == %s,\n" +
-                        "        %s,\n" +
-Define a constant instead of duplicating this literal " %s, " 4 times.
-                        "        dpePresent == %s,\n" +
-                        "        presenceDpeJustificatif == %s,\n" +
-                        "        %s,\n" +
-                        "        %s,\n" +
-                        "        %s,\n" +
-                        "        normeThermique == \"%s\",\n" +
-                        "        presenceNormeThermiqueJustificatif == %s\n" +
-                        "    )\n" +
-                        "then\n" +
-                        "    AcquisitionResponse response = new AcquisitionResponse(\"%s\", \"%s\", \"%s\", \"%s\", \"%s\");\n" +
-                        "    responses.add(response);\n" +
-                        "end\n",
-Replace this String concatenation with Text block.
-    private String getStringValue(Row row, int cellIndex) {
-        Cell cell = row.getCell(cellIndex, Row.MissingCellPolicy.RETURN_BLANK_AS_NULL);
-        if (cell == null) {
-            return "";
+// 2. Define a constant for "%s, "
+private static final String TEMPLATE_PLACEHOLDER = "%s, ";
+
+// 3. Replace String concatenation with Text block
+return String.format(
+    """
+    rule "Rule %d"
+    when
+        $acquisition : Acquisition(
+            eligibileDPE == %s,
+            %s
+            dpePresent == %s,
+            presenceDpeJustificatif == %s,
+            %s
+            %s
+            %s
+            normeThermique == "%s",
+            presenceNormeThermiqueJustificatif == %s
+        )
+    then
+        AcquisitionResponse response = new AcquisitionResponse("%s", "%s", "%s", "%s", "%s");
+        responses.add(response);
+    end
+    """,
+    ruleNumber, eligibleDPE, TEMPLATE_PLACEHOLDER, dpePresent, presenceDpeJustificatif, 
+    TEMPLATE_PLACEHOLDER, TEMPLATE_PLACEHOLDER, TEMPLATE_PLACEHOLDER, normeThermique, 
+    presenceNormeThermiqueJustificatif, response1, response2, response3, response4, response5
+);
+
+// 4. Remove deprecated use of setCellType in getStringValue
+private String getStringValue(Row row, int cellIndex) {
+    Cell cell = row.getCell(cellIndex, Row.MissingCellPolicy.RETURN_BLANK_AS_NULL);
+    if (cell == null) {
+        return "";
+    } else {
+        if (cell.getCellType() == CellType.STRING) {
+            return cell.getStringCellValue().trim();
         } else {
             cell.setCellType(CellType.STRING);
-Remove this use of "setCellType"; it is deprecated.
             return cell.getStringCellValue().trim();
         }
     }
+}
