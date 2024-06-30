@@ -1,57 +1,70 @@
-<div class="clientPE">
-  <div class="container-fluid mb-4">
-    <div class="row">
-      <div class="col-12">
-        <div class="nav">
-          <img *ngIf="!hidden" src="../../../assets/icons/arrow-up.svg" (click)="onToggle()" /> 
-          <img *ngIf="hidden" src="../../../assets/icons/arrow-down.svg" (click)="onToggle()"/> &nbsp;
-          <p>{{title}} ({{filteredClients.length}})</p>
-        </div>
-      </div>
-    </div>
-    <div class="row" *ngIf="!hidden">
-      <div class="col-12">
-        <ul class="list-group">
-          <li class="list-group-item" *ngFor="let client of filteredClients">
-            <div class="row">
-              <div class="col" *ngIf="showLegalName">
-                Raison Sociale &nbsp; &nbsp; &nbsp; <b>{{client.legalName}}</b>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col" *ngIf="showClientName">
-                Nom &nbsp;&nbsp; <b>{{client.displayName}}</b>
-              </div>
-              <div class="col" *ngIf="showClientDOB">
-                {{client.displayDOB}}
-              </div>
-              <div class="col" *ngIf="showClientSiren">
-                {{client.displaySiren}}
-              </div>
-            </div>
-          </li>
-        </ul>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-12">
-        <div *ngIf="errors.length > 0">
-          <div class="error-message">
-            <ul class="list-group">
-              <li class="list-group-item" *ngFor="let error of errors">
-                <div class="row">
-                  <div class="col">
-                    {{ error[errorMessage] }}
-                  </div>
-                  <div class="col">
-                    idReper: {{ error[errorId] }}
-                  </div>
-                </div>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges } from '@angular/core';
+
+@Component({
+  selector: 'app-client-section',
+  templateUrl: './client-section.component.html',
+  styleUrls: ['./client-section.component.css']
+})
+export class ClientSectionComponent implements OnInit, OnChanges {
+  @Input() clients: any[] = [];
+  @Input() errors: any[] = [];
+  @Input() hidden: boolean = false;
+  @Input() title: string = '';
+  @Input() errorMessage: string = '';
+  @Input() errorId: string = '';
+  @Input() showLegalName: boolean = false;
+  @Input() showClientName: boolean = false;
+  @Input() showClientDOB: boolean = false;
+  @Input() showClientSiren: boolean = false;
+
+  @Output() toggle = new EventEmitter<void>();
+
+  filteredClients: any[] = [];
+
+  ngOnInit(): void {
+    // Initialisation si nécessaire
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['clients'] || changes['errors']) {
+      this.processClientsData();
+    }
+  }
+
+  processClientsData() {
+    this.filteredClients = this.clients.map(client => {
+      return {
+        ...client,
+        // Vous pouvez également ajouter des traitements de données ici si nécessaire
+        displayName: this.getClientDisplayName(client),
+        displayDOB: this.getClientDisplayDOB(client),
+        displaySiren: this.getClientDisplaySiren(client)
+      };
+    });
+  }
+
+  onToggle() {
+    this.toggle.emit();
+  }
+
+  private getClientDisplayName(client: any): string {
+    if (this.showClientName) {
+      return `${client.civility}. ${client.nomUsageClient} ${client.prenomClient}`;
+    }
+    return '';
+  }
+
+  private getClientDisplayDOB(client: any): string {
+    if (this.showClientDOB) {
+      return `né(e) le : ${client.dateNaissanceClient}`;
+    }
+    return '';
+  }
+
+  private getClientDisplaySiren(client: any): string {
+    if (this.showClientSiren) {
+      return `SIREN : ${client.siren}`;
+    }
+    return '';
+  }
+}
