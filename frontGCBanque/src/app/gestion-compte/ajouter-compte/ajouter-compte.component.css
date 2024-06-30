@@ -1,83 +1,57 @@
-import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
-import { ConfigurationService } from '../../app/config/configuration.service';
-
-@Injectable({
-  providedIn: 'root'
-})
-export class ClientParticulierService {
-
-  
-//private baseUrl = 'http://localhost:8081/api/v1/clients/particulier/';
-private baseUrl =`${ConfigurationService.Settings.msofdURL}/api/v1/clients/particulier/`
-   
-  private username = 'user1';
-  private password = 'user1Pass';
-
-  constructor(private http: HttpClient) { }
-
-  getClientData(idReper: string): Observable<any> {
-    const apiUrl = `${this.baseUrl}${idReper}`;
-    const headers = new HttpHeaders({ Authorization: 'Basic ' + btoa(this.username + ':' + this.password) });
-
-    return this.http.get(apiUrl, { headers }).pipe(
-
-
-      catchError((errorP: HttpErrorResponse) => {
-
-        if (errorP.status === 404) {
-          console.error("Client Inconnu du SI LCL ");
-        } 
-        return throwError('Une erreur s\'est produite lors de la récupération des données.');
-      })
-    );
-  }
-}
-//
-	  import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
-import { ConfigurationService } from '../../app/config/configuration.service';
-
-@Injectable({
-  providedIn: 'root'
-})
-export class ClientEntrepriseService {
-
-  //private baseUrl = 'http://localhost:8081/api/v1/clients/entreprise/';
- 
- private baseUrl =`${ConfigurationService.Settings.msofdURL}/api/v1/clients/entreprise/`
- 
-  private username = 'user1';
-  private password = 'user1Pass';
-
-  // Variables pour stocker les messages d'erreur et l'idReper en mémoire
-  errorMessage: string | null = null;
-  storedIdReper: string | null = null;
-
-  constructor(private http: HttpClient) { }
-
-  getEntrepriseData(idReper: string): Observable<any> {
-    const apiUrl = `${this.baseUrl}${idReper}`;
-    const headers = new HttpHeaders({ Authorization: 'Basic ' + btoa(this.username + ':' + this.password) });
-
-    return this.http.get(apiUrl, { headers }).pipe(
-      catchError((errorE: HttpErrorResponse) => {
-
-        if (errorE.status === 404) {
-          console.error("Client Inconnu du SI LCL ");
-        } 
-        return throwError('Une erreur s\'est produite lors de la récupération des données.');
-      })
-    );
-  }
-}
-
-
-
-
-
-
+<div class="clientPE">
+  <div class="container-fluid mb-4">
+    <div class="row">
+      <div class="col-12">
+        <div class="nav">
+          <img *ngIf="!hidden" src="../../../assets/icons/arrow-up.svg" (click)="onToggle()" /> 
+          <img *ngIf="hidden" src="../../../assets/icons/arrow-down.svg" (click)="onToggle()"/> &nbsp;
+          <p>{{title}} ({{filteredClients.length}})</p>
+        </div>
+      </div>
+    </div>
+    <div class="row" *ngIf="!hidden">
+      <div class="col-12">
+        <ul class="list-group">
+          <li class="list-group-item" *ngFor="let client of filteredClients">
+            <div class="row">
+              <div class="col" *ngIf="showLegalName">
+                Raison Sociale &nbsp; &nbsp; &nbsp; <b>{{client.legalName}}</b>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col" *ngIf="showClientName">
+                Nom &nbsp;&nbsp; <b>{{client.displayName}}</b>
+              </div>
+              <div class="col" *ngIf="showClientDOB">
+                {{client.displayDOB}}
+              </div>
+              <div class="col" *ngIf="showClientSiren">
+                {{client.displaySiren}}
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-12">
+        <div *ngIf="errors.length > 0">
+          <div class="error-message">
+            <ul class="list-group">
+              <li class="list-group-item" *ngFor="let error of errors">
+                <div class="row">
+                  <div class="col">
+                    {{ error[errorMessage] }}
+                  </div>
+                  <div class="col">
+                    idReper: {{ error[errorId] }}
+                  </div>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
