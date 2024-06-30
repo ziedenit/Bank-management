@@ -1,106 +1,122 @@
-
+<!-- client-particulier.component.html -->
+<div class="clientPE" *ngIf="clientParticulier">
+  <div class="container-fluid mb-4">
+    <div class="row">
+      <div class="col-12">
+        <div class="nav">
+          <img *ngIf="!hiddenClient" src="../../../assets/icons/arrow-up.svg" (click)="hideDataClient()" />
+          <img *ngIf="hiddenClient" src="../../../assets/icons/arrow-down.svg" (click)="showDataClient()" /> &nbsp;
+          <p>Client ({{ idRepers.length }})</p>
+        </div>
+      </div>
+    </div>
+    <div class="row" *ngIf="elementClient">
+      <div class="col-12">
+        <ul class="list-group">
+          <li class="list-group-item" *ngFor="let client of clientDataList">
+            <div class="row">
+              <div class="col">
+                Nom &nbsp;&nbsp; <b>{{ client.civility }}.&nbsp; {{ client.nomUsageClient }} {{ client.prenomClient }}</b>
+              </div>
+              <div class="col">
+                né (e) le : &nbsp;&nbsp; <b>{{ client.dateNaissanceClient }}</b>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-12">
+        <div *ngIf="errorrs.length > 0">
+          <div class="error-message">
+            <ul class="list-group">
+              <li class="list-group-item" *ngFor="let error of errorrs">
+                <div class="row">
+                  <div class="col">
+                    {{ error.messageErrorP }}
+                  </div>
+                  <div class="col">
+                    idReper du Client: {{ error.idReperErrorP }}
+                  </div>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 //
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { FinancementService } from 'chemin/vers/votre/service/financement.service';
+// client-particulier.component.ts
+import { Component, Input, OnInit } from '@angular/core';
+import { ClientService } from '../services/client.service';
 
 @Component({
-  selector: 'app-votre-composant',
-  templateUrl: './votre-composant.component.html',
-  styleUrls: ['./votre-composant.component.css']
+  selector: 'app-client-particulier',
+  templateUrl: './client-particulier.component.html',
+  styleUrls: ['./client-particulier.component.css']
 })
-export class VotreComposantComponent implements OnInit {
+export class ClientParticulierComponent implements OnInit {
+  @Input() idRepers: string[] = [];
+  @Input() clientParticulier: boolean = false;
 
-  financementId: string;
-  objetsFinancement: any[]; // Assurez-vous que ce type correspond à la structure de vos objets de financement
-  objetFinancementSelectionneIndex: number;
+  clientDataList: any[] = [];
+  errorrs: { idReperErrorP: string, messageErrorP: string }[] = [];
+  hiddenClient = false;
+  elementClient = true;
 
-  constructor(private route: ActivatedRoute, private financementService: FinancementService) { }
+  constructor(private clientService: ClientService) {}
 
-  ngOnInit(): void {
-    this.financementId = this.route.snapshot.params['id']; // À adapter en fonction de votre configuration de routage
+  ngOnInit() {
+    this.idRepers.forEach(idReper => this.getClientData(idReper));
+  }
 
-    // Récupérer la liste des objets de financement
-    this.financementService.getObjetsFinancementByFinancementId(this.financementId).subscribe(
-      (objetsFinancement) => {
-        this.objetsFinancement = objetsFinancement;
+  getClientData(idReper: string) {
+    this.clientService.getClientData(idReper).subscribe(
+      (data) => {
+        this.clientDataList.push(data);
+        console.log("le client particuliers", this.clientDataList);
       },
-      (error) => {
-        console.error('Une erreur s\'est produite lors de la récupération des objets de financement :', error);
+      (errorP) => {
+        this.errorrs.push({ idReperErrorP: idReper, messageErrorP: 'Client Inconnu du SI LCL' });
       }
     );
   }
 
-  onObjetFinancementSelectionne(index: number): void {
-    this.objetFinancementSelectionneIndex = index;
+  showDataClient() {
+    this.hiddenClient = false;
+    this.elementClient = true;
   }
 
-}
-
-//
-/* Ajoutez ces styles pour gérer le changement de couleur */
-.breadcrumb-item.selected {
-  color: blue !important; /* Change la couleur du texte pour les éléments sélectionnés */
-}
-
-.breadcrumb-item:not(.selected) {
-  color: grey !important; /* Change la couleur du texte pour les éléments non sélectionnés */
-}
-
-/* Ajoutez ces styles pour rendre le design responsive */
-.breadcrumb-item {
-  display: inline-block;
-  padding: 0.5rem 1rem;
-  font-size: 16px;
-}
-
-@media (max-width: 768px) {
-  .breadcrumb-item {
-    font-size: 14px; /* Réduit la taille du texte pour les écrans plus petits */
+  hideDataClient() {
+    this.hiddenClient = true;
+    this.elementClient = false;
   }
 }
-//
-import { Observable } from 'rxjs';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-
-@Injectable({
-  providedIn: 'root'
-})
-export class FinancementService {
-
-  private financementObjetURL = "http://localhost:8081/api/v1/financement/objets_financement/";
-
-  constructor(private http: HttpClient) { }
-
-  httpOptions = {
-    headers: new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Authorization': 'Basic ' + btoa('user1:user1Pass')
-    })
-  };
-
-  getObjetsFinancementByFinancementId(idFinancement: string): Observable<any[]> {
-    const url = `${this.financementObjetURL}${idFinancement}`;
-    return this.http.get<any[]>(url, this.httpOptions);
-  }
-}
-// hmtl
-      <div>
-  <!-- Fil d'Ariane -->
-  <nav *ngIf="objetsFinancement && objetsFinancement.length > 1" aria-label="breadcrumb">
-    <ol class="breadcrumb">
-      <li class="breadcrumb-item" *ngFor="let objet of objetsFinancement; let i = index"
-          [ngClass]="{'selected': i === objetFinancementSelectionneIndex}" (click)="onObjetFinancementSelectionne(i)">
-        <a>{{ objet.nom }}</a> <!-- À adapter en fonction de votre structure d'objet de financement -->
-      </li>
-    </ol>
-  </nav>
-
-  <!-- Détails de l'objet de financement sélectionné -->
-  <div *ngIf="objetFinancementSelectionneIndex !== undefined">
-    <h2>Détails de l'objet de financement sélectionné :</h2>
-    <!-- Affichez ici les détails de l'objet de financement sélectionné -->
-    <p>{{ objetsFinancement[objetFinancementSelectionneIndex].nom }}</p> <!-- Exemple de détail, à adapter en fonction de votre structure d'objet de financement -->
-  </div>
+// HTML du Composant Principal
+<!-- app.component.html -->
+<div class="main-container">
+  <header>
+    <app-header></app-header>
+  </header>
+  <main>
+    <app-client-particulier [idRepers]="idRepers" [clientParticulier]="clientParticulier"></app-client-particulier>
+  </main>
 </div>
+//
+// app.component.ts
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css']
+})
+export class AppComponent {
+  idRepers = ['123', '456', '789']; // Exemple d'ID de clients
+  clientParticulier = true;
+
+  constructor() {}
+}
