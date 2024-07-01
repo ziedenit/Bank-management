@@ -1,111 +1,67 @@
-@Test
-void should_patch_financement_champs() throws Exception {
-    // Création du DPE initial
-    Dpe dpeInitial = Dpe.builder()
-            .classeCep("A")
-            .classeGes("C")
-            .estimationCep(60.0)
-            .estimationGes(80.0)
-            .numeroDpe("DDD7E1287825F")
-            .build();
+    @Test
+    void should_throw_list_objet_not_found_exception () throws Exception {
+        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
 
-    // Création du Bien initial
-    Bien bienInitial = Bien.builder()
-            .bienFinanceLCL(true)
-            .codeBatiment("00001")
-            .typeBatiment("Appartement")
-            .codePostal("75016")
-            .surfaceBien(79.0)
-            .anneeConstruction(2000)
-            .dpeActuel(dpeInitial)
-            .montantFinanceLCL(900000.00)
-            .build();
+        Dpe dpeActuel = Dpe.builder()
+                .classeCep("A")
+                .classeGes("B")
+                .estimationCep(100.0)
+                .estimationGes(60.0)
+                .numeroDpe("2337E1287825F")
+                .build();
 
-    // Création de la Garantie initiale
-    List<Garantie> listGarantieInitial = new ArrayList<>();
-    Garantie garantieInitial = Garantie.builder()
-            .idGarantie("G12345678")
-            .bien(bienInitial)
-            .build();
-    listGarantieInitial.add(garantieInitial);
+        Bien firstBien = Bien.builder()
+                .codeBatiment("00001")
+                .typeBatiment("Appartement")
+                .codePostal("75016")
+                .surfaceBien(79.0)
+                .anneeConstruction(2000)
+                .dpeActuel(dpeActuel)
+                .montantFinanceLCL(10000.00)
+                .build();
+        List<String> idRepers = new ArrayList<>();
+        idRepers.add("8415595180");
+        Intervenant intervenant = Intervenant.builder()
+                .idReper(idRepers)
+                .build();
+        ArrayList<ObjetFinancement> listObjets = new ArrayList<>();
+        Financement financement = Financement.builder()
+                .objetFinancement(listObjets)
+                .intervenant(intervenant)
+                .build();
+        Financement createdFinancement = financementService.createFinancement(financement);
+        String idFinancement = createdFinancement.getIdFinancement();
 
-    // Création de l'ObjetFinancement initial
-    ObjetFinancement objetInitial = ObjetFinancement.builder()
-            .codeObjetFinancement("02")
-            .quotePartObjet(100.0)
-            .bien(bienInitial)
-            .garantie(listGarantieInitial)
-            .build();
+        MvcResult result = mockMvc.perform(get("/api/v1/financement/listObjetFinancement/" + idFinancement)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andReturn();
+        assertTrue(result.getResolvedException() instanceof ListObjetNotFoundException);
 
-    // Création de l'Intervenant initial
-    List<String> idRepersInitial = new ArrayList<>();
-    idRepersInitial.add("8415595180");
-    Intervenant intervenantInitial = Intervenant.builder()
-            .idReper(idRepersInitial)
-            .build();
+    }
+//
+time=2024-07-01T14:11:37.392+02:00|level=INFO |event_cod=empty|event_typ=APPLICATIVE|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=Initializing Spring TestDispatcherServlet ''
+time=2024-07-01T14:11:37.393+02:00|level=INFO |event_cod=empty|event_typ=APPLICATIVE|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=Initializing Servlet ''
+time=2024-07-01T14:11:37.402+02:00|level=INFO |event_cod=empty|event_typ=APPLICATIVE|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=Completed initialization in 9 ms
+time=2024-07-01T14:11:37.488+02:00|level=INFO |event_cod=empty|event_typ=APPLICATIVE|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=List Objets Financement: get by idFinancement FE3XG7F4I
 
-    // Création de la liste d'ObjetsFinancement initiale
-    List<ObjetFinancement> listObjetFinancementInitial = new ArrayList<>();
-    listObjetFinancementInitial.add(objetInitial);
+java.lang.AssertionError: Status expected:<404> but was:<200>
+Expected :404
+Actual   :200
+<Click to see difference>
 
-    // Création du Financement initial
-    Financement financementInitial = Financement.builder()
-            .objetFinancement(listObjetFinancementInitial)
-            .intervenant(intervenantInitial)
-            .build();
 
-    // Création d'un Financement pour test
-    Financement createdFinancement = Financement.builder()
-            .idFinancement("F0001")
-            .objetFinancement(listObjetFinancementInitial)
-            .intervenant(intervenantInitial)
-            .build();
-
-    // Configuration des mocks
-    when(idGeneratorService.generateId("F")).thenReturn("F0001");
-    when(idGeneratorService.generateId("O")).thenReturn("O0001");
-    when(idGeneratorService.generateId("G")).thenReturn("G0001");
-    when(financementRepository.save(any(Financement.class))).thenReturn(createdFinancement);
-
-    // Création du Financement via le service
-    financementService.createFinancement(financementInitial);
-
-    // Création du DPE mis à jour
-    Dpe dpeUpdated = Dpe.builder()
-            .classeCep("B")
-            .build();
-
-    // Création du Bien mis à jour
-    Bien bienUpdated = Bien.builder()
-            .codePostal("75018")
-            .surfaceBien(120.0)
-            .dpeActuel(dpeUpdated)
-            .build();
-
-    // Création de l'ObjetFinancement mis à jour
-    ObjetFinancement objetUpdated = ObjetFinancement.builder()
-            .idObjetFinancement(createdFinancement.getObjetFinancement().get(0).getIdObjetFinancement())
-            .bien(bienUpdated)
-            .build();
-
-    List<ObjetFinancement> listObjetFinancementUpdated = new ArrayList<>();
-    listObjetFinancementUpdated.add(objetUpdated);
-
-    // Création du Financement mis à jour
-    Financement patchedFinancement = Financement.builder()
-            .objetFinancement(listObjetFinancementUpdated)
-            .build();
-
-    // Configuration du mock pour le patch
-    when(financementRepository.findByIdFinancement("F0001")).thenReturn(Optional.of(createdFinancement));
-    when(financementRepository.save(any(Financement.class))).thenAnswer(invocation -> invocation.getArguments()[0]);
-
-    // Application du patch
-    Financement result = financementService.patchFinancementChamps("F0001", patchedFinancement);
-
-    // Assertions
-    assertNotNull(result);
-    assertEquals("75018", result.getObjetFinancement().get(0).getBien().getCodePostal());
-    assertEquals(120.0, result.getObjetFinancement().get(0).getBien().getSurfaceBien());
-    assertEquals("B", result.getObjetFinancement().get(0).getBien().getDpeActuel().getClasseCep());
-}
+	at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:59)
+	at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:122)
+	at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$9(StatusResultMatchers.java:637)
+	at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:214)
+	at com.cl.msofd.controller.FinancementControllerTest.should_throw_list_objet_not_found_exception(FinancementControllerTest.java:149)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+commentr je fixe ce test sachant que le service et les suivant  public List<ObjetFinancement> getListObjectFinancementByIdFinancement(String idFinancement) {
+        return financementRepository.findByidFinancement(idFinancement)
+                .orElseThrow(() -> new ListObjetNotFoundException("Financement not found with id: " + idFinancement))
+                .getObjetFinancement();
+    }
