@@ -77,3 +77,27 @@ void should_patch_financement_champs() throws Exception {
     assertEquals(result.getObjetFinancement().get(0).getBien().getSurfaceBien(), 120.0);
     assertEquals(result.getObjetFinancement().get(0).getBien().getDpeActuel().getClasseCep(), "B");
 }
+
+java.lang.NullPointerException: Cannot invoke "com.cl.msofd.model.Financement.getObjetFinancement()" because "createdFinancement" is null
+
+	at com.cl.msofd.service.FinancementServiceTest.should_patch_financement_champs(FinancementServiceTest.java:204)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+    public Financement createFinancement(Financement financement) {
+
+        financement.setIdFinancement(idGeneratorService.generateId("F"));
+
+        if (financement.getObjetFinancement() != null) {
+            financement.getObjetFinancement().forEach(objetFinancement -> {
+                objetFinancement.setIdObjetFinancement(idGeneratorService.generateId("O"));
+
+                if (objetFinancement.getGarantie() != null) {
+                    objetFinancement.getGarantie().forEach(garantie -> {
+                        garantie.setIdGarantie(idGeneratorService.generateId("G"));
+                    });
+                }
+            });
+        }
+        return financementRepository.save(financement);
+    }
