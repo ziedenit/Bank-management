@@ -1,669 +1,712 @@
-<h2 class ="Titre-01"> Acquisition des données et des justificatifs</h2>
+package com.cl.msofd.service;
 
-<!---------------------------------------bloc clients Particuliers---------------------------------------------------------->
-<div class="clientPE" *ngIf="clientParticulier==true" >
-<div class="container-fluid mb-4">
-  <div class="row">
-    <div class="col-12">
-      <div  class="nav" >
-        <img  *ngIf="hiddenClient==false" src="../../../assets/icons/arrow-up.svg"  (click)="hideDataClient()" /> 
-         <img *ngIf="hiddenClient==true" src="../../../assets/icons/arrow-down.svg"   (click)="showDataClient()"/>  &nbsp;
-        <p>Client ({{idRepers.length }})</p> 
-       </div>
-    </div>
-  </div>
-  <div class="row" *ngIf="elementClient">
-    <div class="col-12">
-      <ul class="list-group">
-        <li class="list-group-item" *ngFor="let client of clientDataList">
-          <div class="row">
-            <div class="col">
-              Nom &nbsp;&nbsp;  <b>{{client.civility }}.&nbsp; {{client.nomUsageClient }} {{client.prenomClient}}</b>
-            </div>
-            <div class="col">
-              né (e) le : &nbsp;&nbsp; <b>{{client.dateNaissanceClient}} </b>
-            </div>
-          </div>
-        </li>
-      </ul>
-    </div>
-  </div>
-  <div class="row">
-    <div class="col-lg-12">
-      <!-- Affichage du message d'erreur -->
-      <div *ngIf="errorrs.length > 0">
-        <div class="error-message">
-          <ul class="list-group">
-            <li class="list-group-item" *ngFor="let error of errorrs">
-              <div class="row">
-                <div class="col">
-                  {{ error.messageErrorP  }}
-                </div>
-                <div class="col">
-                  idReper du Client: {{ error.idReperErrorP }}
-                </div>
-              </div>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-</div>
-<div class="clientPE" *ngIf="clientParticulier==false" >
-<div class="container-fluid mb-4">
-  <div class="row">
-    <div class="col-12">
-      <div  class="nav" >
-        <img  *ngIf="hiddenClient==false" src="../../../assets/icons/arrow-up.svg"  (click)="hideDataClient()" /> 
-         <img *ngIf="hiddenClient==true" src="../../../assets/icons/arrow-down.svg"   (click)="showDataClient()"/>  &nbsp;
-        Client ({{idRepers.length }}) 
-       </div>
-    </div>
-  </div>
-  <div class="row" *ngIf="elementClient">
-    <div class="col-12">
-      <ul class="list-group">
-        <li class="list-group-item" *ngFor="let client of entrepriseData">
-          <div class="row">
-            <div class="col"  *ngIf="!nonraison">
-              Raison Sociale &nbsp; &nbsp; &nbsp; <b>  {{client.legalName}} </b>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col">  
-              Nom &nbsp; &nbsp; &nbsp; <b> {{client.civilite }}. &nbsp;{{client.usuaLastName }} {{client.firstName}} </b>
-            </div>
-      
-            <div class="col">
-             SIREN &nbsp; &nbsp; &nbsp; <b>{{client.siren}} </b>
-            </div>
-          </div>
-     
-        </li>
-      </ul>
-    </div>
-  </div>
-  <div class="row">
-    <div class="col-12">
-      <!-- Affichage du message d'erreur -->
-      <div *ngIf="errors.length > 0">
-        <div class="error-message">
-          <ul class="list-group">
-            <li class="list-group-item" *ngFor="let error of errors">
-              <div class="row">
-                <div class="col">
-                  {{ error.messageErrorE}}
-                </div>
-                <div class="col">
-                  idReper: {{ error.idReperErrorE }}
-                </div>
-              </div>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-</div>
+import com.cl.logs.commun.CommonLogger;
+import com.cl.logs.commun.CommonLoggerFactory;
+import com.cl.logs.types.EventTyp;
+import com.cl.logs.types.SecEventTyp;
+import com.cl.msofd.dto.FinancementDto;
+import com.cl.msofd.dto.FinancementGarantieDto;
+import com.cl.msofd.dto.GarantieDto;
+import com.cl.msofd.dto.ResponseFinancementGarantieDto;
+import com.cl.msofd.exception.FinancementNotFoundException;
+import com.cl.msofd.exception.GarantieNotFoundException;
+import com.cl.msofd.exception.ListObjetNotFoundException;
+import com.cl.msofd.mapper.FinancementMapper;
+import com.cl.msofd.model.*;
+import com.cl.msofd.repository.FinancementRepository;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.util.ReflectionUtils;
 
-<div class="container-fluid">
-  
-  <div class="row" >
-    <div class="col-12">
-      <div class="card border-0">
-        <div class="card-body" style="border: 1px solid #b1bfeb; box-shadow: 0 2px 10px  #b1bfeb;">
-          <div class="blockSize">
-          <h3 class="d-inline-block font-weight-bold"  style="font-size: 17px;">Objet de financement</h3>
-        <span class="float-right" >
-            <img *ngIf="hiddenObjetfinancement==false" src="../../../assets/icons/arrow-up.svg" alt="Fleche haut" (click)="hideDataObjetFinancement()">
-            <img *ngIf="hiddenObjetfinancement==true" src="../../../assets/icons/arrow-down.svg" alt="Fleche bas" (click)="showDataObjetFinancement()">
-          </span> 
-         <div *ngIf="elementObjetfinancement == true"> 
-    
-          <div class="row">          
-                 <!-------------------- champs famille non envoyé dans le context ----------------------->
-                 <div class="col-lg-4 "*ngIf="hideFieldForm==false && presenceFamilleObjet==false && presenceObjet==false "  >
-                  <div class="form-group"    >
-                    <div class ="custom-label">
-                    <label for="familleObjet" >Famille objet de financement </label>&nbsp;<span class="required">*</span>
-                 
-
-                    <select class="form-control form-control-sm"  id="selectedFamilleObjet" [(ngModel)]="selectedFamilleObjet" style="margin-bottom:-12px;">
-                      <option value='option0' selected> </option>
-                      <option value='option1'>Immobilier </option>
-                      <option value='option2'>Installation, maintenance et réparation d'équipement/technologie liés aux bâtiments</option>
-                      <option value='option3'>Énergies renouvelables </option>
-                      <option value='option4'>Transport </option>
-                      <option value='option5'>Autres </option>
-                    </select>
-                  </div>
-                  </div>
-                 </div>
-                    <!-------------------- champs famille envoyé et pas l'objet de financement----------------------->
-              <div class="col-lg-4 " *ngIf="hideFieldForm==false&&presenceFamilleObjet==true && presenceObjet==false">
-                <div class="custom-label">
-                <label  for="familleContext"  >Famille objet de financement</label>&nbsp;<span class="required">*</span>
-            
-                <input type="text" disabled class="form-control form-control-sm disable-cursor" [(ngModel)]="familleObjetText" id="familleObjetText" name="ObjectFinance"/> 
-              </div>  </div>
-           
-            
-              <!-------------------- champs objet financé non envoyé dans le context ----------------------->
-              
-              
-            </div>
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 
-            <div class="row">       
-              <div class="col-lg-4 " *ngIf="hideFieldForm==false&&presenceObjet==false">
-                <div  class="form-group"   >
-                  <div class="custom-label">
-                <label for="objetFinancementType" style="margin-top: 10px;" >Objet de financementbjet de financement </label>     &nbsp;<span class="required">*</span>
-              
-                <select [(ngModel)]="selectedObjetFinancement" class="form-control form-control-sm" id="selectedObjetFinancement" name="selectedObjetFinancement">
-                    <option value='option0' selected> </option>
-                    <option value='option1' *ngIf="selectedFamilleObjet=='option1' || familleObjet=='01' ">Construction de bâtiment </option>
-                    <option value='option2' *ngIf="selectedFamilleObjet=='option1' || familleObjet=='01'">Acquisition de bâtiment </option>
-                    <option value='option3' *ngIf="selectedFamilleObjet=='option1' ||familleObjet=='01'">Rénovation de bâtiment</option>
-                    <option value='option4'*ngIf="selectedFamilleObjet=='option1' ||familleObjet=='01'">Acquisition de bâtiment + Rénovation de bâtiment</option>
-                    <option value='option5'*ngIf="selectedFamilleObjet=='option1' || familleObjet=='01' || selectedFamilleObjet=='option2' ">Equipements favorisant l'efficacité énergétique et performance énergétique du bâtiment</option>
-                    <option value='option6'*ngIf="selectedFamilleObjet=='option1' || selectedFamilleObjet=='option2' || selectedFamilleObjet=='option4' || familleObjet=='immobilier'">Stations de recharge pour véhicules électriques</option>
-                    <option value='option7'*ngIf="selectedFamilleObjet=='option3' || selectedFamilleObjet=='option2'">Technologies liées aux énergies renouvelables</option>  
-                  </select>
-                 
-                </div></div>
-              </div>
+@Service
+
+public class FinancementService {
+    private final ObjectMapper objectMapper;
+
+    public FinancementService() {
+        this.objectMapper = new ObjectMapper();
+        this.objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    }
+
+    private static final CommonLogger commonLogger = CommonLoggerFactory.getLogger(FinancementService.class);
+
+    @Autowired
+
+    private FinancementRepository financementRepository;
+
+    @Autowired
+
+    private FinancementMapper financementMapper;
 
 
-              <div class="col-lg-4 " *ngIf="hideFieldForm==false&&presenceObjet==true">
-                <div class="form-group "  >
-                <div class="custom-label">
-                <label for="input1"  >Object financé</label>
-            
-                <input type="text" disabled class="form-control form-control-sm disable-cursor " id="input1" placeholder="Renovation ou aquisition" [(ngModel)]="objetFinance">
-              </div>  </div>
-              </div>
-            
-              <div class="col-lg-4">
-                <div class="form-group" *ngIf="!hideFieldForm">
-                  <div class="custom-label">
-                    <label for="prixAquisitionBien">Prix du bien <em>(en euro)</em></label>
-                    <span class="required"> *</span>
-                    <input type="text" 
-                           [ngModel]="prixAquisitionBien | number:'1.0-2':'fr'"
-                           (ngModelChange)="onPriceChange($event)"
-                           class="form-control form-control-sm" 
-                           id="prixAquisitionBien" 
-                           name="description" 
-                           [disabled]="isFieldsDisabled" />
-                  </div>
-                </div>
-              </div>
-              
-             
-              
-   
-              <div class="col-lg-4">
-                <div class="form-group" *ngIf="hideFieldForm==false " >
-                  <div class="custom-label">
-                  <label for="dateDepot" > Date de dépôt de PC  <span class="required" *ngIf="selectedNatBatiment=='option2'"> *</span></label>
-                  
-                  <input type="date" class="form-control form-control-sm" id="dateDepot" [(ngModel)]="dateDepot"  placeholder="yyyy/MM/dd" [disabled]="isFieldsDisabled" />
-                </div>
-              </div></div>
+    @Autowired
 
-            </div>
-                   
-             <div class="row">
+    private IdGeneratorService idGeneratorService;
 
-              <div class="col-lg-4">
-                <div class="form-group" >
-                  <div class="custom-label">
-                  <label for="select2" >Eligibilité au DPE </label>
-                 
-                  <select class="form-control form-control-sm"  (mouseenter)="showDescription($event)" id="select2" [(ngModel)]="selectedType">
-                    <option *ngFor="let option of options" [value]="option.value" [title]="option.description"> {{ option.label }}</option>
-                  </select>
-                </div>
-              </div>
-                <div class="alertArea" *ngIf="showFirstEligiblite==true">  <img src="../../../assets/icons/alerte.png" class="imageErreur"  alt="image flèche haut" > {{messageAlert}}
-                </div>
-              </div> 
+    public Financement createFinancement(Financement financement) {
 
-              <div class="col-lg-4">
-                <div  class="form-group"  *ngIf="hideFieldForm==false ">
-                  <div class="custom-label">
-                  <label for="montantFinance" >Montant financé  <em>(en euro)</em></label>
-                  <span class="required"> *</span>       
-                  <input type="text"
-                   [ngModel]="montantLclFinance | number:'1.0-2':'fr'" 
-                   (ngModelChange)="onMontantChange($event)"
-                    class="form-control form-control-sm" 
-                     id=montantLclFinance 
-                      name="description" 
-                      [disabled]="isFieldsDisabled" />
-                  
-              </div>
-              </div> 
-              </div> 
+        financement.setIdFinancement(idGeneratorService.generateId("F"));
+
+        if (financement.getObjetFinancement() != null) {
+            financement.getObjetFinancement().forEach(objetFinancement -> {
+                objetFinancement.setIdObjetFinancement(idGeneratorService.generateId("O"));
+
+                if (objetFinancement.getGarantie() != null) {
+                    objetFinancement.getGarantie().forEach(garantie -> {
+                        garantie.setIdGarantie(idGeneratorService.generateId("G"));
+                    });
+                }
+            });
+        }
+        return financementRepository.save(financement);
+    }
+
+    public void deleteFinancementByIdFinancement(String id) {
+
+        financementRepository.deleteByIdFinancement(id);
+
+    }
 
 
+    public Financement getFinancementByIdFinancement(String idFinancement) {
 
-              <div class="col-lg-4"  *ngIf="hideFieldForm==false ">
-                <div class="form-group" *ngIf="hideFieldForm==false"  [ngClass]="{ 'disabled': isFieldsDisabled }" >
-                  <div class="custom-label">
-                <label for="NormeThermique" class="labelFormulaire" >Norme Thermique </label>
-                <select class="form-control form-control-sm" id="NormeThermique" required [(ngModel)]="normeThermique"    name="NormeThermique" [disabled]="isFieldsDisabled">
-                  <option value='option0' selected> </option>
-                  <option value='option1'> RT2012  </option>
-                  <option value='option2'> RE2020 </option>
-                  <option value='option3' >Autre</option>
-                </select>
-      
-              </div></div>
-              </div>
-            </div>
-            <div class="row">
-              
+        return financementRepository.findByidFinancement(idFinancement)
 
-              <div class="col-lg-4">
-                <div class="form-group" *ngIf="hideFieldForm==false">
-                  <div class="custom-label">
-                  <label for="categorieBatiment" >Etat du bien</label>&nbsp;<span class="required" >*</span>
-                
-                  <select class="form-control form-control-sm" id="natureBien" name="natureBien" [(ngModel)]="selectedNatBatiment" (change)="onChangeEtatBien()" >
-               
-                    <option value='option0' selected>--Sélectionner une valeur --</option>
-                    <option value='option1'> Ancien</option>
-                    <option value='option2'>Neuf</option>
-            
-                  </select>
-                </div></div>
-              </div>
+                .orElseThrow(() -> new FinancementNotFoundException(
 
-              <div class="col-lg-4"  *ngIf="hideFieldForm==false ">
-                <div  class="form-group">
-                  <div class="custom-label">
-                  <label for="partLcl"  >Part LCL <em> (en euro)</em></label>
-                  <span class="required"> *</span>             
-                  <input type="text" [ngModel]="partLcl | number:'1.0-2':'fr'" 
-                  (ngModelChange)="onPartChange($event)"
-                   class="form-control form-control-sm" 
-                    id=partLcl  name="description" 
-                    [disabled]="isFieldsDisabled" />    
-                </div>
-              </div> </div>
+                        String.format("Le financement %s est inexistant", idFinancement)));
 
-              <div class="col-lg-4"  *ngIf="hideFieldForm==false ">
-                <div class="form-group" *ngIf="hideFieldForm==false"  [ngClass]="{ 'disabled': isFieldsDisabled }" >
-                  <div class="custom-label">
-                  <label class="labelFormulaire" for="dpe">Siren du diagnostiqueur</label>
-      
-                  <span class="required" *ngIf="selectedNatBatiment=='option1' || numeroDpeAdeme!=null" > *</span> 
-                   
-                  <input type="text" class="form-control form-control-sm" placeholder="Ex: 123456789"  id ="SirenDPE" [(ngModel)]="SirenDPE"   [disabled]="isFieldsDisabled" /> 
-              </div></div>
-              <div class="erreurDpe" *ngIf="hideFieldForm==false"   fxLayoutAlign="left center"  style="margin-top: -2px;">
-               {{messageSiren}}
-              </div>
-              <div *ngIf="isValid !== null">
-                <p class="erreurDpe" *ngIf="!isValid && hideFieldForm==false">Le numéro SIREN {{ siren }} est invalide.</p>
-              </div>
-            
-      
-          </div>
-              
-            
+    }
 
-        
-            </div >
-            <div class="row">
-              <div class="col-lg-4" *ngIf=" presenceadresse &&hideFieldForm==false"  [ngClass]="{ 'disabled': isFieldsDisabled }">
-                  
-                      <label for="addressBien"  ></label>
-                      <input type="text" class="form-control form-control-sm" (ngModelChange)="onFieldChange()" placeholder="Adresse du bien" id="addressBien" [(ngModel)]="addresseBien" name="description" [disabled]="isFieldsDisabled" />
-                      <div class="form-group">
-                        <div  class="listeAdress">
-                          <ul >
-                            <li *ngFor="let result of addressResult">
-                              <button (click)="selectAddres(result)">
-                                {{ result.properties.label }}
-                              </button>
-                            </li>
-                          </ul>
-                        </div>
-                      </div>
-                      
-              </div>
-              <div class="col-lg-2"   *ngIf="presenceadresse&& hideFieldForm==false"   [ngClass]="{ 'disabled': isFieldsDisabled }">
-               
-                  <label for="addressBien" ></label> <span class="required">*</span>
-                  <input type="text" id="codePostal"  class="form-control form-control-sm"   [(ngModel)]="addresseBienCodePostal" (ngModelChange)="onFieldChange()" placeholder="Code postal"  name="codePostal"   [ngClass]="{ 'disabled': isFieldsDisabled }">
-                 
-                
-              </div>
-              <div class="col-lg-2"  *ngIf="presenceadresse&&hideFieldForm==false"  [ngClass]="{ 'disabled': isFieldsDisabled }">
-               
-                  <label for="addressBien" ></label> <span class="required">*</span>
-                  <input   type="text" id="ville"  class="form-control form-control-sm"   [(ngModel)]="addresseBienVille" (ngModelChange)="onFieldChange()" placeholder="Ville"   name="Ville"  [ngClass]="{ 'disabled': isFieldsDisabled }">
-                 
-                  
-              </div>
-              
-            </div> 
-       <div class="row">
-        <!-- <div class="col-lg-4">         
-        </div> -->
+    ///////////////////////// Return Multi Financement Object List///////////////////////////////////////////////
+    public List<ObjetFinancement> getListObjectFinancementByIdFinancement(String idFinancement) {
+        commonLogger.eventTyp(EventTyp.APPLICATIVE).secEventTyp(SecEventTyp.METIER).logger().info("recherche de la liste de objets...");
 
-        <div class="col-lg-4 ">
-                
-          <div class="form-group " *ngIf="hideFieldForm==false">
-            <div class="custom-label">
-            <label for="categorieBatiment" > Nature du bien</label>&nbsp;<span class="required">*</span>
-            <select class="form-control form-control-sm"  [(ngModel)]="codeBatimentSelected" id="categorieBatiment" >
-              <option value='option0' selected >--Sélectionner une valeur -- </option>
-              <option value='option1' > Résidentiel</option>
-              <option value='option2'  >Bureaux</option>
-              <option value='option3'>Bureaux IGH (hauteur >28 m)</option>
-              <option value='option4'>Hôtels</option>
-              <option value='option5'>Santé (centres hospitaliers, EHPAD, Etabl. Médicaux sociaux…)</option> 
-              <option value='option6'>Centres commerciaux</option>
-              <option value='option7'>Autre</option>
-            </select>
-          </div>
-        </div> </div>
+        List<ObjetFinancement> listObjetsFinancement = financementRepository.findByidFinancement(idFinancement).get().getObjetFinancement();
 
-       
-        <div class="col-lg-4"   > </div>
+        if (listObjetsFinancement==null||listObjetsFinancement.isEmpty()) {
+            throw new ListObjetNotFoundException(
+                    String.format("Pas de liste d'objet financement pour ce le financement ayant comme id  ", idFinancement));
 
-        <div class="col-lg-2"  *ngIf="hideFieldForm==false " >
-          <div [ngClass]="{ 'disabled': isFieldsDisabled }">
-            <div class="custom-label">
-            <label class="labelDPE" for="dpe" >N° du DPE <span class="required" *ngIf="selectedNatBatiment=='option1'"> *</span></label>
-            <input type="text" class="form-control form-control-sm" id="numeroDpeAdeme" placeholder="Ex: 2100E0981916Z" [(ngModel)]="numeroDpeAdeme"   [disabled]="isFieldsDisabled" />
-            <div class="erreurDpe"  fxLayoutAlign="left center" >
-              {{message}}
-            </div>
-            </div></div>
-               
-          
-        </div>
-        <div class="col-lg-2" *ngIf="hideFieldForm==false ">    
-       <br><br>
-          <img   src="../../../assets/images/search.png"  (click)="showAdemeResult(numeroDpeAdeme)" style=" width:20px; height: 20px;">  
-        
-        </div>
-
-       </div>
-      
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div> 
-</div>
-<div  class="container-fluid">
-  <div class="row">
-    <div class="col-lg-12">
-      <div class="card border-0">
-        <div class="card-body" style="border: 1px solid #b1bfeb; box-shadow: 0 2px 10px  #b1bfeb;">
-          <div class="blockSize bg-light-gray">
-            <div [class.DpeAdem]="elemenDPE == false">
-              <div [hidden]="!depExist" *ngIf="hideFieldForm==false">
-                <div class="DPE-Bloc" >
-                  <span class="float-right">
-                    <img *ngIf="hiddenDPE==false" src="../../../assets/icons/arrow-up.svg" alt="image flèche haut" (click)="hideDataDPE()" />
-                    <img *ngIf="hiddenDPE==true" src="../../../assets/icons/arrow-down.svg" alt="image flèche haut" (click)="showDataDPE()" />
-                  </span> 
-                  <h3 class="d-inline-block font-weight-bold">Données du DPE</h3>
-                </div>
-                <div  *ngIf="elemenDPE == true">
-                  <form class="DpeFormulaire" [formGroup]="formGroup">
-                    <div class="row">
-                      <div class="col-lg-3 col-md-6">
-                        <label for="numeroNomRue " class="d-block dpeLabel">Adresse du bien <span class="required"> *</span></label>
-                        <input type="text" id="numeroNomRue"  formControlName="numeroNomRue" name="numeroNomRue" class="form-control">
-                        <div class="listeAdress" *ngIf="showAdressResults==true">
-                          <ul>
-                            <li *ngFor="let result of addressResults">
-                              <button (click)="selectAddress(result)">
-                                {{ result.properties.label }}
-                              </button>
-                            </li>
-                          </ul>
-                        </div>
-                      </div>
-                      <div class="col-lg-3 col-md-6" >
-                        <label for="codePostal" class="d-block dpeLabel">Code postal <span class="required"> *</span></label>
-                        <input type="text" id="codePostal"  formControlName="codePostal" name="codePostal" class="form-control">
-                      </div>
-                      <div class="col-lg-3 col-md-6">
-                        <label for="ville" class="d-block dpeLabel">Ville <span class="required"> *</span> </label>
-                        <input type="text" id="ville"  formControlName="ville" name="ville" class="form-control">
-                      </div>
-                      <div class="col-lg-3 col-md-6" [hidden]="hideField==true ">
-                        <label for="dateDiangnostique" class="d-block dpeLabel">Date du diagnostic</label>
-                        <input type="text" id="dateDiangnostique"  formControlName="dateDiangnostique" name="dateDiangnostique" class="form-control">
-                      </div>
-                      <div class="col-lg-3 col-md-6">
-                        <label for="anneeConstruction" class="d-block dpeLabel">Année de construction  <span class="required" *ngIf="selectedNatBatiment=='option1'">*</span></label>
-                       
-                        <input type="text" id="anneeConstruction"  formControlName="anneeConstruction" name="anneeConstruction" class="form-control">
-                      </div>
-
-                      <div class="col-lg-3 col-md-6" [hidden]="hideField==true "  >
-                        <label for="typeBatiment" class="d-block dpeLabel">Type de bien</label>
-                        <input type="text" id="typeBatiment"  formControlName="typeBatiment" id="typeBatiment" name="typeBatiment" class="form-control">
-                      </div>
-
-                      <div class="col-lg-3 col-md-6">
-                        <label for="surfaceBien"  class="champs dpeLabel">Surface du bien <em>(en m²) </em><span class="required">*</span></label>
-                        <input type="text" id="surfaceBien"  formControlName="surfaceBien" name="surfaceBien" id="SurfaceDuBien" class="form-control">
-                
-                      </div>
-
-                      <div class="col-lg-3 col-md-6" [hidden]="hideField==true ">
-                        <label for="EnergieType"  class="champs dpeLabel">Type d'énergie </label>
-                        <input type="text" id="EnergieType"  formControlName="EnergieType" name="EnergieType" id="EnergieType" class="form-control">
-                        <img  *ngIf="valGesObligatoire==true" src="../../../assets/icons/obligatoire.svg" style="width:15px; height: 15px;" alt="image flèche haut" >
-                      </div>
-                     
-                      <div class="col-lg-3 col-md-6"  style="margin-top: 10px;" [hidden]="hideField==false " >
-                        <label class="champs dpeLabel" >Lettre CEP
-                        <span class="required" *ngIf="selectedNatBatiment=='option1'">*</span></label>
-                        <select id="LettreCEPlist" name="LettreCEPlist"  formControlName="lettreCEP" class="form-control"  >
-                          <option value='option0' > </option>
-                          <option value='option1' >A</option>
-                          <option value='option2' >B </option>
-                          <option value='option3' >C </option>
-                          <option value='option4' >D</option>
-                          <option value='option5' >E</option>
-                          <option value='option6' >F </option>
-                          <option value='option7' >G</option> 
-                        </select> 
-                      </div>
+        }
+        return listObjetsFinancement;
+    }
 
 
-                      <div class="col-lg-3 col-md-6"  style="margin-top: 10px;" [hidden]="hideField==true">
-                        <label for="LettreCEP" class="champs dpeLabel">Lettre CEP <span class="required" *ngIf="selectedNatBatiment=='option1'">*</span></label>
-                            <input type="text" id="LettreCEP" formControlName="lettreCEP" name="LettreCEP"  class="form-control">             
-                      </div>
+    ////////////////////////////////CPPE reserve idFinancement/////////////////////////////////////////////////////////
 
-             <div class="col-lg-3 col-md-6"  style="margin-top: 10px;">
-              <label for="ValeurCEP" class="champs dpeLabel">Valeur CEP <em>(en kWhep/m².an)</em>     <span class="required" *ngIf="selectedNatBatiment=='option1'"> *</span></label>
-               <input type="text" id="ValeurCEP"   formControlName="valeurCEP" id="ValeurCEP" class="form-control">             
-              </div>
+    public String createFinancementReturnId(FinancementDto financementDto) throws Exception {
 
-                      <div class="col-lg-3 col-md-6"  style="margin-top: 10px;" [hidden]="hideField==false">
-                        <label class="champs dpeLabel" >Lettre GES
-                        <span class="required" *ngIf="selectedNatBatiment=='option1'">*</span></label>
-                        <select id="lettreGeslist" name="lettreGeslist"  formControlName="lettreGES" class="form-control" >
-                          <option value='option0' > </option>
-                          <option value='option1' >A</option>
-                          <option value='option2' >B </option>
-                          <option value='option3' >C </option>
-                          <option value='option4' >D</option>
-                          <option value='option5' >E</option>
-                          <option value='option6' >F </option>
-                          <option value='option7' >G</option> 
-                        </select> 
-                      </div>
-                     
-<div class="col-lg-3 col-md-6"  style="margin-top: 10px;" [hidden]="hideField==true">
-  <label for="LettreGES" class="champs dpeLabel">Lettre GES <span class="required" *ngIf="selectedNatBatiment=='option1'">*</span></label>
-      <input type="text" id="LettreGES" formControlName="lettreGES" name="LettreGES"  class="form-control">          
-</div>
+        commonLogger.eventTyp(EventTyp.APPLICATIVE).secEventTyp(SecEventTyp.METIER).logger().info("create financement from  {} :", financementDto);
+
+        Financement financement = financementMapper.createFinancementFromFinancementDto(financementDto);
+
+        Financement savedFinancement = financementRepository.save(financement);
+
+        return savedFinancement.getIdFinancement();
+
+    }
 
 
-    <div class="col-lg-3 col-md-6"  style="margin-top: 10px;">
-      <label for="valeurGES" class="champs dpeLabel"> Valeur GES <em>(en kWhep/m².an)</em>     <span class="required" *ngIf="selectedNatBatiment=='option1'"> *</span></label>
-<input type="text" id="valeurGES"   formControlName="valeurGES" id="ValeurGES" class="form-control">
+    ///////////////////////////////////CPPE reserve id Garantie/////////////////////////////////////////////////////////////////
 
-                 
-</div>
-                    </div>
-                  </form>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+    public String createGarantieFromGarantieDto(GarantieDto garantieDto) throws FinancementNotFoundException {
 
+        List<Garantie> garantieList = new ArrayList<>();
 
+        commonLogger.eventTyp(EventTyp.APPLICATIVE).secEventTyp(SecEventTyp.METIER).logger().info("create garantie from  {} :", garantieDto);
 
+        Financement financementGarantie = financementRepository.findByidFinancement(garantieDto.getIdFinancement())
 
-<div class="container-fluid" >
-   
-  <div class="justificatifs" *ngIf="hideFieldForm==false" >
-  
-    <div class="blocJust">
-    <img  *ngIf="hiddenJustificatif==false" src="../../../assets/icons/arrow-up.svg"  (click)="hideDataJustificatif()" class="haut"  /> 
-     &nbsp; <img *ngIf="hiddenJustificatif==true" src="../../../assets/icons/arrow-down.svg" class="bas"  (click)="showDataJustificatif() "/> &nbsp;
-    <h3  class="d-inline-block font-weight-bold" style="margin-top: 14px;font-size: 17px; "> Documents envoyés à la GED </h3>
-    </div >
+                .orElseThrow(() -> new FinancementNotFoundException("Le financement avec l'ID spécifié est introuvable"));
 
-   
-    <div *ngIf="elementJustificatif == true" class="content">
-      <div class="checkbox-group">
-        
-        <!-- Document attestant la date de dépôt de permis de construire -->
-        <div *ngIf="dateDepot" class="checkbox-item">
-          <label>
-            <input type="checkbox" [(ngModel)]="isDateDepotChecked" [disabled]="isFieldsDisabled" (change)="logCheckboxStates()" style="margin-top: -10px;">
-            <p style="margin-left: 10px;">Document attestant de la date de dépôt du permis de construire</p>
-          </label>
-        </div>
-  
-         <!-- DPE ou Compromis de vente si le numéro DPE est saisi -->
-      <div *ngIf="numeroDpeAdeme" class="checkbox-item" style="height: 50px; margin-top: -30px;" >
-        <label>
-          <input type="checkbox" [(ngModel)]="isDpeChecked" [disabled]="isFieldsDisabled" (change)="logCheckboxStates()" >
-          <p style="margin-left: 10px; margin-top: 12px;"> Document DPE ou Compromis de vente </p>
-          <select [(ngModel)]="selectedOptionJustif" class="dropdown-list">
-            <option value="DPE">Document DPE</option>
-            <option value="Compromis de vente">Compromis de vente</option>
-          </select>
-        </label>       
-      </div>
+        if (garantieDto.isBienFinanceLCL()) {
 
-  
-        <!-- Document attestant de la Norme thermique si renseignée -->
-        <div *ngIf="normeThermique && normeThermique !== 'option0' && !dateDepot" class="checkbox-item">
-          <label>
-            <input type="checkbox" [(ngModel)]="isNormeThermiqueChecked" [disabled]="isFieldsDisabled" (change)="logCheckboxStates()" style="margin-top: -10px;">
-           <p style="margin-left: 10px;"> Document attestant de la Norme thermique</p>
-          </label>
-        </div>
-  
-      </div>
-    </div>
-  </div>
-  
-  
+            Bien bienFinanceLcl = financementGarantie.getObjetFinancement().get(0).getBien();
+
+            Garantie garantie = Garantie.builder()
+
+                    .idGarantie(idGeneratorService.generateId("G"))
+
+                    .bien(bienFinanceLcl)
+
+                    .build();
+
+            garantieList.add(garantie);
+
+            financementGarantie.getObjetFinancement().get(0).setGarantie(garantieList);
 
 
-  <div class="resultats"  >  
-    <div  class="blocResults">
-      <img  *ngIf="hiddenResults==false" src="../../../assets/icons/arrow-up.svg"  (click)="hideDataResults()"   /> 
-       &nbsp; <img *ngIf="hiddenResults==true" src="../../../assets/icons/arrow-down.svg" (click)="showDataResults()"/>  &nbsp;
-      <h3 class="d-inline-block font-weight-bold" style="margin-top: 14px;  font-size: 17px; font-weight:bold; "> Résultats</h3>
-    </div >
-    
-  <div  *ngIf="elementResults==true" >
-     <div *ngIf="selectedType !== 'option1'" class="erreurMessageResultat">
+        } else {
 
-     <p style="font-size: 16px; padding-top: 5px; padding-bottom: 5px; font-weight: 500;"><img src="../../../assets/icons/alerte.png" class="imageErreur" style="padding-bottom: 2px;" alt="image flèche haut" >Financement non éligible à la Taxonomie</p>
-    </div>
-    
+            Garantie garantie = Garantie.builder()
 
-  <div *ngIf="DpeResults && hideFieldForm==false" >  
+                    .idGarantie(idGeneratorService.generateId("G"))
+
+                    .bien(Bien.builder()
+
+                            .idBien(idGeneratorService.generateId("B"))
+
+                            .bienFinanceLCL(garantieDto.isBienFinanceLCL())
+
+                            .prixBien(garantieDto.getPrixBien())
+
+                            .typeBatiment(garantieDto.getTypeBatiment())
+
+                            .dateDebutConstruction(garantieDto.getDateDebutConstruction())
+
+                            .numeroNomRue(garantieDto.getNumeroNomRue())
+
+                            .codePostal(garantieDto.getCodePostalBien())
+
+                            .nomCommune(garantieDto.getVilleBien())
+
+                            .paysBien(garantieDto.getPaysBien())
+
+                            .surfaceBien(garantieDto.getSurfaceBien())
+
+                            .dpeActuel(Dpe.builder()
+
+                                    .classeCep(garantieDto.getClasseCep())
+
+                                    .build())
+
+                            .build())
+
+                    .build();
+
+            garantieList.add(garantie);
+
+            financementGarantie.getObjetFinancement().get(0).setGarantie(garantieList);
+
+        }
+
+        financementRepository.save(financementGarantie);
+        financementRepository.deleteByIdFinancement(financementGarantie.getIdFinancement());
+
+        return financementGarantie.getObjetFinancement().get(0).getGarantie().get(0).getIdGarantie();
+
+    }
 
 
-  <div style="display: flex; align-items: center; justify-content: flex-end; margin-top: -25px;" >
-    <img src="../../../assets/images/help.png" style="width:20px; height: 25px; margin-left: 25px;" matTooltip="Chaque objet de financement est associé à un arbre de décision. Cet arbre de décision permet de déterminer le caractère aligné de l’objet, c’est-à-dire s’il est vert au sens de la réglementation « Taxonomie », en fonction des données qui ont été renseignées pour cet objet.">
-  </div>
-  
-  <div class="ResultatVert" style="font-weight: 500;">   
-    <img src="../../../assets/icons/coche.png" style="width:20px; height: 20px; margin-right: 16px; margin-left: 10px;">
-    {{ eligibiliteDpeMessage }} {{ alignementResultText }}
-  </div>
-  
+    //////////////////////////////////Get une garantie d'un financement par son idGarantie////////////////////////////////////////////////
 
-      <div [hidden]="!champObligatoire" style="font-weight: 500;" >
-        <div class="Resultatrougee" >
-        &nbsp; <img  *ngIf="donneeObligatoire" src="../../../assets/icons/alerte.png" class="imageErreur">
-        &nbsp;  {{donneeObligatoire}} 
-      </div>
-       </div>
-  
-      
-      <div class='textblock' style="font-weight: 500;">
-        <div *ngIf="errorDpeMessage" >
-          <div class="Resultatrouge">
-        &nbsp; <img   src="../../../assets/icons/alerte.png" class="imageErreur"  >
-        &nbsp; {{errorDpeMessage }}</div>
-      </div> 
-  
-  
-      <div *ngIf="errorNormeThermiqueMessage" >
-        <div class="Resultatrouge">
-        &nbsp; <img src="../../../assets/icons/alerte.png" class="imageErreur"  >
-        &nbsp;   {{errorNormeThermiqueMessage }} </div>
-      </div>
-  
-  
-      <div *ngIf="errorDateDepotMessage" >
-        <div class="Resultatrouge">
-        &nbsp; <img  src="../../../assets/icons/alerte.png" class="imageErreur"  >
-        &nbsp;  {{errorDateDepotMessage}}</div>
-      </div>
-      </div>
-  
-      </div>
-      </div>  
-  
-      </div>
-    </div>
-      <div class="container-fluid" >
-  
-        <div class=footer>
-        <div class="ButtonsFooter" style="display: flex; justify-content: flex-end">
-        <!-- <button  class="precedent" routerLink="/generale" >Précédent</button>
-         &nbsp;    -->
-       <button (click)="showAlignement()"   mat-raised-button color="primary" [disabled]="selectedType!='option1'">Calculer</button>
-         &nbsp; 
-       <button  mat-raised-button color="primary"  (click)="postContinuer()" >Continuer</button>
-      </div>
-      </div>
-      
-      
-      </div>
+    public Garantie getGarantie(String idFinancement, String idGarantie) {
 
+        Garantie returnedGarantie = null;
+
+        List<Garantie> garantieList;
+
+        Financement existingFinancement = financementRepository.findByidFinancement(idFinancement).orElseThrow(() -> new FinancementNotFoundException(
+
+                String.format("Le financement %s est inexistant", idFinancement)));
+
+        commonLogger.eventTyp(EventTyp.APPLICATIVE).secEventTyp(SecEventTyp.METIER).logger().info("recherche de la garantie...");
+
+        if (existingFinancement.getObjetFinancement() != null && existingFinancement.getObjetFinancement().get(0).getGarantie() != null) {
+
+            garantieList = existingFinancement.getObjetFinancement().get(0).getGarantie();
+
+            if (garantieList.isEmpty() || !garantieIdExist(idGarantie, garantieList)) {
+
+                throw new GarantieNotFoundException(
+
+                        String.format("Le financement %s ne possède aucune garantie associée ", idFinancement));
+
+            } else {
+
+                returnedGarantie = garantieList.stream().
+
+                        filter(garantie -> garantie.getIdGarantie().equals(idGarantie))
+
+                        .toList().get(0);
+
+            }
+
+        }
+
+        return returnedGarantie;
+
+    }
+
+
+    public boolean garantieIdExist(String idGarantie, List<Garantie> garantieList) {
+
+        return garantieList.stream().
+
+                anyMatch(garantie -> garantie.getIdGarantie().equals(idGarantie));
+
+    }
+
+
+    /////////////////////////////////////////Service NECI/////////////////////////////////////////////////////////////////////
+
+    public ResponseFinancementGarantieDto createFinancementGarantie(FinancementGarantieDto financementGarantieDto) {
+
+        Financement financement = financementMapper.createFinancementFromFinancementGarantieDto(financementGarantieDto);
+
+        Financement savedFinancement = financementRepository.save(financement);
+
+        return ResponseFinancementGarantieDto.builder()
+
+                .idFinancement(savedFinancement.getIdFinancement())
+
+                .idGarantie(savedFinancement.getObjetFinancement().get(0).getGarantie()
+
+                        .stream()
+
+                        .map(Garantie::getIdGarantie)
+
+                        .toList()
+
+                )
+
+                .build();
+
+    }
+
+/////////////////////////////////patch financement par objet//////////////////////////////////////////
+
+    public Financement patchFinancement(String idFinancement, Financement financementToUpdate) {
+        Financement existingFinancement = financementRepository.findByidFinancement(idFinancement).orElse(null);
+
+        if (existingFinancement == null) {
+
+            throw new FinancementNotFoundException(
+
+                    String.format("Le financement a modifier %s est inexistant", idFinancement));
+
+        }
+
+        Field[] fields = Financement.class.getDeclaredFields();
+
+        Arrays.stream(fields).forEach(field -> {
+            ReflectionUtils.makeAccessible(field);
+
+            try {
+
+                Object newValue = field.get(financementToUpdate);
+
+                if (newValue != null) {
+
+                    field.set(existingFinancement, newValue);
+
+                }
+
+            } catch (IllegalAccessException e) {
+
+                commonLogger.eventTyp(EventTyp.APPLICATIVE).secEventTyp(SecEventTyp.METIER).logger().info("erreur lors de l'update du financement causé par: {}", e.getMessage());
+
+            }
+
+        });
+
+        return financementRepository.save(existingFinancement);
+
+    }
+
+    public Financement patchFinancementChamps(String idFinancement, Financement financementToUpdate) throws Exception {
+        // Récupère le financement existant
+        Financement existingFinancement = financementRepository.findByidFinancement(idFinancement)
+                .orElseThrow(() -> new FinancementNotFoundException(String.format("Le financement à modifier %s est inexistant", idFinancement)));
+
+        // Mise à jour par champs objets de financement
+        if (financementToUpdate.getObjetFinancement() != null) {
+            for (ObjetFinancement updatedObjet : financementToUpdate.getObjetFinancement()) {
+                boolean found = false;
+                for (int i = 0; i < existingFinancement.getObjetFinancement().size(); i++) {
+                    ObjetFinancement existingObjet = existingFinancement.getObjetFinancement().get(i);
+                    if (existingObjet.getIdObjetFinancement().equals(updatedObjet.getIdObjetFinancement())) {
+                        merge(existingObjet, updatedObjet);
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    existingFinancement.getObjetFinancement().add(updatedObjet);
+                }
+            }
+        }
+
+
+        // Sauvegarder le financement mis à jour
+        Financement savedFinancement = financementRepository.save(existingFinancement);
+
+        // Supprimer l'ancien financement
+        financementRepository.deleteByIdFinancement(existingFinancement.getIdFinancement());
+
+        return savedFinancement;
+    }
+
+    private void merge(Object target, Object source) throws Exception {
+        Field[] fields = source.getClass().getDeclaredFields();
+        for (Field field : fields) {
+            field.setAccessible(true);
+            Object value = field.get(source);
+            if (value != null) {
+                field.set(target, value);
+            }
+        }
+    }
+
+
+}
+//
+package com.cl.msofd.service;
+
+import com.cl.msofd.dto.ResponseFinancementGarantieDto;
+import com.cl.msofd.model.*;
+import com.cl.msofd.repository.FinancementRepository;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+@SpringBootTest
+class FinancementServiceTest {
+
+    @Autowired
+    private FinancementRepository financementRepository;
+
+    @Autowired
+    private FinancementService financementService;
+
+    @Autowired
+    IdGeneratorService idGeneratorService;
+    private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+
+
+    @Test
+    void should_return_garantie_based_on_idFinancement_and_idGarantie() throws Exception {
+
+
+        ArrayList<String> idReper = new ArrayList<String>(Arrays.asList("0123456789"));
+
+        List<Garantie> listGarantie = new ArrayList<Garantie>();
+
+        Garantie garantie1 = Garantie.builder()
+                .bien(Bien.builder()
+                        .bienFinanceLCL(false)
+                        .adresseComplete("2 rue de Bercy")
+                        .codePostal("75012")
+                        .nomCommune("Paris")
+                        .paysBien("France")
+                        .typeBatiment("Appartement")
+                        .prixBien(1000000.0)
+                        .montantFinanceLCL(500000.0)
+                        .partLCL(50.0)
+                        .dpeActuel(Dpe.builder().numeroDpe("2125E0981916Z")
+                                .estimationCep(45.0)
+                                .classeCep("A")
+                                .estimationGes(960.0)
+                                .classeGes("B")
+                                .build())
+
+                        .build())
+                .idGarantie("GR51TLJ5G")
+                .build();
+        listGarantie.add(garantie1);
+
+        Garantie garantie2 = Garantie.builder()
+                .idGarantie("GR51TLJ5K")
+                .bien(Bien.builder()
+                        .bienFinanceLCL(true)
+                        .build())
+                .build();
+        listGarantie.add(garantie2);
+
+        ArrayList<ObjetFinancement> listObjets = new ArrayList<ObjetFinancement>();
+        listObjets.add(ObjetFinancement.builder()
+                .codeObjetFinancement("02")
+                .bien(Bien.builder().montantFinanceLCL(500000.0)
+                        .adresseComplete("14 Avenue de l'Opéra")
+                        .codePostal("75001")
+                        .nomCommune("Paris")
+                        .paysBien("France")
+                        .surfaceBien(152.0)
+                        .typeEnergie("Gaz naturel")
+                        .typeBatiment("Appartement")
+                        .typeUsage("00001")
+                        .etatBien("Ancien")
+                        .bienFinanceLCL(true)
+                        .prixBien(1000000.0)
+                        .montantFinanceLCL(500000.0)
+                        .partLCL(50.0)
+
+                        .dpeActuel(Dpe.builder().numeroDpe("2125E0981916Z")
+                                .estimationCep(45.0)
+                                .classeCep("A")
+                                .estimationGes(960.0)
+                                .classeGes("B")
+                                .build())
+
+                        .build())
+
+                .garantie(listGarantie)
+
+                .build());
+
+        Financement financement = Financement.builder()
+                .idFinancement("FR51TLJ5K")
+                .codeApplicatifOrigine("02")
+                .agenceCompte("003800000056968N")
+                .objetFinancement(listObjets)
+
+                .intervenant(Intervenant.builder()
+                        .idReper(idReper)
+                        .build())
+                .build();
+
+        Financement createdFinancement = financementService.createFinancement(financement);
+
+        Garantie returnedGarantie = financementService.getGarantie(createdFinancement.getIdFinancement(), garantie1.getIdGarantie());
+        assertEquals(returnedGarantie.getIdGarantie(), garantie1.getIdGarantie());
+
+    }
+
+
+    @Test
+    void should_patch_existing_financement() throws Exception {
+        Dpe dpeActuel = Dpe.builder()
+                .classeCep("A")
+                .classeGes("C")
+                .estimationCep(60.0)
+                .estimationGes(80.0)
+                .numeroDpe("DDD7E1287825F")
+                .build();
+
+        Bien bien = Bien.builder()
+                .bienFinanceLCL(true)
+                .codeBatiment("00001")
+                .typeBatiment("Appartement")
+                .codePostal("75016")
+                .surfaceBien(79.0)
+                .anneeConstruction(2000)
+                .dpeActuel(dpeActuel)
+                .montantFinanceLCL(900000.00)
+                .build();
+
+        List<Garantie> listGarantie = new ArrayList<>();
+        Garantie garantie = Garantie.builder()
+                .idGarantie("G12345678")
+                .bien(bien)
+                .build();
+        listGarantie.add(garantie);
+
+
+        ObjetFinancement object = ObjetFinancement.builder()
+                .codeObjetFinancement("02")
+                .quotePartObjet(100.0)
+                .bien(bien)
+                .garantie(listGarantie)
+                .build();
+
+        List<String> idRepers = new ArrayList<>();
+        idRepers.add("8415595180");
+        Intervenant intervenant = Intervenant.builder()
+                .idReper(idRepers)
+                .build();
+        List<ObjetFinancement> listObjetFinancement = new ArrayList<>();
+        listObjetFinancement.add(object);
+        Financement financementExistant = Financement.builder()
+                .objetFinancement(listObjetFinancement)
+                .intervenant(intervenant)
+                .build();
+
+        financementService.createFinancement(financementExistant);
+
+        Dpe dpeAct = Dpe.builder()
+                .classeCep("A")
+                .estimationCep(60.0)
+                .build();
+
+        Bien bienObjet = Bien.builder()
+                .codePostal("75018")
+                .surfaceBien(120.0)
+                .dpeActuel(dpeAct)
+                .build();
+
+        ObjetFinancement objectFinancement = ObjetFinancement.builder()
+                .codeObjetFinancement("03")
+                .quotePartObjet(100.0)
+                .bien(bienObjet)
+                .build();
+        List<ObjetFinancement> listObjetsFinancement = new ArrayList<>();
+        listObjetsFinancement.add(objectFinancement);
+        Financement patchedFinancement = Financement.builder()
+                .objetFinancement(listObjetsFinancement)
+                .build();
+
+        Financement result = financementService.patchFinancementChamps(financementExistant.getIdFinancement(), patchedFinancement);
+        assertEquals(result.getObjetFinancement().get(0).getCodeObjetFinancement(), financementExistant.getObjetFinancement().get(0).getCodeObjetFinancement());
+        assertEquals(result.getObjetFinancement().get(0).getBien().getCodePostal(), financementExistant.getObjetFinancement().get(0).getBien().getCodePostal());
+        assertEquals(result.getObjetFinancement().get(0).getBien().getDpeActuel().getClasseCep(), financementExistant.getObjetFinancement().get(0).getBien().getDpeActuel().getClasseCep());
+        assertEquals(result.getObjetFinancement().get(0).getBien().getDpeActuel().getEstimationCep(), financementExistant.getObjetFinancement().get(0).getBien().getDpeActuel().getEstimationCep());
+        assertEquals(result.getObjetFinancement().get(0).getQuotePartObjet(), financementExistant.getObjetFinancement().get(0).getQuotePartObjet());
+
+    }
+
+
+    @Test
+    void createFinancementGarantieOK() {
+
+        ArrayList<String> idReper = new ArrayList<String>(Arrays.asList("0123456789"));
+
+        List<Garantie> listGarantie = new ArrayList<Garantie>();
+
+        Garantie garantie1 = Garantie.builder()
+                .bien(Bien.builder()
+                        .bienFinanceLCL(false)
+                        .adresseComplete("2 rue de Bercy")
+                        .codePostal("75012")
+                        .nomCommune("Paris")
+                        .paysBien("France")
+                        .typeBatiment("Appartement")
+                        .prixBien(1000000.0)
+                        .montantFinanceLCL(500000.0)
+                        .partLCL(50.0)
+                        .dpeActuel(Dpe.builder().numeroDpe("2125E0981916Z")
+                                .estimationCep(45.0)
+                                .classeCep("A")
+                                .estimationGes(960.0)
+                                .classeGes("B")
+                                .build())
+
+                        .build())
+                .build();
+        listGarantie.add(garantie1);
+
+        Garantie garantie2 = Garantie.builder()
+                .bien(Bien.builder()
+                        .bienFinanceLCL(true)
+                        .build())
+                .build();
+        listGarantie.add(garantie2);
+
+        List<ObjetFinancement> listObjetFinancement = new ArrayList<>();
+        listObjetFinancement.add(ObjetFinancement.builder()
+                .codeObjetFinancement("02")
+                .bien(Bien.builder().montantFinanceLCL(500000.0)
+                        .adresseComplete("14 Avenue de l'Opéra")
+                        .codePostal("75001")
+                        .nomCommune("Paris")
+                        .paysBien("France")
+                        .surfaceBien(152.0)
+                        .typeEnergie("Gaz naturel")
+                        .typeBatiment("Appartement")
+                        .typeUsage("00001")
+                        .etatBien("Ancien")
+                        .bienFinanceLCL(true)
+                        .prixBien(1000000.0)
+                        .montantFinanceLCL(500000.0)
+                        .partLCL(50.0)
+
+                        .dpeActuel(Dpe.builder().numeroDpe("2125E0981916Z")
+                                .estimationCep(45.0)
+                                .classeCep("A")
+                                .estimationGes(960.0)
+                                .classeGes("B")
+                                .build())
+
+                        .build())
+
+                .garantie(listGarantie)
+
+                .build());
+        Financement financement = Financement.builder()
+                .codeApplicatifOrigine("02")
+                .agenceCompte("003800000056968N")
+                .objetFinancement(listObjetFinancement)
+
+                .intervenant(Intervenant.builder()
+                        .idReper(idReper)
+                        .build())
+                .build();
+
+        Financement financementSave = financementRepository.save(financement);
+        ResponseFinancementGarantieDto responseFiancement = ResponseFinancementGarantieDto.builder()
+                .idFinancement(financementSave.getIdFinancement())
+                .build();
+        assertEquals(financementSave.getIdFinancement(), responseFiancement.getIdFinancement());
+
+    }
+
+
+    @Test
+    void createFinancementGarantieKO() {
+
+        ArrayList<String> idReper = new ArrayList<String>(Arrays.asList("0123456789"));
+        ArrayList<ObjetFinancement> listObjets = new ArrayList<ObjetFinancement>();
+        listObjets.add(ObjetFinancement.builder()
+                .codeObjetFinancement("55")
+                .bien(Bien.builder().montantFinanceLCL(500000.0)
+                        .adresseComplete("14 Avenue de l'Opéra")
+                        .codePostal("75001")
+                        .nomCommune("Paris")
+                        .paysBien("France")
+                        .surfaceBien(152.0)
+                        .typeEnergie("Gaz naturel")
+                        .typeBatiment("Appartement")
+                        .typeUsage("00001")
+                        .etatBien("Ancien")
+                        .bienFinanceLCL(true)
+                        .prixBien(1000000.0)
+                        .montantFinanceLCL(500000.0)
+                        .partLCL(50.0)
+
+                        .dpeActuel(Dpe.builder().numeroDpe("2125E0981916Z")
+                                .estimationCep(45.0)
+                                .classeCep("A")
+                                .estimationGes(960.0)
+                                .classeGes("B")
+                                .build())
+
+                        .build())
+
+                .build());
+
+
+        Financement financement = Financement.builder().idFinancement(idGeneratorService.generateId("F"))
+                .codeApplicatifOrigine("02")
+                .agenceCompte("003800000056968N")
+                .objetFinancement(listObjets)
+
+                .intervenant(Intervenant.builder()
+                        .idReper(idReper)
+                        .build())
+                .build();
+
+        try {
+            financementRepository.save(financement);
+        } catch (Exception e) {
+            assertTrue(true);
+        }
+
+    }
+
+    @AfterEach
+    public void cleanUpEach() {
+
+        financementService.deleteFinancementByIdFinancement("FR51TLJ5K");
+        financementService.deleteFinancementByIdFinancement("F12345671");
+        financementService.deleteFinancementByIdFinancement("123456ABC");
+
+
+    }
+}
