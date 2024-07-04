@@ -1,157 +1,126 @@
 package com.cl.msofd.service;
-
-import com.cl.msofd.exception.DpeAdemeExistingException;
-import com.cl.msofd.exception.DpeAdemeNotFoundException;
-import com.cl.msofd.model.Ademe;
-import com.cl.msofd.model.DpeAdeme;
-import com.cl.msofd.repository.DpeAdemeRepository;
-import com.cl.msofd.repository.DpeAdemeRepositoryCustom;
-import com.cl.msofd.utility.JSONUtilOFD;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatchers;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-
-import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.net.http.HttpResponse.BodyHandlers;
-import java.util.Collections;
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
-
-public class DpeAdemeServiceTest {
-
-    @Mock
-    private DpeAdemeRepository dpeAdemeRepository;
-
-    @Mock
-    private DpeAdemeRepositoryCustom dpeAdemeRepositoryCustom;
-
-    @Mock
-    private HttpClient ademeHttpClient;
-
-    @Mock
-    private JSONUtilOFD jsonUtils;
-
-    @InjectMocks
-    private DpeAdemeService dpeAdemeService;
-
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
+import com.cl.logs.commun.CommonLogger;
+import com.cl.logs.commun.CommonLoggerFactory;
+import com.cl.logs.types.EventTyp;
+import com.cl.logs.types.SecEventTyp;
+import com.cl.msofd.model.ContextAlignement;
+import com.cl.msofd.model.Referentiel;
+import com.cl.msofd.utility.CalculAlignementStrategy;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.stereotype.Service;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+@Service
+public class AlignementService {
+    private final CommonLogger commonLogger = CommonLoggerFactory.getLogger(AlignementService.class);
+    private final SimpleDateFormat formatDate = new SimpleDateFormat("dd/MM/yyyy");
+    private final MongoTemplate mongoTemplate;
+    @Autowired
+    public AlignementService(MongoTemplate mongoTemplate) {
+        this.mongoTemplate = mongoTemplate;
     }
-
-    @Test
-    void should_create_DpeAdeme_when_not_exists() {
-        DpeAdeme dpeAdeme = DpeAdeme.builder().numDpe("123456").build();
-
-        when(dpeAdemeRepositoryCustom.findByNumDpe(dpeAdeme.getNumDpe())).thenReturn(Optional.empty());
-        when(dpeAdemeRepository.save(dpeAdeme)).thenReturn(dpeAdeme);
-
-        DpeAdeme result = dpeAdemeService.create(dpeAdeme);
-        assertThat(result).isEqualTo(dpeAdeme);
+    ///////////////////////////////////obtenirValeurCepTop///////////////////////////////////////////////////
+    public double obtenirValeurCepTop(String codeRecherche) {
+        Query query = new Query(Criteria.where("table").is("seuil_cep_top").and("code").is(codeRecherche));
+        commonLogger.eventTyp(EventTyp.APPLICATIVE).secEventTyp(SecEventTyp.METIER).logger().info("searching ValeurCepTop by code : {}", codeRecherche);
+        Referentiel referentiel = mongoTemplate.findOne(query, Referentiel.class);
+        return checkRefValue(referentiel);
     }
-
-    @Test
-    void should_throw_DpeAdemeExistingException_when_dpe_exists() {
-        DpeAdeme dpeAdeme = DpeAdeme.builder().numDpe("123456").build();
-
-        when(dpeAdemeRepositoryCustom.findByNumDpe(dpeAdeme.getNumDpe())).thenReturn(Optional.of(dpeAdeme));
-
-        assertThrows(DpeAdemeExistingException.class, () -> dpeAdemeService.create(dpeAdeme));
+    ////////////////////////////////obtenirValeurCepMax///////////////////////////////////////////////////////
+    public double obtenirValeurCepMax(String codeRecherche) {
+        Query query = new Query(Criteria.where("table").is("seuil_cep_max").and("code").is(codeRecherche));
+        commonLogger.eventTyp(EventTyp.APPLICATIVE).secEventTyp(SecEventTyp.METIER).logger().info("searching ValeurCepMax by code : {}", codeRecherche);
+        Referentiel referentiel = mongoTemplate.findOne(query, Referentiel.class);
+        return checkRefValue(referentiel);
     }
-
-    @Test
-    void should_get_DpeAdeme_when_exists() throws Exception {
-        String numDpe = "123456";
-        DpeAdeme dpeAdeme = DpeAdeme.builder().numDpe(numDpe).build();
-        Ademe ademe = Ademe.builder().results(Collections.singletonList(dpeAdeme)).build();
-        String responseBody = new ObjectMapper().writeValueAsString(ademe);
-
-        HttpResponse<String> httpResponse = mock(HttpResponse.class);
-        when(httpResponse.statusCode()).thenReturn(200);
-        when(httpResponse.body()).thenReturn(responseBody);
-
-        CompletableFuture<HttpResponse<String>> response = CompletableFuture.completedFuture(httpResponse);
-        when(ademeHttpClient.sendAsync(any(HttpRequest.class), ArgumentMatchers.<HttpResponse.BodyHandler<String>>any()))
-                .thenReturn(response);
-
-        when(jsonUtils.covertFromJsonToObject(responseBody, Ademe.class)).thenReturn(ademe);
-
-        DpeAdeme result = dpeAdemeService.getDpe(numDpe);
-        assertThat(result).isEqualTo(dpeAdeme);
+/////////////////////////////////calcul de l'alignement//////////////////////////////////////////////////
+    public synchronized String alignement(ContextAlignement ligneContext) {
+        String aligne = "07";
+        try {
+            String typeObjetFinancement = ligneContext.getTypeObjetFinancement();
+            Integer anneeConstruction = ligneContext.getAnneeConstruction();
+            String etiquetteDpe = (ligneContext.getEtiquetteDpe() == null ? "NC" : ligneContext.getEtiquetteDpe());
+            double valeurCep = ligneContext.getValeurCep();
+            Date dateDepotPc = ligneContext.getDateDepotPc();
+            boolean presenceDpe = ligneContext.isPresenceDpe();
+            boolean presenceDateDepotPc = ligneContext.isPresenceDateDepotPc();
+            String normeThermique = (ligneContext.getNormeThermique() == null ? "NC" : ligneContext.getNormeThermique());
+            String codeBatiment = ligneContext.getCodeBatiment();
+            Double valeurCeptop = obtenirValeurCepTop(codeBatiment);
+            Double valeurCepmax = obtenirValeurCepMax(codeBatiment);
+            // Update valeurCep if it's 0
+            if (valeurCep == 0.0) {
+                valeurCep = 10000.0;
+            }
+            if (typeObjetFinancement != null && typeObjetFinancement.equals("02")) {
+                aligne = alignementAcquisition(presenceDpe, presenceDateDepotPc, etiquetteDpe, valeurCep, valeurCeptop, valeurCepmax, dateDepotPc, normeThermique, anneeConstruction);
+            }
+        } catch (Exception e) {
+            commonLogger.eventTyp(EventTyp.APPLICATIVE).secEventTyp(SecEventTyp.METIER).logger().info("Calcul : update error");
+            aligne = "07";
+        }
+        return aligne;
     }
-
-    @Test
-    void should_throw_DpeAdemeNotFoundException_when_dpe_does_not_exist() throws Exception {
-        String numDpe = "123456";
-        Ademe ademe = Ademe.builder().results(Collections.emptyList()).build();
-        String responseBody = new ObjectMapper().writeValueAsString(ademe);
-
-        HttpResponse<String> httpResponse = mock(HttpResponse.class);
-        when(httpResponse.statusCode()).thenReturn(200);
-        when(httpResponse.body()).thenReturn(responseBody);
-
-        CompletableFuture<HttpResponse<String>> response = CompletableFuture.completedFuture(httpResponse);
-        when(ademeHttpClient.sendAsync(any(HttpRequest.class), ArgumentMatchers.<HttpResponse.BodyHandler<String>>any()))
-                .thenReturn(response);
-
-        when(jsonUtils.covertFromJsonToObject(responseBody, Ademe.class)).thenReturn(ademe);
-
-        assertThrows(DpeAdemeNotFoundException.class, () -> dpeAdemeService.getDpe(numDpe));
+    private String alignementAcquisition(boolean presenceDpe, boolean presenceDateDepotPc, String etiquetteDpe,
+                                         double valeurCep, double valeurCeptop, double valeurCepmax, Date dateDepotPc, String normeThermique, Integer anneeConstruction) throws ParseException {
+        if (presenceDateDepotPc) {
+            if (presenceDpe) {
+                return alignementAcquisitionDpePresent(etiquetteDpe, valeurCep, valeurCeptop, valeurCepmax, dateDepotPc, normeThermique);
+            } else {
+                return alignementAcquisitionDpeAbsent(dateDepotPc);
+            }
+        } else {
+            return alignementAcquisitionAncien(presenceDpe, etiquetteDpe, valeurCep, valeurCeptop, valeurCepmax, normeThermique, anneeConstruction);
+        }
     }
-
-    @Test
-    void should_get_DpeAdeme_from_neuf() throws Exception {
-        String numDpe = "123456";
-        DpeAdeme dpeAdeme = DpeAdeme.builder().numDpe(numDpe).build();
-        Ademe ademe = Ademe.builder().results(Collections.singletonList(dpeAdeme)).build();
-        String responseBody = new ObjectMapper().writeValueAsString(ademe);
-
-        HttpResponse<String> httpResponse = mock(HttpResponse.class);
-        when(httpResponse.statusCode()).thenReturn(200);
-        when(httpResponse.body()).thenReturn(responseBody);
-
-        CompletableFuture<HttpResponse<String>> response = CompletableFuture.completedFuture(httpResponse);
-        when(ademeHttpClient.sendAsync(any(HttpRequest.class), ArgumentMatchers.<HttpResponse.BodyHandler<String>>any()))
-                .thenReturn(response);
-
-        when(jsonUtils.covertFromJsonToObject(responseBody, Ademe.class)).thenReturn(ademe);
-
-        when(dpeAdemeRepositoryCustom.findByNumDpe(numDpe)).thenReturn(Optional.empty());
-        when(dpeAdemeRepository.save(dpeAdeme)).thenReturn(dpeAdeme);
-
-        DpeAdeme result = dpeAdemeService.getDpeNeuf(numDpe);
-        assertThat(result).isEqualTo(dpeAdeme);
+    private String alignementAcquisitionDpePresent(String etiquetteDpe, double valeurCep, double valeurCeptop, double valeurCepmax, Date dateDepotPc,
+                                                   String normeThermique) throws ParseException {
+        Date startDate = formatDate.parse("01/01/1700");
+        Date endDate = formatDate.parse("31/12/2012");
+        CalculAlignementStrategy calculAlignementFirstStrategy = new CalculAlignementStrategy();
+        if (dateDepotPc.compareTo(endDate) <= 0 && dateDepotPc.compareTo(startDate) > 0) {
+            return calculAlignementFirstStrategy.aligneDpeCep(etiquetteDpe, valeurCep, valeurCeptop);
+        } else if (dateDepotPc.compareTo(formatDate.parse("31/12/2020")) <= 0) {
+            return calculAlignementFirstStrategy.alignCepDpeEtNormeTh(etiquetteDpe, valeurCep, valeurCeptop, normeThermique, endDate);
+        } else if (dateDepotPc.compareTo(formatDate.parse("31/12/2021")) <= 0) {
+            return calculAlignementFirstStrategy.aligneCepCepmax(valeurCep, valeurCepmax);
+        } else {
+            return "01";
+        }
     }
-
-    @Test
-    void should_throw_DpeAdemeNotFoundException_when_dpe_does_not_exist_in_neuf() throws Exception {
-        String numDpe = "123456";
-        Ademe ademe = Ademe.builder().results(Collections.emptyList()).build();
-        String responseBody = new ObjectMapper().writeValueAsString(ademe);
-
-        HttpResponse<String> httpResponse = mock(HttpResponse.class);
-        when(httpResponse.statusCode()).thenReturn(200);
-        when(httpResponse.body()).thenReturn(responseBody);
-
-        CompletableFuture<HttpResponse<String>> response = CompletableFuture.completedFuture(httpResponse);
-        when(ademeHttpClient.sendAsync(any(HttpRequest.class), ArgumentMatchers.<HttpResponse.BodyHandler<String>>any()))
-                .thenReturn(response);
-
-        when(jsonUtils.covertFromJsonToObject(responseBody, Ademe.class)).thenReturn(ademe);
-
-        assertThrows(DpeAdemeNotFoundException.class, () -> dpeAdemeService.getDpeNeuf(numDpe));
+    private String alignementAcquisitionDpeAbsent(Date dateDepotPc) throws ParseException {
+        if (dateDepotPc.compareTo(formatDate.parse("01/01/2022")) >= 0) {
+            return "01";
+        } else {
+            return "07";
+        }
+    }
+    private String alignementAcquisitionAncien(boolean presenceDpe, String etiquetteDpe, double valeurCep, double valeurCeptop, double valeurCepmax
+            , String normeThermique, Integer anneeConstruction) throws ParseException {
+        Date endDate = formatDate.parse("31/12/2012");
+        CalculAlignementStrategy calculAlignementFirstStrategy = new CalculAlignementStrategy();
+        if (presenceDpe && anneeConstruction > 1700 && anneeConstruction <= 2012) {
+            return calculAlignementFirstStrategy.alignCepDpeEtNormeTh(etiquetteDpe, valeurCep, valeurCeptop, normeThermique, endDate);
+        } else if (anneeConstruction <= 2020) {
+            return calculAlignementFirstStrategy.alignCepDpeEtNormeTh(etiquetteDpe, valeurCep, valeurCeptop, normeThermique, endDate);
+        } else if (anneeConstruction.equals(2021)) {
+            return calculAlignementFirstStrategy.aligneCepCepmax(valeurCep, valeurCepmax);
+        } else if (anneeConstruction >= 2022) {
+            return calculAlignementFirstStrategy.aligneCepCepmaxNorm(valeurCep, valeurCepmax, normeThermique);
+        } else {
+            return "07";
+        }
+    }
+    private double checkRefValue(Referentiel referentiel)
+    {
+        if (referentiel != null) {
+            return Double.parseDouble(referentiel.getValeur1());
+        } else {
+            return 0;
+        }
     }
 }
