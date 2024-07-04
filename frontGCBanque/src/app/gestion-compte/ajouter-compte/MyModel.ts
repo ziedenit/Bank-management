@@ -1,9 +1,8 @@
 package com.cl.msofd.service;
 
 import com.cl.msofd.clients.*;
-import com.cl.msofd.clients.Error;
 import com.cl.msofd.exception.ClientNotFoundException;
-import com.cl.msofd.model.ClientEntreprise;
+import com.cl.msofd.model.ClientParticulier;
 import com.cl.msofd.utility.JSONUtilOFD;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,7 +17,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -28,10 +26,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
-class EntrepriseServiceTest {
+class ClientServiceTest {
 
     @Autowired
-    private EntrepriseService entrepriseService;
+    private ClientService clientService;
 
     @MockBean(name = "httpClient")
     private HttpClient httpClient;
@@ -48,16 +46,18 @@ class EntrepriseServiceTest {
     }
 
     @Test
-    void should_return_ClientEntreprise_for_LEGAL_PERSON() throws Exception {
+    void should_return_ClientParticulier_for_INDIVIDUAL() throws Exception {
         ClientDetails clientDetails = new ClientDetails();
-        clientDetails.setPersonType("LEGAL_PERSON");
+        clientDetails.setPersonType("INDIVIDUAL");
         clientDetails.setPersonId("12345");
-        clientDetails.setCasaData(new DescriptiveCompany("123456789", "Mock Company"));
-        DescriptiveIndividual representative = new DescriptiveIndividual();
-        representative.setFirstName("John");
-        representative.setUsualLastName("Doe");
-        representative.setCivility(new Civility());
-        clientDetails.setRepresentativesLegals(Collections.singletonList(representative));
+        DescriptiveIndividual descriptiveIndividual = new DescriptiveIndividual();
+        descriptiveIndividual.setFirstName("John");
+        descriptiveIndividual.setUsualLastName("Doe");
+        Civility civility = new Civility();
+        civility.setLabel("Mr");
+        descriptiveIndividual.setCivility(civility);
+        descriptiveIndividual.setBirthDate(java.sql.Date.valueOf("2000-01-01"));
+        clientDetails.setDescriptiveIndividual(descriptiveIndividual);
 
         ClientResponse clientResponse = new ClientResponse();
         clientResponse.setEntrepriseDetails(clientDetails);
@@ -73,17 +73,15 @@ class EntrepriseServiceTest {
 
         when(jsonUtils.covertFromJsonToObject(responseBody, ClientResponse.class)).thenReturn(clientResponse);
 
-        ClientEntreprise expectedClient = ClientEntreprise.builder()
+        ClientParticulier expectedClient = ClientParticulier.builder()
                 .idReper("12345")
-                .typePerson("LEGAL_PERSON")
-                .siren("123456789")
-                .legalName("Mock Company")
-                .firstName("John")
-                .usuaLastName("Doe")
-                .civilite(representative.getCivility().getLabel())
+                .nomUsageClient("Doe")
+                .prenomClient("John")
+                .dateNaissanceClient(java.sql.Date.valueOf("2000-01-01"))
+                .civility("Mr")
                 .build();
 
-        ClientEntreprise actualClient = entrepriseService.getClient("12345");
+        ClientParticulier actualClient = clientService.getClient("12345");
 
         assertThat(actualClient).isEqualTo(expectedClient);
     }
@@ -105,9 +103,8 @@ class EntrepriseServiceTest {
         when(httpClient.sendAsync(any(HttpRequest.class), ArgumentMatchers.<HttpResponse.BodyHandler<String>>any()))
                 .thenReturn(response);
 
-        assertThatThrownBy(() -> entrepriseService.getClient("unknownId"))
+        assertThatThrownBy(() -> clientService.getClient("unknownId"))
                 .isInstanceOf(ClientNotFoundException.class)
                 .hasMessage("Client not found");
     }
-
 }
