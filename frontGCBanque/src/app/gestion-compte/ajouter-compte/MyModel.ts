@@ -1,124 +1,269 @@
 package com.cl.msofd.service;
 
-import com.cl.msofd.clients.Error;
-import com.cl.msofd.clients.*;
 import com.cl.msofd.exception.ClientNotFoundException;
+import com.cl.msofd.clients.ClientResponse;
+import com.cl.msofd.clients.Error;
 import com.cl.msofd.model.ClientParticulier;
 import com.cl.msofd.utility.JSONUtilOFD;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.mockito.junit.jupiter.MockitoExtension;
-
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 import java.io.IOException;
+import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.sql.Date;
+import java.net.http.HttpResponse.BodyHandlers;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+@Service
+public class ClientService {
+    public static final String AUTHORIZATION = "Authorization";
 
-@ExtendWith(MockitoExtension.class)
-public class ClientServiceTest {
-
-    @Mock
+    @Autowired
     private HttpClient httpClient;
 
-    @Mock
+    @Autowired
     private JSONUtilOFD jsonUtils;
 
-    @InjectMocks
-    private ClientService clientService;
+    @Value("${referentiel.personne.url}")
+    private String referentielPersonne;
 
-    @BeforeEach
-    public void setUp() {
-        MockitoAnnotations.openMocks(this);
-        when(clientService.referentielPersonne).thenReturn("http://example.com/api/client/%s");
-        when(jsonUtils.basicAuthReferentiel()).thenReturn("Basic dGVzdDp0ZXN0"); // Exemple d'un auth header Basic
-    }
 
-    @Test
-    void testGetClient_Success() throws IOException, InterruptedException, ExecutionException, ClientNotFoundException {
-        // Mock des données de réponse de l'API
-        ClientDetails clientDetails = ClientDetails.builder()
-                .personId("12345")
-                .descriptiveIndividual(DescriptiveIndividual.builder()
-                        .usualLastName("Doe")
-                        .firstName("John")
-                        .birthDate(Date.valueOf("1990-01-01"))  // Date corrigée
-                        .civility(new Civility("Mr"))
-                        .build())
+    public ClientParticulier getClient(String idReper) throws IOException, InterruptedException, ExecutionException , ClientNotFoundException {
+        String url = String.format(referentielPersonne, idReper).concat("&person_type=INDIVIDUAL");
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .header(AUTHORIZATION, jsonUtils.basicAuthReferentiel())
                 .build();
 
-        ClientResponse clientResponse = ClientResponse.builder()
-                .entrepriseDetails(clientDetails)
+        CompletableFuture<HttpResponse<String>> response = httpClient.sendAsync(request, BodyHandlers.ofString());
+        HttpResponse<String> httpResponse = response.get();
+        String responseBody = httpResponse.body();
+
+        
+        // Vérifiez si la réponse est un tableau d'erreurs
+        if (httpResponse.statusCode() != 200 || responseBody.startsWith("[")) {
+            // Parsez le tableau d'erreurs
+            ObjectMapper objectMapper = new ObjectMapper();
+            Error[] errors = objectMapper.readValue(responseBody, Error[].class);
+            for (Error error : errors) {
+                if (error.getCode().equals("B801")) {
+                    throw new ClientNotFoundException(error.getMessage());
+                }
+            }
+        }
+
+        ClientResponse personDetails = jsonUtils.covertFromJsonToObject(responseBody, ClientResponse.class);
+        if (personDetails == null) {
+            throw new ClientNotFoundException("Client not found");
+        }
+        return ClientParticulier.builder()
+                .idReper(personDetails.getEntrepriseDetails().getPersonId())
+                .nomUsageClient(personDetails.getEntrepriseDetails().getDescriptiveIndividual().getUsualLastName())
+                .prenomClient(personDetails.getEntrepriseDetails().getDescriptiveIndividual().getFirstName())
+                .dateNaissanceClient(personDetails.getEntrepriseDetails().getDescriptiveIndividual().getBirthDate())
+                .civility(personDetails.getEntrepriseDetails().getDescriptiveIndividual().getCivility().getLabel())
                 .build();
-
-        // Mock des utils JSON
-        when(jsonUtils.covertFromJsonToObject(anyString(), any())).thenReturn(clientResponse);
-
-        // Création d'une réponse HTTP simulée
-        HttpResponse<String> httpResponse = mock(HttpResponse.class);
-        when(httpResponse.statusCode()).thenReturn(200);
-        when(httpResponse.body()).thenReturn("{\"person_details\":{\"person_id\":\"12345\",\"descriptive_individual\":{\"usual_last_name\":\"Doe\",\"first_name\":\"John\",\"birth_date\":\"01/01/1990\",\"civility\":{\"label\":\"Mr\"}}}}");
-
-        when(httpClient.sendAsync(any(HttpRequest.class), any(HttpResponse.BodyHandler.class)))
-                .thenReturn(CompletableFuture.completedFuture(httpResponse));
-
-        // Test de la méthode getClient
-        ClientParticulier clientParticulier = clientService.getClient("12345");
-
-        assertEquals("12345", clientParticulier.getIdReper());
-        assertEquals("Doe", clientParticulier.getNomUsageClient());
-        assertEquals("John", clientParticulier.getPrenomClient());
-        assertEquals(Date.valueOf("1990-01-01"), clientParticulier.getDateNaissanceClient());
-        assertEquals("Mr", clientParticulier.getCivility());
-    }
-
-    @Test
-    void testGetClient_ClientNotFound() throws IOException, InterruptedException, ExecutionException {
-        // Mock des données d'erreur de l'API
-        String responseBody = "[{\"code\":\"B801\",\"message\":\"Client not found\"}]";
-        HttpResponse<String> httpResponse = mock(HttpResponse.class);
-        when(httpResponse.statusCode()).thenReturn(404);
-        when(httpResponse.body()).thenReturn(responseBody);
-
-        when(httpClient.sendAsync(any(HttpRequest.class), any(HttpResponse.BodyHandler.class)))
-                .thenReturn(CompletableFuture.completedFuture(httpResponse));
-
-        // Test de la méthode getClient en cas d'erreur
-        assertThrows(ClientNotFoundException.class, () -> clientService.getClient("12345"));
-    }
-
-    @Test
-    void testGetClient_NoPersonDetails() throws IOException, InterruptedException, ExecutionException {
-        // Mock des données de réponse sans détails de personne
-        ClientResponse clientResponse = ClientResponse.builder()
-                .entrepriseDetails(null)
-                .build();
-
-        // Mock des utils JSON
-        when(jsonUtils.covertFromJsonToObject(anyString(), any())).thenReturn(clientResponse);
-
-        // Création d'une réponse HTTP simulée
-        HttpResponse<String> httpResponse = mock(HttpResponse.class);
-        when(httpResponse.statusCode()).thenReturn(200);
-        when(httpResponse.body()).thenReturn("{\"person_details\":null}");
-
-        when(httpClient.sendAsync(any(HttpRequest.class), any(HttpResponse.BodyHandler.class)))
-                .thenReturn(CompletableFuture.completedFuture(httpResponse));
-
-        // Test de la méthode getClient en cas de détails de personne null
-        assertThrows(ClientNotFoundException.class, () -> clientService.getClient("12345"));
     }
 }
+//
+
+package com.cl.msofd.model;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.*;
+
+import java.io.Serializable;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class ClientParticulier implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    private String idReper;
+
+    private String nomUsageClient;
+
+    private String prenomClient;
+
+    @JsonFormat(pattern = "dd/MM/yyyy")
+    private java.sql.Date dateNaissanceClient;
+
+    private String civility;
+}
+//
+package com.cl.msofd.clients;
+
+import java.io.Serializable;
+import java.util.List;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+
+@JsonIgnoreProperties(ignoreUnknown=true)
+public class ClientDetails  implements Serializable {
+	private static final long serialVersionUID = 1L;
+	  @JsonProperty("person_type")
+	    private String personType;
+	  
+	  @JsonProperty("person_id")
+	    private String personId;
+	    	    
+	  @JsonProperty("descriptive_individual")
+	    private DescriptiveIndividual descriptiveIndividual;
+     
+      @JsonProperty("casa_data")
+       private DescriptiveCompany casaData;
+      
+      @JsonProperty("representatives_legals")
+      private List <DescriptiveIndividual>  representativesLegals;
+     
+}
+//
+package com.cl.msofd.clients;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.io.Serializable;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+
+@JsonIgnoreProperties(ignoreUnknown=true)
+public class DescriptiveIndividual implements Serializable {
+	
+	
+    @JsonProperty("usual_last_name")
+    private String usualLastName;
+
+    @JsonProperty("first_name")
+    private String firstName;
+
+    @JsonProperty("civility")
+    private Civility civility;
+    
+    @JsonProperty("birth_date")
+    private java.sql.Date birthDate;
+
+}
+//
+package com.cl.msofd.clients;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.io.Serializable;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+
+@JsonIgnoreProperties(ignoreUnknown=true)
+public class Civility implements Serializable {
+    private int code;
+    private String label;
+}
+//
+package com.cl.msofd.clients;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.io.Serializable;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+
+@JsonIgnoreProperties(ignoreUnknown=true)
+public class DescriptiveCompany implements Serializable {
+
+	@JsonProperty("siren")
+    private String siren;
+	
+	@JsonProperty("legal_name")
+    private String legalName;
+
+}
+
+//
+package com.cl.msofd.clients;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.io.Serializable;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+
+@JsonIgnoreProperties(ignoreUnknown=true)
+public class DescriptiveIndividual implements Serializable {
+	
+	
+    @JsonProperty("usual_last_name")
+    private String usualLastName;
+
+    @JsonProperty("first_name")
+    private String firstName;
+
+    @JsonProperty("civility")
+    private Civility civility;
+    
+    @JsonProperty("birth_date")
+    private java.sql.Date birthDate;
+
+}
+
+Bonjour je veux creer une classe de test pour le service ci dessus sanchant que je dois mocker referentielPersonne merc 
+
+
