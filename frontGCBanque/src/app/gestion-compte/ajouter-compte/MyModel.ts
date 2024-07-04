@@ -1,95 +1,43 @@
-package com.cl.msofd.service;
+java.lang.IllegalStateException: Failed to load ApplicationContext for [WebMergedContextConfiguration@401788d5 testClass = com.cl.msofd.service.EntrepriseServiceTest, locations = [], classes = [com.cl.msofd.MsofdApplication], contextInitializerClasses = [], activeProfiles = [], propertySourceDescriptors = [], propertySourceProperties = ["org.springframework.boot.test.context.SpringBootTestContextBootstrapper=true"], contextCustomizers = [org.springframework.boot.test.context.filter.ExcludeFilterContextCustomizer@3527942a, org.springframework.boot.test.json.DuplicateJsonObjectContextCustomizerFactory$DuplicateJsonObjectContextCustomizer@4f80542f, org.springframework.boot.test.mock.mockito.MockitoContextCustomizer@8a258112, org.springframework.boot.test.web.client.TestRestTemplateContextCustomizer@2892d68, org.springframework.boot.test.autoconfigure.actuate.observability.ObservabilityContextCustomizerFactory$DisableObservabilityContextCustomizer@1f, org.springframework.boot.test.autoconfigure.properties.PropertyMappingContextCustomizer@0, org.springframework.boot.test.autoconfigure.web.servlet.WebDriverContextCustomizer@543295b0, org.springframework.boot.test.context.SpringBootTestAnnotation@4b5ab2e4], resourceBasePath = "src/main/webapp", contextLoader = org.springframework.boot.test.context.SpringBootContextLoader, parent = null]
 
-import com.cl.msofd.clients.ClientResponse;
-import com.cl.msofd.clients.Error;
-import com.cl.msofd.exception.ClientNotFoundException;
-import com.cl.msofd.model.ClientEntreprise;
-import com.cl.msofd.utility.JSONUtilOFD;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatchers;
-import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-
-import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.util.concurrent.CompletableFuture;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-
-@SpringBootTest
-class EntrepriseServiceTest {
-
-    @Autowired
-    private EntrepriseService entrepriseService;
-
-    @MockBean
-    private HttpClient httpClient;
-
-    @MockBean
-    private JSONUtilOFD jsonUtils;
-
-    private final String referentielPersonneUrl = "http://example.com/referentiel/personne?idReper=%s";
-
-    @BeforeEach
-    void setUp() {
-        // Mock the URL value
-        Mockito.when(jsonUtils.basicAuthReferentiel()).thenReturn("Basic Auth");
-    }
-
-    @Test
-    void should_return_ClientEntreprise_for_LEGAL_PERSON() throws Exception {
-        // Mock the HttpClient response
-        ClientResponse clientResponse = new ClientResponse(); // Populate with necessary mock data
-        String responseBody = new ObjectMapper().writeValueAsString(clientResponse);
-        HttpResponse<String> httpResponse = Mockito.mock(HttpResponse.class);
-        when(httpResponse.statusCode()).thenReturn(200);
-        when(httpResponse.body()).thenReturn(responseBody);
-
-        CompletableFuture<HttpResponse<String>> response = CompletableFuture.completedFuture(httpResponse);
-        when(httpClient.sendAsync(any(HttpRequest.class), ArgumentMatchers.<HttpResponse.BodyHandler<String>>any()))
-                .thenReturn(response);
-
-        when(jsonUtils.covertFromJsonToObject(responseBody, ClientResponse.class)).thenReturn(clientResponse);
-
-        // Create a sample ClientResponse for LEGAL_PERSON
-        ClientEntreprise expectedClient = new ClientEntreprise(); // Populate with expected data
-
-        ClientEntreprise actualClient = entrepriseService.getClient("12345");
-
-        assertThat(actualClient).isEqualTo(expectedClient);
-    }
-
-    @Test
-    void should_throw_ClientNotFoundException_for_unknown_id() throws Exception {
-        // Mock the HttpClient response with an error
-        Error error = new Error();
-        error.setCode("B801");
-        error.setMessage("Client not found");
-        Error[] errors = {error};
-        String errorResponse = new ObjectMapper().writeValueAsString(errors);
-
-        HttpResponse<String> httpResponse = Mockito.mock(HttpResponse.class);
-        when(httpResponse.statusCode()).thenReturn(404);
-        when(httpResponse.body()).thenReturn(errorResponse);
-
-        CompletableFuture<HttpResponse<String>> response = CompletableFuture.completedFuture(httpResponse);
-        when(httpClient.sendAsync(any(HttpRequest.class), ArgumentMatchers.<HttpResponse.BodyHandler<String>>any()))
-                .thenReturn(response);
-
-        assertThatThrownBy(() -> entrepriseService.getClient("unknownId"))
-                .isInstanceOf(ClientNotFoundException.class)
-                .hasMessage("Client not found");
-    }
-
-    // Add more tests to cover different scenarios, e.g. for INDIVIDUAL_COMPANY and other edge cases.
-}
+	at org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.loadContext(DefaultCacheAwareContextLoaderDelegate.java:180)
+	at org.springframework.test.context.support.DefaultTestContext.getApplicationContext(DefaultTestContext.java:130)
+	at org.springframework.test.context.web.ServletTestExecutionListener.setUpRequestContextIfNecessary(ServletTestExecutionListener.java:191)
+	at org.springframework.test.context.web.ServletTestExecutionListener.prepareTestInstance(ServletTestExecutionListener.java:130)
+	at org.springframework.test.context.TestContextManager.prepareTestInstance(TestContextManager.java:260)
+	at org.springframework.test.context.junit.jupiter.SpringExtension.postProcessTestInstance(SpringExtension.java:163)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197)
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:179)
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(ArrayList.java:1625)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:509)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:499)
+	at java.base/java.util.stream.StreamSpliterators$WrappingSpliterator.forEachRemaining(StreamSpliterators.java:310)
+	at java.base/java.util.stream.Streams$ConcatSpliterator.forEachRemaining(Streams.java:735)
+	at java.base/java.util.stream.Streams$ConcatSpliterator.forEachRemaining(Streams.java:734)
+	at java.base/java.util.stream.ReferencePipeline$Head.forEach(ReferencePipeline.java:762)
+	at java.base/java.util.Optional.orElseGet(Optional.java:364)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+Caused by: java.lang.IllegalStateException: Unable to register mock bean java.net.http.HttpClient expected a single matching bean to replace but found [ademeHttpClient, httpClient]
+	at org.springframework.boot.test.mock.mockito.MockitoPostProcessor.getBeanName(MockitoPostProcessor.java:220)
+	at org.springframework.boot.test.mock.mockito.MockitoPostProcessor.registerMock(MockitoPostProcessor.java:177)
+	at org.springframework.boot.test.mock.mockito.MockitoPostProcessor.register(MockitoPostProcessor.java:167)
+	at org.springframework.boot.test.mock.mockito.MockitoPostProcessor.postProcessBeanFactory(MockitoPostProcessor.java:141)
+	at org.springframework.boot.test.mock.mockito.MockitoPostProcessor.postProcessBeanFactory(MockitoPostProcessor.java:129)
+	at org.springframework.context.support.PostProcessorRegistrationDelegate.invokeBeanFactoryPostProcessors(PostProcessorRegistrationDelegate.java:363)
+	at org.springframework.context.support.PostProcessorRegistrationDelegate.invokeBeanFactoryPostProcessors(PostProcessorRegistrationDelegate.java:197)
+	at org.springframework.context.support.AbstractApplicationContext.invokeBeanFactoryPostProcessors(AbstractApplicationContext.java:788)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:606)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:754)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:456)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:334)
+	at org.springframework.boot.test.context.SpringBootContextLoader.lambda$loadContext$3(SpringBootContextLoader.java:137)
+	at org.springframework.util.function.ThrowingSupplier.get(ThrowingSupplier.java:58)
+	at org.springframework.util.function.ThrowingSupplier.get(ThrowingSupplier.java:46)
+	at org.springframework.boot.SpringApplication.withHook(SpringApplication.java:1454)
+	at org.springframework.boot.test.context.SpringBootContextLoader$ContextLoaderHook.run(SpringBootContextLoader.java:553)
+	at org.springframework.boot.test.context.SpringBootContextLoader.loadContext(SpringBootContextLoader.java:137)
+	at org.springframework.boot.test.context.SpringBootContextLoader.loadContext(SpringBootContextLoader.java:108)
+	at org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.loadContextInternal(DefaultCacheAwareContextLoaderDelegate.java:225)
+	at org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.loadContext(DefaultCacheAwareContextLoaderDelegate.java:152)
+	... 17 more
