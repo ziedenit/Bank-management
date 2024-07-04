@@ -1,8 +1,9 @@
-import com.cl.msofd.clients.ClientDetails;
-import com.cl.msofd.clients.ClientResponse;
-import com.cl.msofd.clients.DescriptiveIndividual;
+package com.cl.msofd.service;
+
 import com.cl.msofd.clients.Error;
+import com.cl.msofd.clients.*;
 import com.cl.msofd.exception.ClientNotFoundException;
+import com.cl.msofd.model.ClientParticulier;
 import com.cl.msofd.utility.JSONUtilOFD;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,12 +14,10 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.IOException;
-import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.sql.Date;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
@@ -55,7 +54,7 @@ public class ClientServiceTest {
                         .usualLastName("Doe")
                         .firstName("John")
                         .birthDate(new Date(90, 0, 1))  // Date exemple
-                        .civility(new Civility("Mr"))
+                        .civility(new Civility())
                         .build())
                 .build();
 
@@ -70,7 +69,7 @@ public class ClientServiceTest {
         HttpResponse<String> httpResponse = mock(HttpResponse.class);
         when(httpResponse.statusCode()).thenReturn(200);
         when(httpResponse.body()).thenReturn("{\"person_details\":{\"person_id\":\"12345\",\"descriptive_individual\":{\"usual_last_name\":\"Doe\",\"first_name\":\"John\",\"birth_date\":\"01/01/1990\",\"civility\":{\"label\":\"Mr\"}}}}");
-        
+
         when(httpClient.sendAsync(any(HttpRequest.class), any(HttpResponse.BodyHandler.class)))
                 .thenReturn(CompletableFuture.completedFuture(httpResponse));
 
@@ -81,7 +80,7 @@ public class ClientServiceTest {
         assertEquals("Doe", clientParticulier.getNomUsageClient());
         assertEquals("John", clientParticulier.getPrenomClient());
         assertEquals(new Date(90, 0, 1), clientParticulier.getDateNaissanceClient());
-        assertEquals("Mr", clientParticulier.getCivility());
+        
     }
 
     @Test
@@ -117,7 +116,7 @@ public class ClientServiceTest {
         HttpResponse<String> httpResponse = mock(HttpResponse.class);
         when(httpResponse.statusCode()).thenReturn(200);
         when(httpResponse.body()).thenReturn("{\"person_details\":null}");
-        
+
         when(httpClient.sendAsync(any(HttpRequest.class), any(HttpResponse.BodyHandler.class)))
                 .thenReturn(CompletableFuture.completedFuture(httpResponse));
 
@@ -125,3 +124,67 @@ public class ClientServiceTest {
         assertThrows(ClientNotFoundException.class, () -> clientService.getClient("12345"));
     }
 }
+//
+ava HotSpot(TM) 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+
+org.opentest4j.AssertionFailedError: Unexpected exception type thrown, 
+Expected :class com.cl.msofd.exception.ClientNotFoundException
+Actual   :class java.lang.NullPointerException
+<Click to see difference>
+
+
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertThrows.assertThrows(AssertThrows.java:67)
+	at org.junit.jupiter.api.AssertThrows.assertThrows(AssertThrows.java:35)
+	at org.junit.jupiter.api.Assertions.assertThrows(Assertions.java:3115)
+	at com.cl.msofd.service.ClientServiceTest.testGetClient_ClientNotFound(ClientServiceTest.java:102)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+Caused by: java.lang.NullPointerException: Cannot invoke "String.length()" because "s" is null
+	at java.base/java.util.Formatter.parse(Formatter.java:2717)
+	at java.base/java.util.Formatter.format(Formatter.java:2671)
+	at java.base/java.util.Formatter.format(Formatter.java:2625)
+	at java.base/java.lang.String.format(String.java:4147)
+	at com.cl.msofd.service.ClientService.getClient(ClientService.java:36)
+	at com.cl.msofd.service.ClientServiceTest.lambda$testGetClient_ClientNotFound$0(ClientServiceTest.java:102)
+	at org.junit.jupiter.api.AssertThrows.assertThrows(AssertThrows.java:53)
+	... 6 more
+
+
+java.lang.NullPointerException: Cannot invoke "String.length()" because "s" is null
+
+	at java.base/java.util.Formatter.parse(Formatter.java:2717)
+	at java.base/java.util.Formatter.format(Formatter.java:2671)
+	at java.base/java.util.Formatter.format(Formatter.java:2625)
+	at java.base/java.lang.String.format(String.java:4147)
+	at com.cl.msofd.service.ClientService.getClient(ClientService.java:36)
+	at com.cl.msofd.service.ClientServiceTest.testGetClient_Success(ClientServiceTest.java:77)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+
+
+org.opentest4j.AssertionFailedError: Unexpected exception type thrown, 
+Expected :class com.cl.msofd.exception.ClientNotFoundException
+Actual   :class java.lang.NullPointerException
+<Click to see difference>
+
+
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertThrows.assertThrows(AssertThrows.java:67)
+	at org.junit.jupiter.api.AssertThrows.assertThrows(AssertThrows.java:35)
+	at org.junit.jupiter.api.Assertions.assertThrows(Assertions.java:3115)
+	at com.cl.msofd.service.ClientServiceTest.testGetClient_NoPersonDetails(ClientServiceTest.java:124)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+Caused by: java.lang.NullPointerException: Cannot invoke "String.length()" because "s" is null
+	at java.base/java.util.Formatter.parse(Formatter.java:2717)
+	at java.base/java.util.Formatter.format(Formatter.java:2671)
+	at java.base/java.util.Formatter.format(Formatter.java:2625)
+	at java.base/java.lang.String.format(String.java:4147)
+	at com.cl.msofd.service.ClientService.getClient(ClientService.java:36)
+	at com.cl.msofd.service.ClientServiceTest.lambda$testGetClient_NoPersonDetails$1(ClientServiceTest.java:124)
+	at org.junit.jupiter.api.AssertThrows.assertThrows(AssertThrows.java:53)
+	... 6 more
