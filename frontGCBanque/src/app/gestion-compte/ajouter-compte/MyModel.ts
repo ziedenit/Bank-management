@@ -1,223 +1,366 @@
+package com.cl.msofd.controller;
+
+import com.cl.logs.commun.CommonLogger;
+import com.cl.logs.commun.CommonLoggerFactory;
+import com.cl.logs.types.EventTyp;
+import com.cl.logs.types.SecEventTyp;
+import com.cl.msofd.exception.DpeAdemeNotFoundException;
+import com.cl.msofd.exception.ErrorResponse;
+import com.cl.msofd.model.DpeAdeme;
+import com.cl.msofd.service.DpeAdemeService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.annotation.Resource;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.io.IOException;
+import java.util.concurrent.ExecutionException;
+
+@RestController
+@RequestMapping("/api/v1")
+public class AdemeController {
+
+
+    @Resource
+    private DpeAdemeService dpeAdemeService;
+
+    private final CommonLogger commonLogger = CommonLoggerFactory.getLogger(AdemeController.class);
+
+
+    @Operation(summary = "Get ademe dpe", description = "Returns a dpe object retrieved from the ademe API")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successful operation"),
+            @ApiResponse(responseCode = "404", description = "Not Found", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema())),
+            @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+    })
+
+    @GetMapping("ademe/dpe/{numDpe}")
+    public ResponseEntity<DpeAdeme> getDpe(
+            @Parameter(description = "ademe number = dpe number: unique identifier for each dpe document", required = true)
+            @PathVariable(value = "numDpe") String numDpe) throws IOException, ExecutionException, InterruptedException {
+        ResponseEntity<DpeAdeme> responseEntity = ResponseEntity.noContent().build();
+        commonLogger.eventTyp(EventTyp.APPLICATIVE).secEventTyp(SecEventTyp.METIER).logger().info("getDpeAdeme : {}", numDpe);
+
+        try {
+            DpeAdeme dpeAdeme = dpeAdemeService.getDpe(numDpe);
+            responseEntity = ResponseEntity.ok(dpeAdeme);
+            return responseEntity;
+        } catch (InterruptedException ie) {
+            commonLogger.eventTyp(EventTyp.APPLICATIVE).secEventTyp(SecEventTyp.METIER).logger().error("InterruptedException: ", ie);
+            Thread.currentThread().interrupt();
+        } catch (ExecutionException ee) {
+            commonLogger.eventTyp(EventTyp.APPLICATIVE).secEventTyp(SecEventTyp.METIER).logger().error("ExecutionException: ", ee);
+        } catch (DpeAdemeNotFoundException ademeE) {
+            // Si DpeAdemeNotFoundException est levée par getDpe, appeler getDpeNeuf
+            DpeAdeme dpeAdemeNeuf = dpeAdemeService.getDpeNeuf(numDpe);
+            responseEntity = ResponseEntity.ok(dpeAdemeNeuf);
+            return responseEntity;
+        }
+
+        return responseEntity;
+    }
+}
+
+
+
+
+
+je veux creer une classe de test pour ce controlleur sanchant que le service DpeAdemeService 
+    est le suivant 
 package com.cl.msofd.service;
 
 import com.cl.logs.commun.CommonLogger;
 import com.cl.logs.commun.CommonLoggerFactory;
 import com.cl.logs.types.EventTyp;
 import com.cl.logs.types.SecEventTyp;
-import com.cl.msofd.dto.FinancementDto;
-import com.cl.msofd.dto.FinancementGarantieDto;
-import com.cl.msofd.dto.GarantieDto;
-import com.cl.msofd.dto.ResponseFinancementGarantieDto;
-import com.cl.msofd.exception.FinancementNotFoundException;
-import com.cl.msofd.exception.GarantieNotFoundException;
-import com.cl.msofd.exception.ListObjetNotFoundException;
-import com.cl.msofd.mapper.FinancementMapper;
-import com.cl.msofd.model.*;
-import com.cl.msofd.repository.FinancementRepository;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.cl.msofd.exception.DpeAdemeExistingException;
+import com.cl.msofd.exception.DpeAdemeNotFoundException;
+import com.cl.msofd.model.Ademe;
+import com.cl.msofd.model.DpeAdeme;
+import com.cl.msofd.repository.DpeAdemeRepository;
+import com.cl.msofd.repository.DpeAdemeRepositoryCustom;
+import com.cl.msofd.utility.Constants;
+import com.cl.msofd.utility.JSONUtilOFD;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import java.lang.reflect.Method;
-import java.util.*;
-import java.util.stream.Collectors;
+
+import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.net.http.HttpResponse.BodyHandlers;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 @Service
-public class FinancementService {
-    private final ObjectMapper objectMapper;
-    private static final CommonLogger commonLogger = CommonLoggerFactory.getLogger(FinancementService.class);
+public class DpeAdemeService {
 
     @Autowired
-    private FinancementRepository financementRepository;
+    private DpeAdemeRepository dpeAdemeRepository;
 
     @Autowired
-    private FinancementMapper financementMapper;
+    private DpeAdemeRepositoryCustom dpeAdemeRepositoryCustom;
 
     @Autowired
-    private IdGeneratorService idGeneratorService;
+    private HttpClient ademeHttpClient;
 
-    public FinancementService() {
-        this.objectMapper = new ObjectMapper();
-        this.objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    @Autowired
+    private JSONUtilOFD jsonUtils;
+
+
+    private final CommonLogger commonLogger = CommonLoggerFactory.getLogger(DpeAdemeService.class);
+
+
+
+
+    public DpeAdeme create(DpeAdeme dpeAdeme) {
+        commonLogger.eventTyp(EventTyp.APPLICATIVE).secEventTyp(SecEventTyp.METIER).logger().info("create dpeAdeme : {}", dpeAdeme);
+        Optional<DpeAdeme> existingDpe = dpeAdemeRepositoryCustom.findByNumDpe(dpeAdeme.getNumDpe());
+        return (DpeAdeme) existingDpe.map(dpe -> {
+            throw new DpeAdemeExistingException(String.format("le numéro DPE %s est déja crée ", dpeAdeme.getNumDpe()));
+        }).orElseGet(() -> dpeAdemeRepository.save(dpeAdeme));
     }
 
-    public Financement createFinancement(Financement financement) {
-        financement.setIdFinancement(idGeneratorService.generateId("F"));
-        if (financement.getObjetFinancement() != null) {
-            financement.getObjetFinancement().forEach(objetFinancement -> {
-                objetFinancement.setIdObjetFinancement(idGeneratorService.generateId("O"));
-                if (objetFinancement.getGarantie() != null) {
-                    objetFinancement.getGarantie().forEach(garantie -> {
-                        garantie.setIdGarantie(idGeneratorService.generateId("G"));
-                    });
-                }
-            });
-        }
-        return financementRepository.save(financement);
-    }
 
-    public void deleteFinancementByIdFinancement(String id) {
-        financementRepository.deleteByIdFinancement(id);
-    }
+    public DpeAdeme getDpe(String numDpe) throws ExecutionException, InterruptedException, IOException {
+        DpeAdeme dpeAdemePersist = null;
+        commonLogger.eventTyp(EventTyp.APPLICATIVE).secEventTyp(SecEventTyp.METIER).logger().info("OFD : Requête Ademe numéro DPE : {}", numDpe);
 
-    public Financement getFinancementByIdFinancement(String idFinancement) {
-        return financementRepository.findByidFinancement(idFinancement)
-                .orElseThrow(() -> new FinancementNotFoundException(
-                        String.format("Le financement %s est inexistant", idFinancement)));
-    }
+        String url = Constants.ADEME_URL + numDpe;
 
-    public List<ObjetFinancement> getListObjectFinancementByIdFinancement(String idFinancement) {
-        commonLogger.eventTyp(EventTyp.APPLICATIVE).secEventTyp(SecEventTyp.METIER).logger().info("Recherche de la liste des objets de financement pour l'ID : {}", idFinancement);
-        Financement financement = getFinancementByIdFinancement(idFinancement);
-        List<ObjetFinancement> listObjetsFinancement = financement.getObjetFinancement();
-        if (listObjetsFinancement == null || listObjetsFinancement.isEmpty()) {
-            throw new ListObjetNotFoundException(
-                    String.format("Pas de liste d'objets de financement pour le financement ayant comme ID : %s", idFinancement));
-        }
-        return listObjetsFinancement;
-    }
+        HttpRequest request = HttpRequest.
+                newBuilder()
+                .uri(URI.create(url))
+                .build();
 
-    public String createFinancementReturnId(FinancementDto financementDto) {
-        commonLogger.eventTyp(EventTyp.APPLICATIVE).secEventTyp(SecEventTyp.METIER).logger().info("create financement from  {} :", financementDto);
-        Financement financement = financementMapper.createFinancementFromFinancementDto(financementDto);
-        Financement savedFinancement = financementRepository.save(financement);
-        return savedFinancement.getIdFinancement();
-    }
+        CompletableFuture<HttpResponse<String>> response = ademeHttpClient.sendAsync(request, BodyHandlers.ofString());
+        Ademe ademe = jsonUtils.covertFromJsonToObject(response.get().body(), Ademe.class);
 
-    public String createGarantieFromGarantieDto(GarantieDto garantieDto) {
-        commonLogger.eventTyp(EventTyp.APPLICATIVE).secEventTyp(SecEventTyp.METIER).logger().info("create garantie from  {} :", garantieDto);
-        Financement financementGarantie = getFinancementByIdFinancement(garantieDto.getIdFinancement());
-        List<Garantie> garantieList = new ArrayList<>();
-        if (garantieDto.isBienFinanceLCL()) {
-            Bien bienFinanceLcl = financementGarantie.getObjetFinancement().get(0).getBien();
-            Garantie garantie = Garantie.builder()
-                    .idGarantie(idGeneratorService.generateId("G"))
-                    .bien(bienFinanceLcl)
-                    .build();
-            garantieList.add(garantie);
-            financementGarantie.getObjetFinancement().get(0).setGarantie(garantieList);
+        if (!ademe.getResults().isEmpty()) {
+
+            DpeAdeme dpeAdeme = ademe.getResults().get(0);
+
+            if (dpeAdeme.getNumDpe().equals(numDpe)) {
+                return dpeAdeme;
+            }
+
+            if (dpeAdeme.getNumDpeRemplace().equals(numDpe)) {
+                dpeAdeme.setNumDpeRemplace(dpeAdeme.getNumDpe());
+                dpeAdeme.setNumDpe(numDpe);
+            }
+            if (dpeAdeme.getNumDpe().equals(numDpe) || dpeAdeme.getNumDpeRemplace().equals(numDpe)) {
+                 dpeAdemePersist = create(dpeAdeme);
+
+            }
+            return dpeAdemePersist;
         } else {
-            Garantie garantie = Garantie.builder()
-                    .idGarantie(idGeneratorService.generateId("G"))
-                    .bien(buildBienFromDto(garantieDto))
-                    .build();
-            garantieList.add(garantie);
-            financementGarantie.getObjetFinancement().get(0).setGarantie(garantieList);
+            throw new DpeAdemeNotFoundException(String.format("Le DPE %s est inexistant", numDpe));
         }
-        financementRepository.save(financementGarantie);
-        financementRepository.deleteByIdFinancement(financementGarantie.getIdFinancement());
-        return financementGarantie.getObjetFinancement().get(0).getGarantie().get(0).getIdGarantie();
     }
+    
+    
+ 
+    
+    public DpeAdeme getDpeNeuf(String numDpe) throws ExecutionException, InterruptedException, IOException {
+   DpeAdeme dpeAdemePersistNeuf = null;
+        commonLogger.eventTyp(EventTyp.APPLICATIVE).secEventTyp(SecEventTyp.METIER).logger().info("OFD : Requête Ademe numéro DPE : {}", numDpe);
 
-    private Bien buildBienFromDto(GarantieDto garantieDto) {
-        return Bien.builder()
-                .idBien(idGeneratorService.generateId("B"))
-                .bienFinanceLCL(garantieDto.isBienFinanceLCL())
-                .prixBien(garantieDto.getPrixBien())
-                .typeBatiment(garantieDto.getTypeBatiment())
-                .dateDebutConstruction(garantieDto.getDateDebutConstruction())
-                .numeroNomRue(garantieDto.getNumeroNomRue())
-                .codePostal(garantieDto.getCodePostalBien())
-                .nomCommune(garantieDto.getVilleBien())
-                .paysBien(garantieDto.getPaysBien())
-                .surfaceBien(garantieDto.getSurfaceBien())
-                .dpeActuel(Dpe.builder().classeCep(garantieDto.getClasseCep()).build())
+        String url = Constants.URL_NEUF + numDpe;
+
+        HttpRequest request = HttpRequest.
+                newBuilder()
+                .uri(URI.create(url))
                 .build();
-    }
+       
+        CompletableFuture<HttpResponse<String>> response = ademeHttpClient.sendAsync(request, BodyHandlers.ofString());
+        Ademe ademe = jsonUtils.covertFromJsonToObject(response.get().body(), Ademe.class);
 
-    public Garantie getGarantie(String idFinancement, String idGarantie) {
-        Financement existingFinancement = getFinancementByIdFinancement(idFinancement);
-        commonLogger.eventTyp(EventTyp.APPLICATIVE).secEventTyp(SecEventTyp.METIER).logger().info("recherche de la garantie...");
-        List<Garantie> garantieList = existingFinancement.getObjetFinancement().get(0).getGarantie();
-        if (garantieList.isEmpty() || !garantieIdExist(idGarantie, garantieList)) {
-            throw new GarantieNotFoundException(
-                    String.format("Le financement %s ne possède aucune garantie associée ", idFinancement));
-        }
-        return garantieList.stream()
-                .filter(garantie -> garantie.getIdGarantie().equals(idGarantie))
-                .findFirst()
-                .orElse(null);
-    }
+        if (!ademe.getResults().isEmpty()) {
 
-    public boolean garantieIdExist(String idGarantie, List<Garantie> garantieList) {
-        return garantieList.stream()
-                .anyMatch(garantie -> garantie.getIdGarantie().equals(idGarantie));
-    }
+            DpeAdeme dpeAdeme = ademe.getResults().get(0);
 
-    public ResponseFinancementGarantieDto createFinancementGarantie(FinancementGarantieDto financementGarantieDto) {
-        Financement financement = financementMapper.createFinancementFromFinancementGarantieDto(financementGarantieDto);
-        Financement savedFinancement = financementRepository.save(financement);
-        List<String> idGaranties = savedFinancement.getObjetFinancement().get(0).getGarantie()
-                .stream()
-                .map(Garantie::getIdGarantie)
-                .collect(Collectors.toList());
-        return ResponseFinancementGarantieDto.builder()
-                .idFinancement(savedFinancement.getIdFinancement())
-                .idGarantie(idGaranties)
-                .build();
-    }
-
-    public Financement patchFinancement(String idFinancement, Financement financementToUpdate) {
-        Financement existingFinancement = financementRepository.findByidFinancement(idFinancement)
-                .orElseThrow(() -> new FinancementNotFoundException(
-                        String.format("Le financement à modifier %s est inexistant", idFinancement)));
-
-        Arrays.stream(Financement.class.getDeclaredFields())
-                .forEach(field -> updateFieldIfNotNull(existingFinancement, financementToUpdate, field));
-
-        return financementRepository.save(existingFinancement);
-    }
-
-    private void updateFieldIfNotNull(Financement existingFinancement, Financement financementToUpdate, Field field) {
-        try {
-            field.setAccessible(true);
-            Object newValue = field.get(financementToUpdate);
-            if (newValue != null) {
-                field.set(existingFinancement, newValue);
+            if (dpeAdeme.getNumDpe().equals(numDpe)) {
+                return dpeAdeme;
             }
-        } catch (IllegalAccessException e) {
-            commonLogger.eventTyp(EventTyp.APPLICATIVE).secEventTyp(SecEventTyp.METIER).logger().info("Erreur lors de l'update du financement causé par: {}", e.getMessage());
+
+            if (dpeAdeme.getNumDpeRemplace().equals(numDpe)) {
+                dpeAdeme.setNumDpeRemplace(dpeAdeme.getNumDpe());
+                dpeAdeme.setNumDpe(numDpe);
+            }
+            if (dpeAdeme.getNumDpe().equals(numDpe) || dpeAdeme.getNumDpeRemplace().equals(numDpe)) {
+                dpeAdemePersistNeuf = create(dpeAdeme);
+
+            }
+            return dpeAdemePersistNeuf;
+        } else {
+            throw new DpeAdemeNotFoundException(String.format("Le DPE %s est inexistant", numDpe));
         }
     }
+       
+}
+// et son classe de test est le suivant 
+package com.cl.msofd.service;
 
-    public Financement patchFinancementChamps(String idFinancement, Financement financementToUpdate) {
-        Financement existingFinancement = getFinancementByIdFinancement(idFinancement);
-        if (financementToUpdate.getObjetFinancement() != null) {
-            for (ObjetFinancement updatedObjet : financementToUpdate.getObjetFinancement()) {
-                boolean found = false;
-                for (ObjetFinancement existingObjet : existingFinancement.getObjetFinancement()) {
-                    if (existingObjet.getIdObjetFinancement().equals(updatedObjet.getIdObjetFinancement())) {
-                        merge(existingObjet, updatedObjet);
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found) {
-                    existingFinancement.getObjetFinancement().add(updatedObjet);
-                }
-            }
-        }
-        Financement savedFinancement = financementRepository.save(existingFinancement);
-        financementRepository.deleteByIdFinancement(existingFinancement.getIdFinancement());
-        return savedFinancement;
+import com.cl.msofd.exception.DpeAdemeExistingException;
+import com.cl.msofd.exception.DpeAdemeNotFoundException;
+import com.cl.msofd.model.Ademe;
+import com.cl.msofd.model.DpeAdeme;
+import com.cl.msofd.repository.DpeAdemeRepository;
+import com.cl.msofd.repository.DpeAdemeRepositoryCustom;
+import com.cl.msofd.utility.JSONUtilOFD;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.util.Collections;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.*;
+
+ class DpeAdemeServiceTest {
+
+    @Mock
+    private DpeAdemeRepository dpeAdemeRepository;
+
+    @Mock
+    private DpeAdemeRepositoryCustom dpeAdemeRepositoryCustom;
+
+    @Mock
+    private HttpClient ademeHttpClient;
+
+    @Mock
+    private JSONUtilOFD jsonUtils;
+
+    @InjectMocks
+    private DpeAdemeService dpeAdemeService;
+
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
     }
 
-    private void merge(Object target, Object source) {
-        Map<String, Method> targetSetters = new HashMap<>();
-        for (Method method : target.getClass().getMethods()) {
-            if (method.getName().startsWith("set") && method.getParameterCount() == 1) {
-                targetSetters.put(method.getName().substring(3).toLowerCase(), method);
-            }
-        }
-        for (Method method : source.getClass().getMethods()) {
-            if (method.getName().startsWith("get") && method.getParameterCount() == 0) {
-                String fieldName = method.getName().substring(3).toLowerCase();
-                Object value = method.invoke(source);
-                if (value != null && targetSetters.containsKey(fieldName)) {
-                    Method setter = targetSetters.get(fieldName);
-                    setter.invoke(target, value);
-                }
-            }
-        }
+    @Test
+    void should_create_DpeAdeme_when_not_exists() {
+        DpeAdeme dpeAdeme = DpeAdeme.builder().numDpe("123456").build();
+
+        when(dpeAdemeRepositoryCustom.findByNumDpe(dpeAdeme.getNumDpe())).thenReturn(Optional.empty());
+        when(dpeAdemeRepository.save(dpeAdeme)).thenReturn(dpeAdeme);
+
+        DpeAdeme result = dpeAdemeService.create(dpeAdeme);
+        assertThat(result).isEqualTo(dpeAdeme);
+    }
+
+    @Test
+    void should_throw_DpeAdemeExistingException_when_dpe_exists() {
+        DpeAdeme dpeAdeme = DpeAdeme.builder().numDpe("123456").build();
+
+        when(dpeAdemeRepositoryCustom.findByNumDpe(dpeAdeme.getNumDpe())).thenReturn(Optional.of(dpeAdeme));
+
+        assertThrows(DpeAdemeExistingException.class, () -> dpeAdemeService.create(dpeAdeme));
+    }
+
+    @Test
+    void should_get_DpeAdeme_when_exists() throws Exception {
+        String numDpe = "123456";
+        DpeAdeme dpeAdeme = DpeAdeme.builder().numDpe(numDpe).build();
+        Ademe ademe = Ademe.builder().results(Collections.singletonList(dpeAdeme)).build();
+        String responseBody = new ObjectMapper().writeValueAsString(ademe);
+
+        HttpResponse<String> httpResponse = mock(HttpResponse.class);
+        when(httpResponse.statusCode()).thenReturn(200);
+        when(httpResponse.body()).thenReturn(responseBody);
+
+        CompletableFuture<HttpResponse<String>> response = CompletableFuture.completedFuture(httpResponse);
+        when(ademeHttpClient.sendAsync(any(HttpRequest.class), ArgumentMatchers.<HttpResponse.BodyHandler<String>>any()))
+                .thenReturn(response);
+
+        when(jsonUtils.covertFromJsonToObject(responseBody, Ademe.class)).thenReturn(ademe);
+
+        DpeAdeme result = dpeAdemeService.getDpe(numDpe);
+        assertThat(result).isEqualTo(dpeAdeme);
+    }
+
+    @Test
+    void should_throw_DpeAdemeNotFoundException_when_dpe_does_not_exist() throws Exception {
+        String numDpe = "123456";
+        Ademe ademe = Ademe.builder().results(Collections.emptyList()).build();
+        String responseBody = new ObjectMapper().writeValueAsString(ademe);
+
+        HttpResponse<String> httpResponse = mock(HttpResponse.class);
+        when(httpResponse.statusCode()).thenReturn(200);
+        when(httpResponse.body()).thenReturn(responseBody);
+
+        CompletableFuture<HttpResponse<String>> response = CompletableFuture.completedFuture(httpResponse);
+        when(ademeHttpClient.sendAsync(any(HttpRequest.class), ArgumentMatchers.<HttpResponse.BodyHandler<String>>any()))
+                .thenReturn(response);
+
+        when(jsonUtils.covertFromJsonToObject(responseBody, Ademe.class)).thenReturn(ademe);
+
+        assertThrows(DpeAdemeNotFoundException.class, () -> dpeAdemeService.getDpe(numDpe));
+    }
+
+    @Test
+    void should_get_DpeAdeme_from_neuf() throws Exception {
+        String numDpe = "123456";
+        DpeAdeme dpeAdeme = DpeAdeme.builder().numDpe(numDpe).build();
+        Ademe ademe = Ademe.builder().results(Collections.singletonList(dpeAdeme)).build();
+        String responseBody = new ObjectMapper().writeValueAsString(ademe);
+
+        HttpResponse<String> httpResponse = mock(HttpResponse.class);
+        when(httpResponse.statusCode()).thenReturn(200);
+        when(httpResponse.body()).thenReturn(responseBody);
+
+        CompletableFuture<HttpResponse<String>> response = CompletableFuture.completedFuture(httpResponse);
+        when(ademeHttpClient.sendAsync(any(HttpRequest.class), ArgumentMatchers.<HttpResponse.BodyHandler<String>>any()))
+                .thenReturn(response);
+
+        when(jsonUtils.covertFromJsonToObject(responseBody, Ademe.class)).thenReturn(ademe);
+
+        when(dpeAdemeRepositoryCustom.findByNumDpe(numDpe)).thenReturn(Optional.empty());
+        when(dpeAdemeRepository.save(dpeAdeme)).thenReturn(dpeAdeme);
+
+        DpeAdeme result = dpeAdemeService.getDpeNeuf(numDpe);
+        assertThat(result).isEqualTo(dpeAdeme);
+    }
+
+    @Test
+    void should_throw_DpeAdemeNotFoundException_when_dpe_does_not_exist_in_neuf() throws Exception {
+        String numDpe = "123456";
+        Ademe ademe = Ademe.builder().results(Collections.emptyList()).build();
+        String responseBody = new ObjectMapper().writeValueAsString(ademe);
+
+        HttpResponse<String> httpResponse = mock(HttpResponse.class);
+        when(httpResponse.statusCode()).thenReturn(200);
+        when(httpResponse.body()).thenReturn(responseBody);
+
+        CompletableFuture<HttpResponse<String>> response = CompletableFuture.completedFuture(httpResponse);
+        when(ademeHttpClient.sendAsync(any(HttpRequest.class), ArgumentMatchers.<HttpResponse.BodyHandler<String>>any()))
+                .thenReturn(response);
+
+        when(jsonUtils.covertFromJsonToObject(responseBody, Ademe.class)).thenReturn(ademe);
+
+        assertThrows(DpeAdemeNotFoundException.class, () -> dpeAdemeService.getDpeNeuf(numDpe));
     }
 }
