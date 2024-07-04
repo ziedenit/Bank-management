@@ -1,140 +1,89 @@
 package com.cl.msofd.service;
-
-import com.cl.msofd.model.ContextXTRA;
-import com.cl.msofd.model.Referentiel;
-import com.cl.msofd.utility.CalculAlignementStrategy;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
+import com.cl.msofd.exception.ClientNotFoundException;
+import com.cl.msofd.clients.*;
+import com.cl.msofd.model.ClientEntreprise;
+import com.cl.msofd.utility.JSONUtilOFD;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.mongodb.core.MongoTemplate;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-
-@SpringBootTest
-class AlignementXtraServiceTest {
-
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.net.http.HttpResponse.BodyHandlers;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.cl.msofd.clients.Error;
+@Service
+public class EntrepriseService {
+    public static final String AUTHORIZATION = "Authorization";
     @Autowired
-    private AlignementXtraService alignementXtraService;
-
-    @MockBean
-    private MongoTemplate mongoTemplate;
-
-    private final SimpleDateFormat formatDate = new SimpleDateFormat("dd/MM/yyyy");
-
-    @BeforeEach
-    void setUp() {
-        Referentiel referentielTop = new Referentiel();
-        referentielTop.setValeur1("100.0");
-
-        Referentiel referentielMax = new Referentiel();
-        referentielMax.setValeur1("200.0");
-
-        when(mongoTemplate.findOne(any(Query.class), Mockito.eq(Referentiel.class)))
-                .thenReturn(referentielTop)
-                .thenReturn(referentielMax);
-    }
-
-    @Test
-    void should_return_07_for_non_acquisition_type() {
-        ContextXTRA context = new ContextXTRA();
-        context.setTypeObjetFinancement("01");
-        String result = alignementXtraService.alignement(context);
-        assertThat(result).isEqualTo("07");
-    }
-
-    @Test
-    void should_return_07_for_null_typeObjetFinancement() {
-        ContextXTRA context = new ContextXTRA();
-        String result = alignementXtraService.alignement(context);
-        assertThat(result).isEqualTo("07");
-    }
-
-    @Test
-    void should_return_01_for_acquisition_new_build_after_2021() throws Exception {
-        Date dateDepotPc = formatDate.parse("15/01/2022");
-        ContextXTRA context = new ContextXTRA();
-        context.setTypeObjetFinancement("02");
-        context.setCodeBatiment("00001");
-        context.setPresenceDateDepotPc(true);
-        context.setPresenceDateDepotPcJustificatif(true);
-        context.setDateDepotPc(dateDepotPc);
-        context.setPresenceDpe(false);
-        context.setNormeThermique("RE2020");
-
-        String result = alignementXtraService.alignement(context);
-        assertThat(result).isEqualTo("01");
-    }
-
-    @Test
-    void should_return_correct_alignment_for_acquisition_new_build_before_2012() throws Exception {
-        Date dateDepotPc = formatDate.parse("15/05/2010");
-        ContextXTRA context = new ContextXTRA();
-        context.setTypeObjetFinancement("02");
-        context.setCodeBatiment("00001");
-        context.setPresenceDateDepotPc(true);
-        context.setPresenceDateDepotPcJustificatif(true);
-        context.setDateDepotPc(dateDepotPc);
-        context.setPresenceDpe(true);
-        context.setEtiquetteDpe("A");
-        context.setValeurCep(50);
-
-        String result = alignementXtraService.alignement(context);
-        assertThat(result).isEqualTo("Expected Aligned Value");  // Replace with actual expected value
-    }
-
-    @Test
-    void should_return_correct_alignment_for_acquisition_new_build_between_2012_and_2021() throws Exception {
-        Date dateDepotPc = formatDate.parse("15/05/2020");
-        ContextXTRA context = new ContextXTRA();
-        context.setTypeObjetFinancement("02");
-        context.setCodeBatiment("00001");
-        context.setPresenceDateDepotPc(true);
-        context.setPresenceDateDepotPcJustificatif(true);
-        context.setDateDepotPc(dateDepotPc);
-        context.setPresenceDpe(true);
-        context.setEtiquetteDpe("B");
-        context.setValeurCep(80);
-        context.setNormeThermique("RT2012");
-
-        String result = alignementXtraService.alignement(context);
-        assertThat(result).isEqualTo("Expected Aligned Value");  // Replace with actual expected value
-    }
-
-    @Test
-    void should_return_correct_alignment_for_acquisition_old_build() {
-        ContextXTRA context = new ContextXTRA();
-        context.setTypeObjetFinancement("02");
-        context.setCodeBatiment("00001");
-        context.setPresenceDateDepotPc(false);
-        context.setPresenceDateDepotPcJustificatif(false);
-        context.setPresenceDpe(true);
-        context.setEtiquetteDpe("C");
-        context.setValeurCep(100);
-        context.setNormeThermique("RT2005");
-
-        String result = alignementXtraService.alignement(context);
-        assertThat(result).isEqualTo("Expected Aligned Value");  // Replace with actual expected value
-    }
-
-    @Test
-    void should_return_valeurCepTop() {
-        String codeRecherche = "00005";
-        Double returnedValue = alignementXtraService.obtenirValeurCepTop(codeRecherche);
-        assertThat(returnedValue).isEqualTo(100.0);
-    }
-
-    @Test
-    void should_return_valeurCepMax() {
-        String codeRecherche = "00004";
-        Double returnedValue = alignementXtraService.obtenirValeurCepMax(codeRecherche);
-        assertThat(returnedValue).isEqualTo(200.0);
+    private HttpClient httpClient;
+    @Autowired
+    private JSONUtilOFD jsonUtils;
+    @Value("${referentiel.personne.url}")
+    private String referentielPersonne;
+    public ClientEntreprise getClient(String idReper) throws IOException, InterruptedException, ExecutionException {
+        String url = String.format(referentielPersonne, idReper).concat("&person_type=INDIVIDUAL_COMPANY");
+        ClientEntreprise rep = null;
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .header(AUTHORIZATION, jsonUtils.basicAuthReferentiel())
+                .build();
+        CompletableFuture<HttpResponse<String>> response = httpClient.sendAsync(request, BodyHandlers.ofString());
+        HttpResponse<String> httpResponse = response.get();
+        String responseBody = httpResponse.body();
+        // Vérifiez si la réponse est un tableau d'erreurs
+        if (httpResponse.statusCode() != 200 || responseBody.startsWith("[")) {
+            // Parsez le tableau d'erreurs
+            ObjectMapper objectMapper = new ObjectMapper();
+            Error[] errors = objectMapper.readValue(responseBody, Error[].class);
+            // Vérifiez si l'erreur est due à un ID reper inconnu
+            for (Error error : errors) {
+                if (error.getCode().equals("B801")) {
+                    throw new ClientNotFoundException(error.getMessage());
+                }
+            }
+        }
+     // Si aucune erreur n'est détectée, continuez le traitement normalement
+        ClientResponse personDetails = jsonUtils.covertFromJsonToObject(responseBody, ClientResponse.class);
+        if (personDetails == null) {
+            throw new ClientNotFoundException("Client not found");
+        }
+        String typePersonne = personDetails.getEntrepriseDetails().getPersonType();
+        if (typePersonne == null) {
+            throw new ClientNotFoundException("Client not found");
+        } else if (typePersonne.equals("LEGAL_PERSON")) { 
+        	// si entreprise==> raison social, siren, civilite, nom,prenom 
+            rep = ClientEntreprise.builder()
+                    .idReper(personDetails.getEntrepriseDetails().getPersonId())
+                    .typePerson(typePersonne)
+                    
+                    .siren(personDetails.getEntrepriseDetails().getCasaData().getSiren())
+                    .legalName(personDetails.getEntrepriseDetails().getCasaData().getLegalName())
+                    .firstName(personDetails.getEntrepriseDetails().getRepresentativesLegals().get(0).getFirstName())
+                    .usuaLastName(personDetails.getEntrepriseDetails().getRepresentativesLegals().get(0).getUsualLastName())
+                    .civilite(personDetails.getEntrepriseDetails().getRepresentativesLegals().get(0).getCivility().getLabel())
+                    .build();
+            
+            
+        } else if (typePersonne.equals("INDIVIDUAL_COMPANY")) {
+        	// si INDIVIDUAL_COMPANY ==> siren, civilite, nom,prenom 
+            rep = ClientEntreprise.builder()
+                    .idReper(personDetails.getEntrepriseDetails().getPersonId())
+                    .typePerson(typePersonne)
+                    
+                    .siren(personDetails.getEntrepriseDetails().getCasaData().getSiren())
+                    .legalName(personDetails.getEntrepriseDetails().getCasaData().getLegalName())
+                    .usuaLastName(personDetails.getEntrepriseDetails().getDescriptiveIndividual().getUsualLastName())
+                    .firstName(personDetails.getEntrepriseDetails().getDescriptiveIndividual().getFirstName())
+                    .civilite(personDetails.getEntrepriseDetails().getDescriptiveIndividual().getCivility().getLabel())
+                    .build();
+        }
+        return rep;
     }
 }
+//
+je veux faire une classe de test unitaire a ce service en se basant sur ce que je fait niveau controlleur ca je mock deja la reponse je prevoir la reponse car j'ai pas acces total a ca referentiel.personne.url 
