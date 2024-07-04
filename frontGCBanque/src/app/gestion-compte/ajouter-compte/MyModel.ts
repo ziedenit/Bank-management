@@ -1,69 +1,15 @@
-package com.cl.msofd.service;
-
-import com.cl.msofd.clients.ClientResponse;
-import com.cl.msofd.clients.EntrepriseDetails;
-import com.cl.msofd.clients.Error;
-import com.cl.msofd.clients.Representative;
-import com.cl.msofd.exception.ClientNotFoundException;
-import com.cl.msofd.model.ClientEntreprise;
-import com.cl.msofd.utility.JSONUtilOFD;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatchers;
-import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-
-import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.util.Collections;
-import java.util.concurrent.CompletableFuture;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-
-@SpringBootTest
-class EntrepriseServiceTest {
-
-    @Autowired
-    private EntrepriseService entrepriseService;
-
-    @MockBean(name = "httpClient")
-    private HttpClient httpClient;
-
-    @MockBean
-    private JSONUtilOFD jsonUtils;
-
-    @Value("${referentiel.personne.url}")
-    private String referentielPersonne;
-
-    @BeforeEach
-    void setUp() {
-        Mockito.when(jsonUtils.basicAuthReferentiel()).thenReturn("Basic Auth");
-    }
-
-    @Test
+  @Test
     void should_return_ClientEntreprise_for_LEGAL_PERSON() throws Exception {
-        // Create and populate a mock ClientResponse object
         ClientResponse clientResponse = new ClientResponse();
-        EntrepriseDetails entrepriseDetails = new EntrepriseDetails();
-        entrepriseDetails.setPersonType("LEGAL_PERSON");
-        entrepriseDetails.setPersonId("12345");
-        entrepriseDetails.setCasaData(new CasaData("123456789", "Mock Company"));
-        Representative representative = new Representative();
-        representative.setFirstName("John");
-        representative.setUsualLastName("Doe");
-        representative.setCivility(new Civility("Mr."));
-        entrepriseDetails.setRepresentativesLegals(Collections.singletonList(representative));
-        clientResponse.setEntrepriseDetails(entrepriseDetails);
+        clientResponse.getEntrepriseDetails().setPersonType("LEGAL_PERSON");
+        clientResponse.getEntrepriseDetails().setPersonId("12345");
+        clientResponse.getEntrepriseDetails().setCasaData(new DescriptiveCompany("123456789", "Mock Company"));
+
+        clientResponse.getEntrepriseDetails().getRepresentativesLegals().get(0).setFirstName("John");
+        clientResponse.getEntrepriseDetails().getRepresentativesLegals().get(0).setUsualLastName("Doe");
+        clientResponse.getEntrepriseDetails().getRepresentativesLegals().get(0).setCivility(new Civility());
+        clientResponse.getEntrepriseDetails().setRepresentativesLegals(Collections.singletonList( clientResponse.getEntrepriseDetails().getRepresentativesLegals().get(0)));
+        clientResponse.setEntrepriseDetails(clientResponse.getEntrepriseDetails());
 
         String responseBody = new ObjectMapper().writeValueAsString(clientResponse);
         HttpResponse<String> httpResponse = Mockito.mock(HttpResponse.class);
@@ -83,35 +29,20 @@ class EntrepriseServiceTest {
                 .legalName("Mock Company")
                 .firstName("John")
                 .usuaLastName("Doe")
-                .civilite("Mr.")
                 .build();
 
         ClientEntreprise actualClient = entrepriseService.getClient("12345");
 
         assertThat(actualClient).isEqualTo(expectedClient);
     }
+//
 
-    @Test
-    void should_throw_ClientNotFoundException_for_unknown_id() throws Exception {
-        // Mock the HttpClient response with an error
-        Error error = new Error();
-        error.setCode("B801");
-        error.setMessage("Client not found");
-        Error[] errors = {error};
-        String errorResponse = new ObjectMapper().writeValueAsString(errors);
+time=2024-07-04T11:47:53.474+02:00|level=INFO |event_cod=empty|event_typ=TECHNICAL|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=Started EntrepriseServiceTest in 15.637 seconds (process running for 18.202)
 
-        HttpResponse<String> httpResponse = Mockito.mock(HttpResponse.class);
-        when(httpResponse.statusCode()).thenReturn(404);
-        when(httpResponse.body()).thenReturn(errorResponse);
+java.lang.NullPointerException: Cannot invoke "com.cl.msofd.clients.ClientDetails.setPersonType(String)" because the return value of "com.cl.msofd.clients.ClientResponse.getEntrepriseDetails()" is null
 
-        CompletableFuture<HttpResponse<String>> response = CompletableFuture.completedFuture(httpResponse);
-        when(httpClient.sendAsync(any(HttpRequest.class), ArgumentMatchers.<HttpResponse.BodyHandler<String>>any()))
-                .thenReturn(response);
+	at com.cl.msofd.service.EntrepriseServiceTest.should_return_ClientEntreprise_for_LEGAL_PERSON(EntrepriseServiceTest.java:54)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
 
-        assertThatThrownBy(() -> entrepriseService.getClient("unknownId"))
-                .isInstanceOf(ClientNotFoundException.class)
-                .hasMessage("Client not found");
-    }
-
-    // Add more tests to cover different scenarios, e.g. for INDIVIDUAL_COMPANY and other edge cases.
-}
