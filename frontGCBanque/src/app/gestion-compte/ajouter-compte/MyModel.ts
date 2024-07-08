@@ -27,7 +27,7 @@ public class AdemeController {
             return ResponseEntity.ok(dpeAdeme);
         } catch (InterruptedException ie) {
             commonLogger.eventTyp(EventTyp.APPLICATIVE).secEventTyp(SecEventTyp.METIER).logger().error("InterruptedException: ", ie);
-            Thread.currentThread().interrupt();
+            Thread.currentThread().interrupt();  // Réinterrompre le thread
             return ResponseEntity.status(500).body(null);
         } catch (ExecutionException ee) {
             commonLogger.eventTyp(EventTyp.APPLICATIVE).secEventTyp(SecEventTyp.METIER).logger().error("ExecutionException: ", ee);
@@ -37,10 +37,14 @@ public class AdemeController {
             try {
                 DpeAdeme dpeAdemeNeuf = dpeAdemeService.getDpeNeuf(numDpe);
                 return ResponseEntity.ok(dpeAdemeNeuf);
-            } catch (Exception e) { Either re-interrupt this method or rethrow the "InterruptedException" that can be caught here.
+            } catch (Exception e) {
+                // Si InterruptedException est capturée ici, réinterrompre le thread
+                if (e instanceof InterruptedException) {
+                    Thread.currentThread().interrupt();
+                }
+                commonLogger.eventTyp(EventTyp.APPLICATIVE).secEventTyp(SecEventTyp.METIER).logger().error("Exception: ", e);
                 return ResponseEntity.status(500).body(null);
             }
         }
     }
 }
-Either re-interrupt this method or rethrow the "InterruptedException" that can be caught here.
