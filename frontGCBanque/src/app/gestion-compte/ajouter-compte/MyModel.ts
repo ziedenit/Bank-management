@@ -258,3 +258,7 @@ class AlignementXtraServiceTest {
             } else {
                 return "01";
             }
+et aussi catch (ParseException e) {
+            commonLogger.eventTyp(EventTyp.APPLICATIVE).secEventTyp(SecEventTyp.METIER).logger().info("Calcul : update error aquisition in new build");
+            return "07";
+        }
