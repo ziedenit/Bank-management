@@ -1,152 +1,236 @@
 package com.cl.msofd.service;
-
-import com.cl.msofd.model.ContextXTRA;
-import org.junit.jupiter.api.Test;
+import com.cl.logs.commun.CommonLogger;
+import com.cl.logs.commun.CommonLoggerFactory;
+import com.cl.logs.types.EventTyp;
+import com.cl.logs.types.SecEventTyp;
+import com.cl.msofd.exception.DpeAdemeExistingException;
+import com.cl.msofd.exception.DpeAdemeNotFoundException;
+import com.cl.msofd.model.Ademe;
+import com.cl.msofd.model.DpeAdeme;
+import com.cl.msofd.repository.DpeAdemeRepository;
+import com.cl.msofd.repository.DpeAdemeRepositoryCustom;
+import com.cl.msofd.utility.Constants;
+import com.cl.msofd.utility.JSONUtilOFD;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.stereotype.Service;
+import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.net.http.HttpResponse.BodyHandlers;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+@Service
+public class DpeAdemeService {
+    @Autowired
+    private DpeAdemeRepository dpeAdemeRepository;
+    @Autowired
+    private DpeAdemeRepositoryCustom dpeAdemeRepositoryCustom;
+    @Autowired
+    private HttpClient ademeHttpClient;
+    @Autowired
+    private JSONUtilOFD jsonUtils;
+    private final CommonLogger commonLogger = CommonLoggerFactory.getLogger(DpeAdemeService.class);
+    public DpeAdeme create(DpeAdeme dpeAdeme) {
+        commonLogger.eventTyp(EventTyp.APPLICATIVE).secEventTyp(SecEventTyp.METIER).logger().info("create dpeAdeme : {}", dpeAdeme);
+        Optional<DpeAdeme> existingDpe = dpeAdemeRepositoryCustom.findByNumDpe(dpeAdeme.getNumDpe());
+        return (DpeAdeme) existingDpe.map(dpe -> {
+            throw new DpeAdemeExistingException(String.format("le numéro DPE %s est déja crée ", dpeAdeme.getNumDpe()));
+        }).orElseGet(() -> dpeAdemeRepository.save(dpeAdeme));
+    }
+    public DpeAdeme getDpe(String numDpe) throws ExecutionException, InterruptedException, IOException {
+        DpeAdeme dpeAdemePersist = null;
+        commonLogger.eventTyp(EventTyp.APPLICATIVE).secEventTyp(SecEventTyp.METIER).logger().info("OFD : Requête Ademe numéro DPE : {}", numDpe);
+        String url = Constants.ADEME_URL + numDpe;
+        HttpRequest request = HttpRequest.
+                newBuilder()
+                .uri(URI.create(url))
+                .build();
+        CompletableFuture<HttpResponse<String>> response = ademeHttpClient.sendAsync(request, BodyHandlers.ofString());
+        Ademe ademe = jsonUtils.covertFromJsonToObject(response.get().body(), Ademe.class);
+        if (!ademe.getResults().isEmpty()) {
+            DpeAdeme dpeAdeme = ademe.getResults().get(0);
+            if (dpeAdeme.getNumDpe().equals(numDpe)) {
+                return dpeAdeme;
+            }
+            if (dpeAdeme.getNumDpeRemplace().equals(numDpe)) {
+                dpeAdeme.setNumDpeRemplace(dpeAdeme.getNumDpe());
+                dpeAdeme.setNumDpe(numDpe);
+            }
+            if (dpeAdeme.getNumDpe().equals(numDpe) || dpeAdeme.getNumDpeRemplace().equals(numDpe)) {
+                 dpeAdemePersist = create(dpeAdeme);
+            }
+            return dpeAdemePersist;
+        } else {
+            throw new DpeAdemeNotFoundException(String.format("Le DPE %s est inexistant", numDpe));
+        }
+    }
+    
+    
+ 
+    
+    public DpeAdeme getDpeNeuf(String numDpe) throws ExecutionException, InterruptedException, IOException {
+   DpeAdeme dpeAdemePersistNeuf = null;
+        commonLogger.eventTyp(EventTyp.APPLICATIVE).secEventTyp(SecEventTyp.METIER).logger().info("OFD : Requête Ademe numéro DPE : {}", numDpe);
+        String url = Constants.URL_NEUF + numDpe;
+        HttpRequest request = HttpRequest.
+                newBuilder()
+                .uri(URI.create(url))
+                .build();
+       
+        CompletableFuture<HttpResponse<String>> response = ademeHttpClient.sendAsync(request, BodyHandlers.ofString());
+        Ademe ademe = jsonUtils.covertFromJsonToObject(response.get().body(), Ademe.class);
+        if (!ademe.getResults().isEmpty()) {
+            DpeAdeme dpeAdeme = ademe.getResults().get(0);
+            if (dpeAdeme.getNumDpe().equals(numDpe)) {
+                return dpeAdeme;
+            }
+            if (dpeAdeme.getNumDpeRemplace().equals(numDpe)) {
+                dpeAdeme.setNumDpeRemplace(dpeAdeme.getNumDpe());
+                dpeAdeme.setNumDpe(numDpe);
+            }
+            if (dpeAdeme.getNumDpe().equals(numDpe) || dpeAdeme.getNumDpeRemplace().equals(numDpe)) {
+                dpeAdemePersistNeuf = create(dpeAdeme);
+            }
+            return dpeAdemePersistNeuf;
+        } else {
+            throw new DpeAdemeNotFoundException(String.format("Le DPE %s est inexistant", numDpe));
+        }
+    }
+       
+}
+j'ai ce service sonar me remonte que j'ai un code dupliquer a refactoriser et au meme temps j'ai cette classe de test package com.cl.msofd.service;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import com.cl.logs.commun.CommonLogger;
+import com.cl.logs.commun.CommonLoggerFactory;
+import com.cl.logs.types.EventTyp;
+import com.cl.logs.types.SecEventTyp;
+import com.cl.msofd.exception.DpeAdemeExistingException;
+import com.cl.msofd.exception.DpeAdemeNotFoundException;
+import com.cl.msofd.model.Ademe;
+import com.cl.msofd.model.DpeAdeme;
+import com.cl.msofd.repository.DpeAdemeRepository;
+import com.cl.msofd.repository.DpeAdemeRepositoryCustom;
+import com.cl.msofd.utility.Constants;
+import com.cl.msofd.utility.JSONUtilOFD;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.net.http.HttpResponse.BodyHandlers;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
-@SpringBootTest
-class AlignementXtraServiceTest {
+@Service
+public class DpeAdemeService {
 
     @Autowired
-    AlignementXtraService alignementXtraService;
+    private DpeAdemeRepository dpeAdemeRepository;
 
-    private final SimpleDateFormat formatDate = new SimpleDateFormat("dd/MM/yyyy");
+    @Autowired
+    private DpeAdemeRepositoryCustom dpeAdemeRepositoryCustom;
 
-    @Test
-    void should_return_07_for_non_acquisition_type() {
-        ContextXTRA context = new ContextXTRA();
-        context.setTypeObjetFinancement("01");
-        String result = alignementXtraService.alignement(context);
-        assertThat(result).isEqualTo("07");
+    @Autowired
+    private HttpClient ademeHttpClient;
+
+    @Autowired
+    private JSONUtilOFD jsonUtils;
+
+
+    private final CommonLogger commonLogger = CommonLoggerFactory.getLogger(DpeAdemeService.class);
+
+
+
+
+    public DpeAdeme create(DpeAdeme dpeAdeme) {
+        commonLogger.eventTyp(EventTyp.APPLICATIVE).secEventTyp(SecEventTyp.METIER).logger().info("create dpeAdeme : {}", dpeAdeme);
+        Optional<DpeAdeme> existingDpe = dpeAdemeRepositoryCustom.findByNumDpe(dpeAdeme.getNumDpe());
+        return (DpeAdeme) existingDpe.map(dpe -> {
+            throw new DpeAdemeExistingException(String.format("le numéro DPE %s est déja crée ", dpeAdeme.getNumDpe()));
+        }).orElseGet(() -> dpeAdemeRepository.save(dpeAdeme));
     }
 
-    @Test
-    void should_return_07_for_null_typeObjetFinancement() {
-        ContextXTRA context = new ContextXTRA();
-        String result = alignementXtraService.alignement(context);
-        assertThat(result).isEqualTo("07");
+
+    public DpeAdeme getDpe(String numDpe) throws ExecutionException, InterruptedException, IOException {
+        DpeAdeme dpeAdemePersist = null;
+        commonLogger.eventTyp(EventTyp.APPLICATIVE).secEventTyp(SecEventTyp.METIER).logger().info("OFD : Requête Ademe numéro DPE : {}", numDpe);
+
+        String url = Constants.ADEME_URL + numDpe;
+
+        HttpRequest request = HttpRequest.
+                newBuilder()
+                .uri(URI.create(url))
+                .build();
+
+        CompletableFuture<HttpResponse<String>> response = ademeHttpClient.sendAsync(request, BodyHandlers.ofString());
+        Ademe ademe = jsonUtils.covertFromJsonToObject(response.get().body(), Ademe.class);
+
+        if (!ademe.getResults().isEmpty()) {
+
+            DpeAdeme dpeAdeme = ademe.getResults().get(0);
+
+            if (dpeAdeme.getNumDpe().equals(numDpe)) {
+                return dpeAdeme;
+            }
+
+            if (dpeAdeme.getNumDpeRemplace().equals(numDpe)) {
+                dpeAdeme.setNumDpeRemplace(dpeAdeme.getNumDpe());
+                dpeAdeme.setNumDpe(numDpe);
+            }
+            if (dpeAdeme.getNumDpe().equals(numDpe) || dpeAdeme.getNumDpeRemplace().equals(numDpe)) {
+                 dpeAdemePersist = create(dpeAdeme);
+
+            }
+            return dpeAdemePersist;
+        } else {
+            throw new DpeAdemeNotFoundException(String.format("Le DPE %s est inexistant", numDpe));
+        }
     }
+    
+    
+ 
+    
+    public DpeAdeme getDpeNeuf(String numDpe) throws ExecutionException, InterruptedException, IOException {
+   DpeAdeme dpeAdemePersistNeuf = null;
+        commonLogger.eventTyp(EventTyp.APPLICATIVE).secEventTyp(SecEventTyp.METIER).logger().info("OFD : Requête Ademe numéro DPE : {}", numDpe);
 
-    @Test
-    void should_return_01_for_acquisition_new_build_after_2021() throws Exception {
-        Date dateDepotPc = formatDate.parse("15/01/2022");
-        ContextXTRA context = new ContextXTRA();
-        context.setTypeObjetFinancement("02");
-        context.setCodeBatiment("00001");
-        context.setPresenceDateDepotPc(true);
-        context.setPresenceDateDepotPcJustificatif(true);
-        context.setDateDepotPc(dateDepotPc);
-        context.setPresenceDpe(false);
-        context.setNormeThermique("RE2020");
+        String url = Constants.URL_NEUF + numDpe;
 
-        String result = alignementXtraService.alignement(context);
-        assertThat(result).isEqualTo("01");
+        HttpRequest request = HttpRequest.
+                newBuilder()
+                .uri(URI.create(url))
+                .build();
+       
+        CompletableFuture<HttpResponse<String>> response = ademeHttpClient.sendAsync(request, BodyHandlers.ofString());
+        Ademe ademe = jsonUtils.covertFromJsonToObject(response.get().body(), Ademe.class);
+
+        if (!ademe.getResults().isEmpty()) {
+
+            DpeAdeme dpeAdeme = ademe.getResults().get(0);
+
+            if (dpeAdeme.getNumDpe().equals(numDpe)) {
+                return dpeAdeme;
+            }
+
+            if (dpeAdeme.getNumDpeRemplace().equals(numDpe)) {
+                dpeAdeme.setNumDpeRemplace(dpeAdeme.getNumDpe());
+                dpeAdeme.setNumDpe(numDpe);
+            }
+            if (dpeAdeme.getNumDpe().equals(numDpe) || dpeAdeme.getNumDpeRemplace().equals(numDpe)) {
+                dpeAdemePersistNeuf = create(dpeAdeme);
+
+            }
+            return dpeAdemePersistNeuf;
+        } else {
+            throw new DpeAdemeNotFoundException(String.format("Le DPE %s est inexistant", numDpe));
+        }
     }
-
-    @Test
-    void should_return_correct_alignment_for_acquisition_new_build_before_2012() throws Exception {
-        Date dateDepotPc = formatDate.parse("15/05/2010");
-        ContextXTRA context = new ContextXTRA();
-        context.setTypeObjetFinancement("02");
-        context.setCodeBatiment("00001");
-        context.setPresenceDateDepotPc(true);
-        context.setPresenceDateDepotPcJustificatif(true);
-        context.setDateDepotPc(dateDepotPc);
-        context.setPresenceDpe(true);
-        context.setEtiquetteDpe("A");
-        context.setValeurCep(50);
-
-        String result = alignementXtraService.alignement(context);
-        assertThat(result).isEqualTo("01");
-    }
-
-    @Test
-    void should_return_correct_alignment_for_acquisition_new_build_between_2012_and_2021() throws Exception {
-        Date dateDepotPc = formatDate.parse("15/05/2020");
-        ContextXTRA context = new ContextXTRA();
-        context.setTypeObjetFinancement("02");
-        context.setCodeBatiment("00001");
-        context.setPresenceDateDepotPc(true);
-        context.setPresenceDateDepotPcJustificatif(true);
-        context.setDateDepotPc(dateDepotPc);
-        context.setPresenceDpe(true);
-        context.setEtiquetteDpe("B");
-        context.setValeurCep(80);
-        context.setNormeThermique("RT2012");
-
-        String result = alignementXtraService.alignement(context);
-        assertThat(result).isEqualTo("01");
-    }
-
-    @Test
-    void should_return_correct_alignment_for_acquisition_between_2020_and_2021() throws Exception {
-        Date dateDepotPc = formatDate.parse("15/05/2021");
-        ContextXTRA context = new ContextXTRA();
-        context.setTypeObjetFinancement("02");
-        context.setCodeBatiment("00001");
-        context.setPresenceDateDepotPc(true);
-        context.setPresenceDateDepotPcJustificatif(true);
-        context.setDateDepotPc(dateDepotPc);
-        context.setPresenceDpe(true);
-        context.setEtiquetteDpe("B");
-        context.setValeurCep(80);
-        context.setNormeThermique("RT2012");
-
-        String result = alignementXtraService.alignement(context);
-        assertThat(result).isEqualTo("01");
-    }
-
-    @Test
-    void should_return_correct_alignment_for_acquisition_old_build() {
-        ContextXTRA context = new ContextXTRA();
-        context.setTypeObjetFinancement("02");
-        context.setCodeBatiment("00001");
-        context.setPresenceDateDepotPc(false);
-        context.setPresenceDateDepotPcJustificatif(false);
-        context.setPresenceDpe(true);
-        context.setEtiquetteDpe("C");
-        context.setValeurCep(100);
-        context.setNormeThermique("RT2005");
-
-        String result = alignementXtraService.alignement(context);
-        assertThat(result).isEqualTo("07");
-    }
-
-    @Test
-    void should_return_valeurCepTop() {
-        String codeRecherche = "00004";
-        // request the Referential Casa
-        Double returnedValue = alignementXtraService.obtenirValeurCepTop(codeRecherche);
-        // mock and assert returned CepTop based on casa Ref
-        assertThat(returnedValue.equals(197.0));
-    }
-
-    @Test
-    void should_return_valeurCepMax() {
-        String codeRecherche = "00001";
-        // request the Referential Casa
-        Double returnedValue = alignementXtraService.obtenirValeurCepMax(codeRecherche);
-        // mock and assert returned CepMax based on casa Ref
-        assertThat(returnedValue.equals(45.0));
-    }
-
-    @Test
-    void should_handle_parse_exception() {
-        ContextXTRA context = new ContextXTRA();
-        context.setTypeObjetFinancement("02");
-        context.setCodeBatiment("00001");
-        context.setPresenceDateDepotPc(true);
-        context.setPresenceDateDepotPcJustificatif(true);
-        context.setDateDepotPc(new Date());  // This will cause ParseException because it's not properly formatted
-
-        String result = alignementXtraService.alignement(context);
-        assertThat(result).isEqualTo("07");
-    }
-}
+       
+} // a améliorer car le taux de couverture actuel est 61% uniquement
