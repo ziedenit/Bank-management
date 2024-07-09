@@ -1,280 +1,182 @@
-C:\Users\guendil_z\Documents\jdk-17.0.9\bin\java.exe -ea -Didea.test.cyclic.buffer.size=1048576 "-javaagent:C:\Users\guendil_z\Documents\IntelliJ IDEA Community Edition 2023.3.4\lib\idea_rt.jar=52107:C:\Users\guendil_z\Documents\IntelliJ IDEA Community Edition 2023.3.4\bin" -Dfile.encoding=UTF-8 -classpath "C:\Users\guendil_z\.m2\repository\org\junit\platform\junit-platform-launcher\1.10.2\junit-platform-launcher-1.10.2.jar;C:\Users\guendil_z\Documents\IntelliJ IDEA Community Edition 2023.3.4\lib\idea_rt.jar;C:\Users\guendil_z\Documents\IntelliJ IDEA Community Edition 2023.3.4\plugins\junit\lib\junit5-rt.jar;C:\Users\guendil_z\Documents\IntelliJ IDEA Community Edition 2023.3.4\plugins\junit\lib\junit-rt.jar;C:\Users\guendil_z\Documents\workspace\msofd\target\test-classes;C:\Users\guendil_z\Documents\workspace\msofd\target\classes;C:\Users\guendil_z\.m2\repository\com\fasterxml\jackson\core\jackson-databind\2.15.4\jackson-databind-2.15.4.jar;C:\Users\guendil_z\.m2\repository\com\fasterxml\jackson\core\jackson-annotations\2.15.4\jackson-annotations-2.15.4.jar;C:\Users\guendil_z\.m2\repository\com\fasterxml\jackson\core\jackson-core\2.15.4\jackson-core-2.15.4.jar;C:\Users\guendil_z\.m2\repository\com\fasterxml\jackson\module\jackson-module-parameter-names\2.15.4\jackson-module-parameter-names-2.15.4.jar;C:\Users\guendil_z\.m2\repository\org\kie\kie-spring\7.60.0.Final\kie-spring-7.60.0.Final.jar;C:\Users\guendil_z\.m2\repository\org\jbpm\jbpm-flow\7.60.0.Final\jbpm-flow-7.60.0.Final.jar;C:\Users\guendil_z\.m2\repository\org\drools\drools-mvel\7.60.0.Final\drools-mvel-7.60.0.Final.jar;C:\Users\guendil_z\.m2\repository\org\drools\drools-serialization-protobuf\7.60.0.Final\drools-serialization-protobuf-7.60.0.Final.jar;C:\Users\guendil_z\.m2\repository\org\kie\soup\kie-soup-commons\7.60.0.Final\kie-soup-commons-7.60.0.Final.jar;C:\Users\guendil_z\.m2\repository\org\kie\soup\kie-soup-project-datamodel-commons\7.60.0.Final\kie-soup-project-datamodel-commons-7.60.0.Final.jar;C:\Users\guendil_z\.m2\repository\org\kie\soup\kie-soup-project-datamodel-api\7.60.0.Final\kie-soup-project-datamodel-api-7.60.0.Final.jar;C:\Users\guendil_z\.m2\repository\org\kie\kie-dmn-api\7.60.0.Final\kie-dmn-api-7.60.0.Final.jar;C:\Users\guendil_z\.m2\repository\org\kie\kie-dmn-feel\7.60.0.Final\kie-dmn-feel-7.60.0.Final.jar;C:\Users\guendil_z\.m2\repository\org\kie\kie-dmn-model\7.60.0.Final\kie-dmn-model-7.60.0.Final.jar;C:\Users\guendil_z\.m2\repository\com\github\javaparser\javaparser-core\3.13.10\javaparser-core-3.13.10.jar;C:\Users\guendil_z\.m2\repository\org\drools\drools-mvel-parser\7.60.0.Final\drools-mvel-parser-7.60.0.Final.jar;C:\Users\guendil_z\.m2\repository\ch\obermuhlner\big-math\2.0.1\big-math-2.0.1.jar;C:\Users\guendil_z\.m2\repository\org\kie\kie-dmn-core\7.60.0.Final\kie-dmn-core-7.60.0.Final.jar;C:\Users\guendil_z\.m2\repository\org\kie\kie-dmn-backend\7.60.0.Final\kie-dmn-backend-7.60.0.Final.jar;C:\Users\guendil_z\.m2\repository\org\drools\drools-ruleunit\7.60.0.Final\drools-ruleunit-7.60.0.Final.jar;C:\Users\guendil_z\.m2\repository\org\drools\drools-canonical-model\7.60.0.Final\drools-canonical-model-7.60.0.Final.jar;C:\Users\guendil_z\.m2\repository\org\drools\drools-model-compiler\7.60.0.Final\drools-model-compiler-7.60.0.Final.jar;C:\Users\guendil_z\.m2\repository\org\drools\drools-mvel-compiler\7.60.0.Final\drools-mvel-compiler-7.60.0.Final.jar;C:\Users\guendil_z\.m2\repository\org\drools\drools-alphanetwork-compiler\7.60.0.Final\drools-alphanetwork-compiler-7.60.0.Final.jar;C:\Users\guendil_z\.m2\repository\org\jpmml\pmml-model\1.5.1\pmml-model-1.5.1.jar;C:\Users\guendil_z\.m2\repository\org\jpmml\pmml-agent\1.5.1\pmml-agent-1.5.1.jar;C:\Users\guendil_z\.m2\repository\com\google\protobuf\protobuf-java\3.6.1\protobuf-java-3.6.1.jar;C:\Users\guendil_z\.m2\repository\org\mvel\mvel2\2.4.13.Final\mvel2-2.4.13.Final.jar;C:\Users\guendil_z\.m2\repository\org\springframework\spring-tx\6.1.4\spring-tx-6.1.4.jar;C:\Users\guendil_z\.m2\repository\org\kie\kie-api\7.60.0.Final\kie-api-7.60.0.Final.jar;C:\Users\guendil_z\.m2\repository\org\kie\soup\kie-soup-maven-support\7.60.0.Final\kie-soup-maven-support-7.60.0.Final.jar;C:\Users\guendil_z\.m2\repository\org\kie\kie-internal\7.60.0.Final\kie-internal-7.60.0.Final.jar;C:\Users\guendil_z\.m2\repository\org\drools\drools-core\7.60.0.Final\drools-core-7.60.0.Final.jar;C:\Users\guendil_z\.m2\repository\org\kie\soup\kie-soup-xstream\7.60.0.Final\kie-soup-xstream-7.60.0.Final.jar;C:\Users\guendil_z\.m2\repository\org\drools\drools-core-reflective\7.60.0.Final\drools-core-reflective-7.60.0.Final.jar;C:\Users\guendil_z\.m2\repository\org\kie\kie-memory-compiler\7.60.0.Final\kie-memory-compiler-7.60.0.Final.jar;C:\Users\guendil_z\.m2\repository\org\drools\drools-core-dynamic\7.60.0.Final\drools-core-dynamic-7.60.0.Final.jar;C:\Users\guendil_z\.m2\repository\org\drools\drools-compiler\7.60.0.Final\drools-compiler-7.60.0.Final.jar;C:\Users\guendil_z\.m2\repository\org\drools\drools-ecj\7.60.0.Final\drools-ecj-7.60.0.Final.jar;C:\Users\guendil_z\.m2\repository\org\antlr\antlr-runtime\3.5.2\antlr-runtime-3.5.2.jar;C:\Users\guendil_z\.m2\repository\org\springframework\spring-core\6.1.4\spring-core-6.1.4.jar;C:\Users\guendil_z\.m2\repository\org\springframework\spring-jcl\6.1.4\spring-jcl-6.1.4.jar;C:\Users\guendil_z\.m2\repository\org\springframework\spring-beans\6.1.4\spring-beans-6.1.4.jar;C:\Users\guendil_z\.m2\repository\org\springframework\spring-context\6.1.4\spring-context-6.1.4.jar;C:\Users\guendil_z\.m2\repository\com\thoughtworks\xstream\xstream\1.4.18\xstream-1.4.18.jar;C:\Users\guendil_z\.m2\repository\io\github\x-stream\mxparser\1.2.2\mxparser-1.2.2.jar;C:\Users\guendil_z\.m2\repository\xmlpull\xmlpull\1.1.3.1\xmlpull-1.1.3.1.jar;C:\Users\guendil_z\.m2\repository\org\slf4j\slf4j-api\2.0.12\slf4j-api-2.0.12.jar;C:\Users\guendil_z\.m2\repository\org\drools\drools-decisiontables\7.60.0.Final\drools-decisiontables-7.60.0.Final.jar;C:\Users\guendil_z\.m2\repository\org\drools\drools-templates\7.60.0.Final\drools-templates-7.60.0.Final.jar;C:\Users\guendil_z\.m2\repository\org\springframework\boot\spring-boot-starter-web\3.2.3\spring-boot-starter-web-3.2.3.jar;C:\Users\guendil_z\.m2\repository\org\springframework\boot\spring-boot-starter\3.2.3\spring-boot-starter-3.2.3.jar;C:\Users\guendil_z\.m2\repository\org\springframework\boot\spring-boot\3.2.3\spring-boot-3.2.3.jar;C:\Users\guendil_z\.m2\repository\org\springframework\boot\spring-boot-autoconfigure\3.2.3\spring-boot-autoconfigure-3.2.3.jar;C:\Users\guendil_z\.m2\repository\org\springframework\boot\spring-boot-starter-logging\3.2.3\spring-boot-starter-logging-3.2.3.jar;C:\Users\guendil_z\.m2\repository\org\apache\logging\log4j\log4j-to-slf4j\2.21.1\log4j-to-slf4j-2.21.1.jar;C:\Users\guendil_z\.m2\repository\org\apache\logging\log4j\log4j-api\2.21.1\log4j-api-2.21.1.jar;C:\Users\guendil_z\.m2\repository\jakarta\annotation\jakarta.annotation-api\2.1.1\jakarta.annotation-api-2.1.1.jar;C:\Users\guendil_z\.m2\repository\org\springframework\boot\spring-boot-starter-json\3.2.3\spring-boot-starter-json-3.2.3.jar;C:\Users\guendil_z\.m2\repository\com\fasterxml\jackson\datatype\jackson-datatype-jdk8\2.15.4\jackson-datatype-jdk8-2.15.4.jar;C:\Users\guendil_z\.m2\repository\org\springframework\boot\spring-boot-starter-tomcat\3.2.3\spring-boot-starter-tomcat-3.2.3.jar;C:\Users\guendil_z\.m2\repository\org\apache\tomcat\embed\tomcat-embed-core\10.1.19\tomcat-embed-core-10.1.19.jar;C:\Users\guendil_z\.m2\repository\org\apache\tomcat\embed\tomcat-embed-websocket\10.1.19\tomcat-embed-websocket-10.1.19.jar;C:\Users\guendil_z\.m2\repository\org\springframework\spring-web\6.1.4\spring-web-6.1.4.jar;C:\Users\guendil_z\.m2\repository\org\springframework\spring-webmvc\6.1.4\spring-webmvc-6.1.4.jar;C:\Users\guendil_z\.m2\repository\org\springframework\boot\spring-boot-starter-security\3.2.3\spring-boot-starter-security-3.2.3.jar;C:\Users\guendil_z\.m2\repository\org\springframework\spring-aop\6.1.4\spring-aop-6.1.4.jar;C:\Users\guendil_z\.m2\repository\org\springframework\security\spring-security-config\6.2.2\spring-security-config-6.2.2.jar;C:\Users\guendil_z\.m2\repository\org\springframework\security\spring-security-web\6.2.2\spring-security-web-6.2.2.jar;C:\Users\guendil_z\.m2\repository\org\springframework\boot\spring-boot-starter-actuator\3.2.3\spring-boot-starter-actuator-3.2.3.jar;C:\Users\guendil_z\.m2\repository\org\springframework\boot\spring-boot-actuator-autoconfigure\3.2.3\spring-boot-actuator-autoconfigure-3.2.3.jar;C:\Users\guendil_z\.m2\repository\org\springframework\boot\spring-boot-actuator\3.2.3\spring-boot-actuator-3.2.3.jar;C:\Users\guendil_z\.m2\repository\io\micrometer\micrometer-observation\1.12.3\micrometer-observation-1.12.3.jar;C:\Users\guendil_z\.m2\repository\io\micrometer\micrometer-commons\1.12.3\micrometer-commons-1.12.3.jar;C:\Users\guendil_z\.m2\repository\io\micrometer\micrometer-jakarta9\1.12.3\micrometer-jakarta9-1.12.3.jar;C:\Users\guendil_z\.m2\repository\io\micrometer\micrometer-core\1.12.3\micrometer-core-1.12.3.jar;C:\Users\guendil_z\.m2\repository\org\hdrhistogram\HdrHistogram\2.1.12\HdrHistogram-2.1.12.jar;C:\Users\guendil_z\.m2\repository\org\latencyutils\LatencyUtils\2.0.3\LatencyUtils-2.0.3.jar;C:\Users\guendil_z\.m2\repository\org\springframework\boot\spring-boot-starter-validation\3.2.3\spring-boot-starter-validation-3.2.3.jar;C:\Users\guendil_z\.m2\repository\org\apache\tomcat\embed\tomcat-embed-el\10.1.19\tomcat-embed-el-10.1.19.jar;C:\Users\guendil_z\.m2\repository\org\hibernate\validator\hibernate-validator\8.0.1.Final\hibernate-validator-8.0.1.Final.jar;C:\Users\guendil_z\.m2\repository\jakarta\validation\jakarta.validation-api\3.0.2\jakarta.validation-api-3.0.2.jar;C:\Users\guendil_z\.m2\repository\org\jboss\logging\jboss-logging\3.5.3.Final\jboss-logging-3.5.3.Final.jar;C:\Users\guendil_z\.m2\repository\com\fasterxml\classmate\1.6.0\classmate-1.6.0.jar;C:\Users\guendil_z\.m2\repository\org\apache\httpcomponents\core5\httpcore5\5.2.4\httpcore5-5.2.4.jar;C:\Users\guendil_z\.m2\repository\org\apache\httpcomponents\client5\httpclient5\5.2.3\httpclient5-5.2.3.jar;C:\Users\guendil_z\.m2\repository\org\apache\httpcomponents\core5\httpcore5-h2\5.2.4\httpcore5-h2-5.2.4.jar;C:\Users\guendil_z\.m2\repository\com\h2database\h2\2.2.224\h2-2.2.224.jar;C:\Users\guendil_z\.m2\repository\org\springframework\boot\spring-boot-starter-data-jpa\3.2.3\spring-boot-starter-data-jpa-3.2.3.jar;C:\Users\guendil_z\.m2\repository\org\springframework\boot\spring-boot-starter-aop\3.2.3\spring-boot-starter-aop-3.2.3.jar;C:\Users\guendil_z\.m2\repository\org\aspectj\aspectjweaver\1.9.21\aspectjweaver-1.9.21.jar;C:\Users\guendil_z\.m2\repository\org\springframework\boot\spring-boot-starter-jdbc\3.2.3\spring-boot-starter-jdbc-3.2.3.jar;C:\Users\guendil_z\.m2\repository\com\zaxxer\HikariCP\5.0.1\HikariCP-5.0.1.jar;C:\Users\guendil_z\.m2\repository\org\springframework\spring-jdbc\6.1.4\spring-jdbc-6.1.4.jar;C:\Users\guendil_z\.m2\repository\org\hibernate\orm\hibernate-core\6.4.4.Final\hibernate-core-6.4.4.Final.jar;C:\Users\guendil_z\.m2\repository\jakarta\persistence\jakarta.persistence-api\3.1.0\jakarta.persistence-api-3.1.0.jar;C:\Users\guendil_z\.m2\repository\jakarta\transaction\jakarta.transaction-api\2.0.1\jakarta.transaction-api-2.0.1.jar;C:\Users\guendil_z\.m2\repository\org\hibernate\common\hibernate-commons-annotations\6.0.6.Final\hibernate-commons-annotations-6.0.6.Final.jar;C:\Users\guendil_z\.m2\repository\io\smallrye\jandex\3.1.2\jandex-3.1.2.jar;C:\Users\guendil_z\.m2\repository\net\bytebuddy\byte-buddy\1.14.12\byte-buddy-1.14.12.jar;C:\Users\guendil_z\.m2\repository\org\glassfish\jaxb\jaxb-runtime\4.0.4\jaxb-runtime-4.0.4.jar;C:\Users\guendil_z\.m2\repository\org\glassfish\jaxb\jaxb-core\4.0.4\jaxb-core-4.0.4.jar;C:\Users\guendil_z\.m2\repository\org\eclipse\angus\angus-activation\2.0.1\angus-activation-2.0.1.jar;C:\Users\guendil_z\.m2\repository\org\glassfish\jaxb\txw2\4.0.4\txw2-4.0.4.jar;C:\Users\guendil_z\.m2\repository\com\sun\istack\istack-commons-runtime\4.1.2\istack-commons-runtime-4.1.2.jar;C:\Users\guendil_z\.m2\repository\jakarta\inject\jakarta.inject-api\2.0.1\jakarta.inject-api-2.0.1.jar;C:\Users\guendil_z\.m2\repository\org\antlr\antlr4-runtime\4.13.0\antlr4-runtime-4.13.0.jar;C:\Users\guendil_z\.m2\repository\org\springframework\data\spring-data-jpa\3.2.3\spring-data-jpa-3.2.3.jar;C:\Users\guendil_z\.m2\repository\org\springframework\data\spring-data-commons\3.2.3\spring-data-commons-3.2.3.jar;C:\Users\guendil_z\.m2\repository\org\springframework\spring-orm\6.1.4\spring-orm-6.1.4.jar;C:\Users\guendil_z\.m2\repository\org\springframework\spring-aspects\6.1.4\spring-aspects-6.1.4.jar;C:\Users\guendil_z\.m2\repository\org\springframework\boot\spring-boot-starter-test\3.2.3\spring-boot-starter-test-3.2.3.jar;C:\Users\guendil_z\.m2\repository\org\springframework\boot\spring-boot-test\3.2.3\spring-boot-test-3.2.3.jar;C:\Users\guendil_z\.m2\repository\org\springframework\boot\spring-boot-test-autoconfigure\3.2.3\spring-boot-test-autoconfigure-3.2.3.jar;C:\Users\guendil_z\.m2\repository\com\jayway\jsonpath\json-path\2.9.0\json-path-2.9.0.jar;C:\Users\guendil_z\.m2\repository\jakarta\xml\bind\jakarta.xml.bind-api\4.0.1\jakarta.xml.bind-api-4.0.1.jar;C:\Users\guendil_z\.m2\repository\jakarta\activation\jakarta.activation-api\2.1.2\jakarta.activation-api-2.1.2.jar;C:\Users\guendil_z\.m2\repository\net\minidev\json-smart\2.5.0\json-smart-2.5.0.jar;C:\Users\guendil_z\.m2\repository\net\minidev\accessors-smart\2.5.0\accessors-smart-2.5.0.jar;C:\Users\guendil_z\.m2\repository\org\ow2\asm\asm\9.3\asm-9.3.jar;C:\Users\guendil_z\.m2\repository\org\assertj\assertj-core\3.24.2\assertj-core-3.24.2.jar;C:\Users\guendil_z\.m2\repository\org\awaitility\awaitility\4.2.0\awaitility-4.2.0.jar;C:\Users\guendil_z\.m2\repository\org\hamcrest\hamcrest\2.2\hamcrest-2.2.jar;C:\Users\guendil_z\.m2\repository\org\junit\jupiter\junit-jupiter\5.10.2\junit-jupiter-5.10.2.jar;C:\Users\guendil_z\.m2\repository\org\junit\jupiter\junit-jupiter-api\5.10.2\junit-jupiter-api-5.10.2.jar;C:\Users\guendil_z\.m2\repository\org\opentest4j\opentest4j\1.3.0\opentest4j-1.3.0.jar;C:\Users\guendil_z\.m2\repository\org\junit\platform\junit-platform-commons\1.10.2\junit-platform-commons-1.10.2.jar;C:\Users\guendil_z\.m2\repository\org\apiguardian\apiguardian-api\1.1.2\apiguardian-api-1.1.2.jar;C:\Users\guendil_z\.m2\repository\org\junit\jupiter\junit-jupiter-params\5.10.2\junit-jupiter-params-5.10.2.jar;C:\Users\guendil_z\.m2\repository\org\junit\jupiter\junit-jupiter-engine\5.10.2\junit-jupiter-engine-5.10.2.jar;C:\Users\guendil_z\.m2\repository\org\junit\platform\junit-platform-engine\1.10.2\junit-platform-engine-1.10.2.jar;C:\Users\guendil_z\.m2\repository\org\mockito\mockito-core\5.7.0\mockito-core-5.7.0.jar;C:\Users\guendil_z\.m2\repository\net\bytebuddy\byte-buddy-agent\1.14.12\byte-buddy-agent-1.14.12.jar;C:\Users\guendil_z\.m2\repository\org\objenesis\objenesis\3.3\objenesis-3.3.jar;C:\Users\guendil_z\.m2\repository\org\mockito\mockito-junit-jupiter\5.7.0\mockito-junit-jupiter-5.7.0.jar;C:\Users\guendil_z\.m2\repository\org\skyscreamer\jsonassert\1.5.1\jsonassert-1.5.1.jar;C:\Users\guendil_z\.m2\repository\com\vaadin\external\google\android-json\0.0.20131108.vaadin1\android-json-0.0.20131108.vaadin1.jar;C:\Users\guendil_z\.m2\repository\org\springframework\spring-test\6.1.4\spring-test-6.1.4.jar;C:\Users\guendil_z\.m2\repository\org\xmlunit\xmlunit-core\2.9.1\xmlunit-core-2.9.1.jar;C:\Users\guendil_z\.m2\repository\org\apache\commons\commons-collections4\4.4\commons-collections4-4.4.jar;C:\Users\guendil_z\.m2\repository\org\springframework\boot\spring-boot-starter-cache\3.2.3\spring-boot-starter-cache-3.2.3.jar;C:\Users\guendil_z\.m2\repository\org\springframework\spring-context-support\6.1.4\spring-context-support-6.1.4.jar;C:\Users\guendil_z\.m2\repository\com\fasterxml\jackson\dataformat\jackson-dataformat-xml\2.15.4\jackson-dataformat-xml-2.15.4.jar;C:\Users\guendil_z\.m2\repository\org\codehaus\woodstox\stax2-api\4.2.1\stax2-api-4.2.1.jar;C:\Users\guendil_z\.m2\repository\com\fasterxml\woodstox\woodstox-core\6.5.1\woodstox-core-6.5.1.jar;C:\Users\guendil_z\.m2\repository\org\yaml\snakeyaml\2.0\snakeyaml-2.0.jar;C:\Users\guendil_z\.m2\repository\org\springframework\security\spring-security-core\6.2.2\spring-security-core-6.2.2.jar;C:\Users\guendil_z\.m2\repository\org\springframework\security\spring-security-crypto\6.2.2\spring-security-crypto-6.2.2.jar;C:\Users\guendil_z\.m2\repository\org\springframework\spring-expression\6.1.4\spring-expression-6.1.4.jar;C:\Users\guendil_z\.m2\repository\org\springframework\boot\spring-boot-starter-data-mongodb\3.2.3\spring-boot-starter-data-mongodb-3.2.3.jar;C:\Users\guendil_z\.m2\repository\org\mongodb\mongodb-driver-sync\4.11.1\mongodb-driver-sync-4.11.1.jar;C:\Users\guendil_z\.m2\repository\org\mongodb\bson\4.11.1\bson-4.11.1.jar;C:\Users\guendil_z\.m2\repository\org\mongodb\mongodb-driver-core\4.11.1\mongodb-driver-core-4.11.1.jar;C:\Users\guendil_z\.m2\repository\org\mongodb\bson-record-codec\4.11.1\bson-record-codec-4.11.1.jar;C:\Users\guendil_z\.m2\repository\org\springframework\data\spring-data-mongodb\4.2.3\spring-data-mongodb-4.2.3.jar;C:\Users\guendil_z\.m2\repository\org\projectlombok\lombok\1.18.30\lombok-1.18.30.jar;C:\Users\guendil_z\.m2\repository\org\springframework\boot\spring-boot-starter-data-rest\3.2.3\spring-boot-starter-data-rest-3.2.3.jar;C:\Users\guendil_z\.m2\repository\org\springframework\data\spring-data-rest-webmvc\4.2.3\spring-data-rest-webmvc-4.2.3.jar;C:\Users\guendil_z\.m2\repository\org\springframework\data\spring-data-rest-core\4.2.3\spring-data-rest-core-4.2.3.jar;C:\Users\guendil_z\.m2\repository\org\springframework\hateoas\spring-hateoas\2.2.0\spring-hateoas-2.2.0.jar;C:\Users\guendil_z\.m2\repository\org\springframework\plugin\spring-plugin-core\3.0.0\spring-plugin-core-3.0.0.jar;C:\Users\guendil_z\.m2\repository\org\atteo\evo-inflector\1.3\evo-inflector-1.3.jar;C:\Users\guendil_z\.m2\repository\org\springframework\boot\spring-boot-configuration-processor\3.2.3\spring-boot-configuration-processor-3.2.3.jar;C:\Users\guendil_z\.m2\repository\com\cl\logs\common-logger\4.0.0\common-logger-4.0.0.jar;C:\Users\guendil_z\.m2\repository\ch\qos\logback\logback-classic\1.4.14\logback-classic-1.4.14.jar;C:\Users\guendil_z\.m2\repository\ch\qos\logback\logback-core\1.4.14\logback-core-1.4.14.jar;C:\Users\guendil_z\.m2\repository\org\slf4j\jul-to-slf4j\2.0.12\jul-to-slf4j-2.0.12.jar;C:\Users\guendil_z\.m2\repository\org\apache\commons\commons-lang3\3.13.0\commons-lang3-3.13.0.jar;C:\Users\guendil_z\.m2\repository\com\fasterxml\jackson\datatype\jackson-datatype-jsr310\2.13.4\jackson-datatype-jsr310-2.13.4.jar;C:\Users\guendil_z\.m2\repository\org\springdoc\springdoc-openapi-starter-webmvc-ui\2.1.0\springdoc-openapi-starter-webmvc-ui-2.1.0.jar;C:\Users\guendil_z\.m2\repository\org\springdoc\springdoc-openapi-starter-webmvc-api\2.1.0\springdoc-openapi-starter-webmvc-api-2.1.0.jar;C:\Users\guendil_z\.m2\repository\org\springdoc\springdoc-openapi-starter-common\2.1.0\springdoc-openapi-starter-common-2.1.0.jar;C:\Users\guendil_z\.m2\repository\io\swagger\core\v3\swagger-core-jakarta\2.2.9\swagger-core-jakarta-2.2.9.jar;C:\Users\guendil_z\.m2\repository\io\swagger\core\v3\swagger-annotations-jakarta\2.2.9\swagger-annotations-jakarta-2.2.9.jar;C:\Users\guendil_z\.m2\repository\io\swagger\core\v3\swagger-models-jakarta\2.2.9\swagger-models-jakarta-2.2.9.jar;C:\Users\guendil_z\.m2\repository\com\fasterxml\jackson\dataformat\jackson-dataformat-yaml\2.15.4\jackson-dataformat-yaml-2.15.4.jar;C:\Users\guendil_z\.m2\repository\org\webjars\swagger-ui\4.18.2\swagger-ui-4.18.2.jar;C:\Users\guendil_z\.m2\repository\javax\xml\bind\jaxb-api\2.3.1\jaxb-api-2.3.1.jar;C:\Users\guendil_z\.m2\repository\javax\activation\javax.activation-api\1.2.0\javax.activation-api-1.2.0.jar;C:\Users\guendil_z\.m2\repository\org\apache\poi\poi\5.0.0\poi-5.0.0.jar;C:\Users\guendil_z\.m2\repository\org\slf4j\jcl-over-slf4j\2.0.12\jcl-over-slf4j-2.0.12.jar;C:\Users\guendil_z\.m2\repository\commons-codec\commons-codec\1.16.1\commons-codec-1.16.1.jar;C:\Users\guendil_z\.m2\repository\org\apache\commons\commons-math3\3.6.1\commons-math3-3.6.1.jar;C:\Users\guendil_z\.m2\repository\com\zaxxer\SparseBitSet\1.2\SparseBitSet-1.2.jar;C:\Users\guendil_z\.m2\repository\org\apache\poi\poi-ooxml\5.0.0\poi-ooxml-5.0.0.jar;C:\Users\guendil_z\.m2\repository\org\apache\poi\poi-ooxml-lite\5.0.0\poi-ooxml-lite-5.0.0.jar;C:\Users\guendil_z\.m2\repository\org\apache\xmlbeans\xmlbeans\4.0.0\xmlbeans-4.0.0.jar;C:\Users\guendil_z\.m2\repository\org\apache\commons\commons-compress\1.20\commons-compress-1.20.jar;C:\Users\guendil_z\.m2\repository\com\github\virtuald\curvesapi\1.06\curvesapi-1.06.jar;C:\Users\guendil_z\.m2\repository\org\bouncycastle\bcpkix-jdk15on\1.68\bcpkix-jdk15on-1.68.jar;C:\Users\guendil_z\.m2\repository\org\bouncycastle\bcprov-jdk15on\1.68\bcprov-jdk15on-1.68.jar;C:\Users\guendil_z\.m2\repository\org\apache\santuario\xmlsec\2.2.1\xmlsec-2.2.1.jar;C:\Users\guendil_z\.m2\repository\org\apache\xmlgraphics\batik-all\1.13\batik-all-1.13.jar;C:\Users\guendil_z\.m2\repository\org\apache\xmlgraphics\batik-anim\1.13\batik-anim-1.13.jar;C:\Users\guendil_z\.m2\repository\org\apache\xmlgraphics\batik-shared-resources\1.13\batik-shared-resources-1.13.jar;C:\Users\guendil_z\.m2\repository\xml-apis\xml-apis-ext\1.3.04\xml-apis-ext-1.3.04.jar;C:\Users\guendil_z\.m2\repository\org\apache\xmlgraphics\batik-awt-util\1.13\batik-awt-util-1.13.jar;C:\Users\guendil_z\.m2\repository\org\apache\xmlgraphics\xmlgraphics-commons\2.4\xmlgraphics-commons-2.4.jar;C:\Users\guendil_z\.m2\repository\commons-io\commons-io\1.3.1\commons-io-1.3.1.jar;C:\Users\guendil_z\.m2\repository\org\apache\xmlgraphics\batik-bridge\1.13\batik-bridge-1.13.jar;C:\Users\guendil_z\.m2\repository\org\apache\xmlgraphics\batik-codec\1.13\batik-codec-1.13.jar;C:\Users\guendil_z\.m2\repository\org\apache\xmlgraphics\batik-constants\1.13\batik-constants-1.13.jar;C:\Users\guendil_z\.m2\repository\org\apache\xmlgraphics\batik-css\1.13\batik-css-1.13.jar;C:\Users\guendil_z\.m2\repository\org\apache\xmlgraphics\batik-dom\1.13\batik-dom-1.13.jar;C:\Users\guendil_z\.m2\repository\xalan\xalan\2.7.2\xalan-2.7.2.jar;C:\Users\guendil_z\.m2\repository\xalan\serializer\2.7.2\serializer-2.7.2.jar;C:\Users\guendil_z\.m2\repository\xml-apis\xml-apis\1.4.01\xml-apis-1.4.01.jar;C:\Users\guendil_z\.m2\repository\org\apache\xmlgraphics\batik-ext\1.13\batik-ext-1.13.jar;C:\Users\guendil_z\.m2\repository\org\apache\xmlgraphics\batik-extension\1.13\batik-extension-1.13.jar;C:\Users\guendil_z\.m2\repository\org\apache\xmlgraphics\batik-gui-util\1.13\batik-gui-util-1.13.jar;C:\Users\guendil_z\.m2\repository\org\apache\xmlgraphics\batik-gvt\1.13\batik-gvt-1.13.jar;C:\Users\guendil_z\.m2\repository\org\apache\xmlgraphics\batik-i18n\1.13\batik-i18n-1.13.jar;C:\Users\guendil_z\.m2\repository\org\apache\xmlgraphics\batik-parser\1.13\batik-parser-1.13.jar;C:\Users\guendil_z\.m2\repository\org\apache\xmlgraphics\batik-rasterizer-ext\1.13\batik-rasterizer-ext-1.13.jar;C:\Users\guendil_z\.m2\repository\org\apache\xmlgraphics\batik-rasterizer\1.13\batik-rasterizer-1.13.jar;C:\Users\guendil_z\.m2\repository\org\apache\xmlgraphics\batik-script\1.13\batik-script-1.13.jar;C:\Users\guendil_z\.m2\repository\org\apache\xmlgraphics\batik-slideshow\1.13\batik-slideshow-1.13.jar;C:\Users\guendil_z\.m2\repository\org\apache\xmlgraphics\batik-squiggle-ext\1.13\batik-squiggle-ext-1.13.jar;C:\Users\guendil_z\.m2\repository\org\apache\xmlgraphics\batik-squiggle\1.13\batik-squiggle-1.13.jar;C:\Users\guendil_z\.m2\repository\org\apache\xmlgraphics\batik-svg-dom\1.13\batik-svg-dom-1.13.jar;C:\Users\guendil_z\.m2\repository\org\apache\xmlgraphics\batik-svgbrowser\1.13\batik-svgbrowser-1.13.jar;C:\Users\guendil_z\.m2\repository\org\apache\xmlgraphics\batik-svggen\1.13\batik-svggen-1.13.jar;C:\Users\guendil_z\.m2\repository\org\apache\xmlgraphics\batik-svgpp\1.13\batik-svgpp-1.13.jar;C:\Users\guendil_z\.m2\repository\org\apache\xmlgraphics\batik-svgrasterizer\1.13\batik-svgrasterizer-1.13.jar;C:\Users\guendil_z\.m2\repository\org\apache\xmlgraphics\batik-swing\1.13\batik-swing-1.13.jar;C:\Users\guendil_z\.m2\repository\org\apache\xmlgraphics\batik-transcoder\1.13\batik-transcoder-1.13.jar;C:\Users\guendil_z\.m2\repository\org\apache\xmlgraphics\batik-util\1.13\batik-util-1.13.jar;C:\Users\guendil_z\.m2\repository\org\apache\xmlgraphics\batik-ttf2svg\1.13\batik-ttf2svg-1.13.jar;C:\Users\guendil_z\.m2\repository\org\apache\xmlgraphics\batik-xml\1.13\batik-xml-1.13.jar;C:\Users\guendil_z\.m2\repository\de\rototor\pdfbox\graphics2d\0.30\graphics2d-0.30.jar;C:\Users\guendil_z\.m2\repository\org\apache\pdfbox\pdfbox\2.0.22\pdfbox-2.0.22.jar;C:\Users\guendil_z\.m2\repository\org\apache\pdfbox\fontbox\2.0.22\fontbox-2.0.22.jar" com.intellij.rt.junit.JUnitStarter -ideVersion5 -junit5 com.cl.msofd.controller.EntrepriseControllerTest
-13:12:22.391 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.cl.msofd.controller.EntrepriseControllerTest]: EntrepriseControllerTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
-13:12:22.737 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.cl.msofd.MsofdApplication for test class com.cl.msofd.controller.EntrepriseControllerTest
-13:12:22,185 |-INFO in ch.qos.logback.classic.LoggerContext[default] - This is logback-classic version 1.4.14
-13:12:22,190 |-INFO in ch.qos.logback.classic.util.ContextInitializer@faa3fed - Here is a list of configurators discovered as a service, by rank: 
-13:12:22,191 |-INFO in ch.qos.logback.classic.util.ContextInitializer@faa3fed -   org.springframework.boot.logging.logback.RootLogLevelConfigurator
-13:12:22,191 |-INFO in ch.qos.logback.classic.util.ContextInitializer@faa3fed - They will be invoked in order until ExecutionStatus.DO_NOT_INVOKE_NEXT_IF_ANY is returned.
-13:12:22,191 |-INFO in ch.qos.logback.classic.util.ContextInitializer@faa3fed - Constructed configurator of type class org.springframework.boot.logging.logback.RootLogLevelConfigurator
-13:12:22,202 |-INFO in ch.qos.logback.classic.util.ContextInitializer@faa3fed - org.springframework.boot.logging.logback.RootLogLevelConfigurator.configure() call lasted 0 milliseconds. ExecutionStatus=INVOKE_NEXT_IF_ANY
-13:12:22,202 |-INFO in ch.qos.logback.classic.util.ContextInitializer@faa3fed - Trying to configure with ch.qos.logback.classic.joran.SerializedModelConfigurator
-13:12:22,204 |-INFO in ch.qos.logback.classic.util.ContextInitializer@faa3fed - Constructed configurator of type class ch.qos.logback.classic.joran.SerializedModelConfigurator
-13:12:22,207 |-INFO in ch.qos.logback.classic.LoggerContext[default] - Could NOT find resource [logback-test.scmo]
-13:12:22,208 |-INFO in ch.qos.logback.classic.LoggerContext[default] - Could NOT find resource [logback.scmo]
-13:12:22,208 |-INFO in ch.qos.logback.classic.util.ContextInitializer@faa3fed - ch.qos.logback.classic.joran.SerializedModelConfigurator.configure() call lasted 4 milliseconds. ExecutionStatus=INVOKE_NEXT_IF_ANY
-13:12:22,208 |-INFO in ch.qos.logback.classic.util.ContextInitializer@faa3fed - Trying to configure with ch.qos.logback.classic.util.DefaultJoranConfigurator
-13:12:22,210 |-INFO in ch.qos.logback.classic.util.ContextInitializer@faa3fed - Constructed configurator of type class ch.qos.logback.classic.util.DefaultJoranConfigurator
-13:12:22,211 |-INFO in ch.qos.logback.classic.LoggerContext[default] - Could NOT find resource [logback-test.xml]
-13:12:22,211 |-INFO in ch.qos.logback.classic.LoggerContext[default] - Could NOT find resource [logback.xml]
-13:12:22,211 |-INFO in ch.qos.logback.classic.util.ContextInitializer@faa3fed - ch.qos.logback.classic.util.DefaultJoranConfigurator.configure() call lasted 1 milliseconds. ExecutionStatus=INVOKE_NEXT_IF_ANY
-13:12:22,211 |-INFO in ch.qos.logback.classic.util.ContextInitializer@faa3fed - Trying to configure with ch.qos.logback.classic.BasicConfigurator
-13:12:22,214 |-INFO in ch.qos.logback.classic.util.ContextInitializer@faa3fed - Constructed configurator of type class ch.qos.logback.classic.BasicConfigurator
-13:12:22,214 |-INFO in ch.qos.logback.classic.BasicConfigurator@381cad29 - Setting up default configuration.
-13:12:22,239 |-INFO in ch.qos.logback.classic.util.ContextInitializer@faa3fed - ch.qos.logback.classic.BasicConfigurator.configure() call lasted 25 milliseconds. ExecutionStatus=NEUTRAL
-13:12:23,250 |-INFO in ch.qos.logback.core.joran.spi.ConfigurationWatchList@988246e - URL [jar:file:/C:/Users/guendil_z/.m2/repository/com/cl/logs/common-logger/4.0.0/common-logger-4.0.0.jar!/logback-spring.xml] is not of type file
-13:12:23,383 |-INFO in ch.qos.logback.core.model.processor.AppenderModelHandler - Processing appender named [Console]
-13:12:23,383 |-INFO in ch.qos.logback.core.model.processor.AppenderModelHandler - About to instantiate appender of type [ch.qos.logback.core.ConsoleAppender]
-13:12:23,441 |-INFO in ch.qos.logback.core.model.processor.AppenderModelHandler - Processing appender named [RollingFile]
-13:12:23,441 |-INFO in ch.qos.logback.core.model.processor.AppenderModelHandler - About to instantiate appender of type [ch.qos.logback.core.rolling.RollingFileAppender]
-13:12:23,456 |-INFO in c.q.l.core.rolling.TimeBasedRollingPolicy@1649498695 - No compression will be used
-13:12:23,458 |-INFO in c.q.l.core.rolling.TimeBasedRollingPolicy@1649498695 - Will use the pattern ./logs/archived/spring-boot-logger-%d{yyyy-MM-dd}.%i.log for the active file
-13:12:23,473 |-INFO in ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP@3c5a54b7 - The date pattern is 'yyyy-MM-dd' from file name pattern './logs/archived/spring-boot-logger-%d{yyyy-MM-dd}.%i.log'.
-13:12:23,473 |-INFO in ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP@3c5a54b7 - Roll-over at midnight.
-13:12:23,482 |-INFO in ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP@3c5a54b7 - Setting initial period to 2024-07-09T11:08:19.196Z
-13:12:23,482 |-WARN in ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP@3c5a54b7 - SizeAndTimeBasedFNATP is deprecated. Use SizeAndTimeBasedRollingPolicy instead
-13:12:23,482 |-WARN in ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP@3c5a54b7 - For more information see http://logback.qos.ch/manual/appenders.html#SizeAndTimeBasedRollingPolicy
-13:12:23,491 |-INFO in ch.qos.logback.core.rolling.RollingFileAppender[RollingFile] - Active log file name: ./logs/spring-boot-logger.log
-13:12:23,491 |-INFO in ch.qos.logback.core.rolling.RollingFileAppender[RollingFile] - File property is set to [./logs/spring-boot-logger.log]
-13:12:23,492 |-INFO in ch.qos.logback.classic.model.processor.RootLoggerModelHandler - Setting level of ROOT logger to INFO
-13:12:23,493 |-INFO in ch.qos.logback.classic.jul.LevelChangePropagator@61f2c3f0 - Propagating INFO level on Logger[ROOT] onto the JUL framework
-13:12:23,494 |-INFO in ch.qos.logback.core.model.processor.AppenderRefModelHandler - Attaching appender named [Console] to Logger[ROOT]
-13:12:23,494 |-INFO in ch.qos.logback.classic.model.processor.RootLoggerModelHandler - Setting level of ROOT logger to INFO
-13:12:23,494 |-INFO in ch.qos.logback.core.model.processor.AppenderRefModelHandler - Attaching appender named [RollingFile] to Logger[ROOT]
-13:12:23,494 |-INFO in ch.qos.logback.core.model.processor.AppenderRefModelHandler - Attaching appender named [Console] to Logger[ROOT]
-13:12:23,494 |-INFO in ch.qos.logback.core.model.processor.DefaultProcessor@291120f4 - End of configuration.
-13:12:23,494 |-INFO in org.springframework.boot.logging.logback.SpringBootJoranConfigurator@417ad4f3 - Registering current configuration as safe fallback point
+package com.cl.msofd.service;
+
+import com.cl.msofd.exception.ClientNotFoundException;
+import com.cl.msofd.clients.*;
+import com.cl.msofd.model.ClientEntreprise;
+import com.cl.msofd.utility.JSONUtilOFD;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.net.http.HttpResponse.BodyHandlers;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.cl.msofd.clients.Error;
+
+@Service
+public class EntrepriseService {
+
+    public static final String AUTHORIZATION = "Authorization";
+
+    @Autowired
+    private HttpClient httpClient;
+
+    @Autowired
+    private JSONUtilOFD jsonUtils;
+
+    @Value("${referentiel.personne.url}")
+    private String referentielPersonne;
+
+    public ClientEntreprise getClient(String idReper) throws IOException, InterruptedException, ExecutionException {
+
+        String url = String.format(referentielPersonne, idReper).concat("&person_type=INDIVIDUAL_COMPANY");
+        ClientEntreprise rep = null;
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .header(AUTHORIZATION, jsonUtils.basicAuthReferentiel())
+                .build();
+
+        CompletableFuture<HttpResponse<String>> response = httpClient.sendAsync(request, BodyHandlers.ofString());
+        HttpResponse<String> httpResponse = response.get();
+        String responseBody = httpResponse.body();
+
+        // Vérifiez si la réponse est un tableau d'erreurs
+        if (httpResponse.statusCode() != 200 || responseBody.startsWith("[")) {
+            // Parsez le tableau d'erreurs
+            ObjectMapper objectMapper = new ObjectMapper();
+            Error[] errors = objectMapper.readValue(responseBody, Error[].class);
+
+            // Vérifiez si l'erreur est due à un ID reper inconnu
+            for (Error error : errors) {
+                if (error.getCode().equals("B801")) {
+                    throw new ClientNotFoundException(error.getMessage());
+                }
+            }
+        }
+
+     // Si aucune erreur n'est détectée, continuez le traitement normalement
+        ClientResponse personDetails = jsonUtils.covertFromJsonToObject(responseBody, ClientResponse.class);
+        if (personDetails == null) {
+            throw new ClientNotFoundException("Client not found");
+        }
+
+        String typePersonne = personDetails.getEntrepriseDetails().getPersonType();
+
+        if (typePersonne == null) {
+            throw new ClientNotFoundException("Client not found");
+        } else if (typePersonne.equals("LEGAL_PERSON")) { 
+        	// si entreprise==> raison social, siren, civilite, nom,prenom 
+            rep = ClientEntreprise.builder()
+                    .idReper(personDetails.getEntrepriseDetails().getPersonId())
+                    .typePerson(typePersonne)
+                    
+                    .siren(personDetails.getEntrepriseDetails().getCasaData().getSiren())
+                    .legalName(personDetails.getEntrepriseDetails().getCasaData().getLegalName())
+                    .firstName(personDetails.getEntrepriseDetails().getRepresentativesLegals().get(0).getFirstName())
+                    .usuaLastName(personDetails.getEntrepriseDetails().getRepresentativesLegals().get(0).getUsualLastName())
+                    .civilite(personDetails.getEntrepriseDetails().getRepresentativesLegals().get(0).getCivility().getLabel())
+                    .build();
+            
+            
+        } else if (typePersonne.equals("INDIVIDUAL_COMPANY")) {
+        	// si INDIVIDUAL_COMPANY ==> siren, civilite, nom,prenom 
+            rep = ClientEntreprise.builder()
+                    .idReper(personDetails.getEntrepriseDetails().getPersonId())
+                    .typePerson(typePersonne)
+                    
+                    .siren(personDetails.getEntrepriseDetails().getCasaData().getSiren())
+                    .legalName(personDetails.getEntrepriseDetails().getCasaData().getLegalName())
+                    .usuaLastName(personDetails.getEntrepriseDetails().getDescriptiveIndividual().getUsualLastName())
+                    .firstName(personDetails.getEntrepriseDetails().getDescriptiveIndividual().getFirstName())
+                    .civilite(personDetails.getEntrepriseDetails().getDescriptiveIndividual().getCivility().getLabel())
+                    .build();
+        }
+        return rep;
+    }
+}
+
+//
+package com.cl.msofd.controller;
+
+import com.cl.msofd.exception.ErrorResponse;
+import com.cl.msofd.model.ClientEntreprise;
+import com.cl.msofd.service.EntrepriseService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import com.cl.logs.commun.CommonLogger;
+import com.cl.logs.commun.CommonLoggerFactory;
+import com.cl.logs.types.EventTyp;
+import com.cl.logs.types.SecEventTyp;
+import java.io.IOException;
+import java.util.concurrent.ExecutionException;
 
 
-  .   ____          _            __ _ _
- /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
-( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
- \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
-  '  |____| .__|_| |_|_| |_\__, | / / / /
- =========|_|==============|___/=/_/_/_/
- :: Spring Boot ::                (v3.2.3)
+@CrossOrigin(origins = "http://localhost:8081")
+@RestController
+@RequestMapping("/api/v1")
+public class EntrepriseController{
 
-time=2024-07-09T13:12:23.564+02:00|level=INFO |event_cod=empty|event_typ=TECHNICAL|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=HV000001: Hibernate Validator 8.0.1.Final
-time=2024-07-09T13:12:23.619+02:00|level=INFO |event_cod=empty|event_typ=TECHNICAL|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=Starting EntrepriseControllerTest using Java 17.0.9 with PID 18500 (started by guendil_z in C:\Users\guendil_z\Documents\workspace\msofd)
-time=2024-07-09T13:12:23.621+02:00|level=INFO |event_cod=empty|event_typ=TECHNICAL|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=The following 1 profile is active: "prod"
-time=2024-07-09T13:12:25.630+02:00|level=INFO |event_cod=empty|event_typ=TECHNICAL|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=Multiple Spring Data modules found, entering strict repository configuration mode
-time=2024-07-09T13:12:25.633+02:00|level=INFO |event_cod=empty|event_typ=TECHNICAL|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=Bootstrapping Spring Data JPA repositories in DEFAULT mode.
-time=2024-07-09T13:12:25.701+02:00|level=INFO |event_cod=empty|event_typ=TECHNICAL|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=Spring Data JPA - Could not safely identify store assignment for repository candidate interface com.cl.msofd.repository.BienRepository; If you want this repository to be a JPA repository, consider annotating your entities with one of these annotations: jakarta.persistence.Entity, jakarta.persistence.MappedSuperclass (preferred), or consider extending one of the following types with your repository: org.springframework.data.jpa.repository.JpaRepository
-time=2024-07-09T13:12:25.705+02:00|level=INFO |event_cod=empty|event_typ=TECHNICAL|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=Spring Data JPA - Could not safely identify store assignment for repository candidate interface com.cl.msofd.repository.ClientRepository; If you want this repository to be a JPA repository, consider annotating your entities with one of these annotations: jakarta.persistence.Entity, jakarta.persistence.MappedSuperclass (preferred), or consider extending one of the following types with your repository: org.springframework.data.jpa.repository.JpaRepository
-time=2024-07-09T13:12:25.716+02:00|level=INFO |event_cod=empty|event_typ=TECHNICAL|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=Spring Data JPA - Could not safely identify store assignment for repository candidate interface com.cl.msofd.repository.DpeAdemeRepository; If you want this repository to be a JPA repository, consider annotating your entities with one of these annotations: jakarta.persistence.Entity, jakarta.persistence.MappedSuperclass (preferred), or consider extending one of the following types with your repository: org.springframework.data.jpa.repository.JpaRepository
-time=2024-07-09T13:12:25.721+02:00|level=INFO |event_cod=empty|event_typ=TECHNICAL|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=Spring Data JPA - Could not safely identify store assignment for repository candidate interface com.cl.msofd.repository.DpeRepository; If you want this repository to be a JPA repository, consider annotating your entities with one of these annotations: jakarta.persistence.Entity, jakarta.persistence.MappedSuperclass (preferred), or consider extending one of the following types with your repository: org.springframework.data.jpa.repository.JpaRepository
-time=2024-07-09T13:12:25.723+02:00|level=INFO |event_cod=empty|event_typ=TECHNICAL|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=Spring Data JPA - Could not safely identify store assignment for repository candidate interface com.cl.msofd.repository.EntrepriseRepository; If you want this repository to be a JPA repository, consider annotating your entities with one of these annotations: jakarta.persistence.Entity, jakarta.persistence.MappedSuperclass (preferred), or consider extending one of the following types with your repository: org.springframework.data.jpa.repository.JpaRepository
-time=2024-07-09T13:12:25.727+02:00|level=INFO |event_cod=empty|event_typ=TECHNICAL|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=Spring Data JPA - Could not safely identify store assignment for repository candidate interface com.cl.msofd.repository.FinancementRepository; If you want this repository to be a JPA repository, consider annotating your entities with one of these annotations: jakarta.persistence.Entity, jakarta.persistence.MappedSuperclass (preferred), or consider extending one of the following types with your repository: org.springframework.data.jpa.repository.JpaRepository
-time=2024-07-09T13:12:25.732+02:00|level=INFO |event_cod=empty|event_typ=TECHNICAL|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=Spring Data JPA - Could not safely identify store assignment for repository candidate interface com.cl.msofd.repository.GarantieRepository; If you want this repository to be a JPA repository, consider annotating your entities with one of these annotations: jakarta.persistence.Entity, jakarta.persistence.MappedSuperclass (preferred), or consider extending one of the following types with your repository: org.springframework.data.jpa.repository.JpaRepository
-time=2024-07-09T13:12:25.735+02:00|level=INFO |event_cod=empty|event_typ=TECHNICAL|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=Finished Spring Data repository scanning in 88 ms. Found 0 JPA repository interfaces.
-time=2024-07-09T13:12:25.752+02:00|level=INFO |event_cod=empty|event_typ=TECHNICAL|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=Multiple Spring Data modules found, entering strict repository configuration mode
-time=2024-07-09T13:12:25.753+02:00|level=INFO |event_cod=empty|event_typ=TECHNICAL|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=Bootstrapping Spring Data MongoDB repositories in DEFAULT mode.
-time=2024-07-09T13:12:25.817+02:00|level=INFO |event_cod=empty|event_typ=TECHNICAL|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=Finished Spring Data repository scanning in 63 ms. Found 7 MongoDB repository interfaces.
-Java HotSpot(TM) 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
-time=2024-07-09T13:12:28.914+02:00|level=INFO |event_cod=empty|event_typ=TECHNICAL|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=HikariPool-1 - Starting...
-time=2024-07-09T13:12:29.326+02:00|level=INFO |event_cod=empty|event_typ=TECHNICAL|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=HikariPool-1 - Added connection conn0: url=jdbc:h2:mem:78c5c452-a179-4676-99c8-1de64e061610 user=SA
-time=2024-07-09T13:12:29.330+02:00|level=INFO |event_cod=empty|event_typ=TECHNICAL|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=HikariPool-1 - Start completed.
-time=2024-07-09T13:12:29.453+02:00|level=INFO |event_cod=empty|event_typ=TECHNICAL|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=HHH000204: Processing PersistenceUnitInfo [name: default]
-time=2024-07-09T13:12:29.628+02:00|level=INFO |event_cod=empty|event_typ=TECHNICAL|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=HHH000412: Hibernate ORM core version 6.4.4.Final
-time=2024-07-09T13:12:29.737+02:00|level=INFO |event_cod=empty|event_typ=TECHNICAL|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=HHH000026: Second-level cache disabled
-time=2024-07-09T13:12:30.033+02:00|level=INFO |event_cod=empty|event_typ=TECHNICAL|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=No LoadTimeWeaver setup: ignoring JPA class transformer
-time=2024-07-09T13:12:31.118+02:00|level=INFO |event_cod=empty|event_typ=TECHNICAL|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
-time=2024-07-09T13:12:31.131+02:00|level=INFO |event_cod=empty|event_typ=TECHNICAL|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=Initialized JPA EntityManagerFactory for persistence unit 'default'
-time=2024-07-09T13:12:31.581+02:00|level=WARN |event_cod=empty|event_typ=TECHNICAL|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=Connection string contains unsupported option 'tlscafile'.
-time=2024-07-09T13:12:31.680+02:00|level=INFO |event_cod=empty|event_typ=TECHNICAL|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=Adding discovered server mongodb-201.dbaas-mongodb.iaas.cagip.group.gca:27017 to client view of cluster
-time=2024-07-09T13:12:31.801+02:00|level=INFO |event_cod=empty|event_typ=TECHNICAL|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=Adding discovered server mongodb-202.dbaas-mongodb.iaas.cagip.group.gca:27017 to client view of cluster
-time=2024-07-09T13:12:31.808+02:00|level=INFO |event_cod=empty|event_typ=TECHNICAL|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=Adding discovered server mongodb-203.dbaas-mongodb.iaas.cagip.group.gca:27017 to client view of cluster
-time=2024-07-09T13:12:31.876+02:00|level=INFO |event_cod=empty|event_typ=TECHNICAL|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=MongoClient with metadata {"application": {"name": "scripta-lcl-ofd-dev"}, "driver": {"name": "mongo-java-driver|sync|spring-boot", "version": "4.11.1"}, "os": {"type": "Windows", "name": "Windows 11", "architecture": "amd64", "version": "10.0"}, "platform": "Java/Oracle Corporation/17.0.9+11-LTS-201"} created with settings MongoClientSettings{readPreference=primary, writeConcern=WriteConcern{w=majority, wTimeout=null ms, journal=null}, retryWrites=true, retryReads=true, readConcern=ReadConcern{level=null}, credential=MongoCredential{mechanism=null, userName='user-rw', source='scripta-lcl-ofd-dev', password=<hidden>, mechanismProperties=<hidden>}, transportSettings=null, streamFactoryFactory=null, commandListeners=[io.micrometer.core.instrument.binder.mongodb.MongoMetricsCommandListener@7aad7df5], codecRegistry=ProvidersCodecRegistry{codecProviders=[ValueCodecProvider{}, BsonValueCodecProvider{}, DBRefCodecProvider{}, DBObjectCodecProvider{}, DocumentCodecProvider{}, CollectionCodecProvider{}, IterableCodecProvider{}, MapCodecProvider{}, GeoJsonCodecProvider{}, GridFSFileCodecProvider{}, Jsr310CodecProvider{}, JsonObjectCodecProvider{}, BsonCodecProvider{}, EnumCodecProvider{}, com.mongodb.client.model.mql.ExpressionCodecProvider@64dfa1a3, com.mongodb.Jep395RecordCodecProvider@1f5a1ad4, com.mongodb.KotlinCodecProvider@7866ffa]}, loggerSettings=LoggerSettings{maxDocumentLength=1000}, clusterSettings={hosts=[mongodb-201.dbaas-mongodb.iaas.cagip.group.gca:27017, mongodb-202.dbaas-mongodb.iaas.cagip.group.gca:27017, mongodb-203.dbaas-mongodb.iaas.cagip.group.gca:27017], srvServiceName=mongodb, mode=MULTIPLE, requiredClusterType=REPLICA_SET, requiredReplicaSetName='mutu-200', serverSelector='null', clusterListeners='[]', serverSelectionTimeout='30000 ms', localThreshold='15 ms'}, socketSettings=SocketSettings{connectTimeoutMS=10000, readTimeoutMS=0, receiveBufferSize=0, proxySettings=ProxySettings{host=null, port=null, username=null, password=null}}, heartbeatSocketSettings=SocketSettings{connectTimeoutMS=10000, readTimeoutMS=10000, receiveBufferSize=0, proxySettings=ProxySettings{host=null, port=null, username=null, password=null}}, connectionPoolSettings=ConnectionPoolSettings{maxSize=100, minSize=0, maxWaitTimeMS=120000, maxConnectionLifeTimeMS=0, maxConnectionIdleTimeMS=0, maintenanceInitialDelayMS=0, maintenanceFrequencyMS=60000, connectionPoolListeners=[io.micrometer.core.instrument.binder.mongodb.MongoMetricsConnectionPoolListener@51c15508], maxConnecting=2}, serverSettings=ServerSettings{heartbeatFrequencyMS=10000, minHeartbeatFrequencyMS=500, serverListeners='[]', serverMonitorListeners='[]'}, sslSettings=SslSettings{enabled=true, invalidHostNameAllowed=false, context=null}, applicationName='scripta-lcl-ofd-dev', compressorList=[], uuidRepresentation=JAVA_LEGACY, serverApi=null, autoEncryptionSettings=null, dnsClient=null, inetAddressResolver=null, contextProvider=null}
-time=2024-07-09T13:12:31.886+02:00|level=WARN |event_cod=empty|event_typ=TECHNICAL|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=Connection string contains unsupported option 'tlscafile'.
-time=2024-07-09T13:12:32.816+02:00|level=INFO |event_cod=empty|event_typ=TECHNICAL|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=Monitor thread successfully connected to server with description ServerDescription{address=mongodb-203.dbaas-mongodb.iaas.cagip.group.gca:27017, type=REPLICA_SET_SECONDARY, state=CONNECTED, ok=true, minWireVersion=0, maxWireVersion=13, maxDocumentSize=16777216, logicalSessionTimeoutMinutes=30, roundTripTimeNanos=389991200, setName='mutu-200', canonicalAddress=mongodb-203.dbaas-mongodb.iaas.cagip.group.gca:27017, hosts=[mongodb-203.dbaas-mongodb.iaas.cagip.group.gca:27017, mongodb-201.dbaas-mongodb.iaas.cagip.group.gca:27017, mongodb-202.dbaas-mongodb.iaas.cagip.group.gca:27017], passives=[], arbiters=[], primary='mongodb-202.dbaas-mongodb.iaas.cagip.group.gca:27017', tagSet=TagSet{[]}, electionId=null, setVersion=28, topologyVersion=TopologyVersion{processId=667319a364de25eba20d131b, counter=4}, lastWriteDate=Tue Jul 09 13:12:32 CEST 2024, lastUpdateTimeNanos=4909859733900}
-time=2024-07-09T13:12:32.816+02:00|level=INFO |event_cod=empty|event_typ=TECHNICAL|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=Monitor thread successfully connected to server with description ServerDescription{address=mongodb-201.dbaas-mongodb.iaas.cagip.group.gca:27017, type=REPLICA_SET_SECONDARY, state=CONNECTED, ok=true, minWireVersion=0, maxWireVersion=13, maxDocumentSize=16777216, logicalSessionTimeoutMinutes=30, roundTripTimeNanos=389469800, setName='mutu-200', canonicalAddress=mongodb-201.dbaas-mongodb.iaas.cagip.group.gca:27017, hosts=[mongodb-203.dbaas-mongodb.iaas.cagip.group.gca:27017, mongodb-201.dbaas-mongodb.iaas.cagip.group.gca:27017, mongodb-202.dbaas-mongodb.iaas.cagip.group.gca:27017], passives=[], arbiters=[], primary='mongodb-202.dbaas-mongodb.iaas.cagip.group.gca:27017', tagSet=TagSet{[]}, electionId=null, setVersion=28, topologyVersion=TopologyVersion{processId=6671e8325134baabad00ddb3, counter=10}, lastWriteDate=Tue Jul 09 13:12:32 CEST 2024, lastUpdateTimeNanos=4909858310400}
-time=2024-07-09T13:12:32.819+02:00|level=INFO |event_cod=empty|event_typ=TECHNICAL|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=Monitor thread successfully connected to server with description ServerDescription{address=mongodb-202.dbaas-mongodb.iaas.cagip.group.gca:27017, type=REPLICA_SET_PRIMARY, state=CONNECTED, ok=true, minWireVersion=0, maxWireVersion=13, maxDocumentSize=16777216, logicalSessionTimeoutMinutes=30, roundTripTimeNanos=390188500, setName='mutu-200', canonicalAddress=mongodb-202.dbaas-mongodb.iaas.cagip.group.gca:27017, hosts=[mongodb-203.dbaas-mongodb.iaas.cagip.group.gca:27017, mongodb-201.dbaas-mongodb.iaas.cagip.group.gca:27017, mongodb-202.dbaas-mongodb.iaas.cagip.group.gca:27017], passives=[], arbiters=[], primary='mongodb-202.dbaas-mongodb.iaas.cagip.group.gca:27017', tagSet=TagSet{[]}, electionId=7fffffff00000000000001df, setVersion=28, topologyVersion=TopologyVersion{processId=667317b2326b0d3d170307ea, counter=6}, lastWriteDate=Tue Jul 09 13:12:32 CEST 2024, lastUpdateTimeNanos=4909859733900}
-time=2024-07-09T13:12:32.826+02:00|level=INFO |event_cod=empty|event_typ=TECHNICAL|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=Discovered replica set primary mongodb-202.dbaas-mongodb.iaas.cagip.group.gca:27017 with max election id 7fffffff00000000000001df and max set version 28
-time=2024-07-09T13:12:34.270+02:00|level=WARN |event_cod=empty|event_typ=TECHNICAL|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
-time=2024-07-09T13:12:35.639+02:00|level=INFO |event_cod=empty|event_typ=TECHNICAL|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=Exposing 3 endpoint(s) beneath base path '/actuator'
-time=2024-07-09T13:12:35.788+02:00|level=INFO |event_cod=empty|event_typ=TECHNICAL|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@52c4bf29, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@34612ba9, org.springframework.security.web.context.SecurityContextHolderFilter@7e199cec, org.springframework.security.web.header.HeaderWriterFilter@1f6865ca, org.springframework.web.filter.CorsFilter@765611c9, org.springframework.security.web.authentication.logout.LogoutFilter@2339ad10, org.springframework.security.web.authentication.www.BasicAuthenticationFilter@4998944b, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@34817fcc, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@3d4b3b94, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@33f2ac11, org.springframework.security.web.session.SessionManagementFilter@785dbe3a, org.springframework.security.web.access.ExceptionTranslationFilter@28446b06, org.springframework.security.web.access.intercept.AuthorizationFilter@6f3b4c9a]
-time=2024-07-09T13:12:35.807+02:00|level=WARN |event_cod=empty|event_typ=TECHNICAL|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=You are asking Spring Security to ignore Ant [pattern='/supervision/**']. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
-time=2024-07-09T13:12:35.807+02:00|level=INFO |event_cod=empty|event_typ=TECHNICAL|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=Will not secure Ant [pattern='/supervision/**']
-time=2024-07-09T13:12:35.808+02:00|level=WARN |event_cod=empty|event_typ=TECHNICAL|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=You are asking Spring Security to ignore Ant [pattern='/sirius/login/**']. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
-time=2024-07-09T13:12:35.808+02:00|level=INFO |event_cod=empty|event_typ=TECHNICAL|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=Will not secure Ant [pattern='/sirius/login/**']
-time=2024-07-09T13:12:35.808+02:00|level=WARN |event_cod=empty|event_typ=TECHNICAL|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=You are asking Spring Security to ignore Ant [pattern='/h2-console/**']. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
-time=2024-07-09T13:12:35.808+02:00|level=INFO |event_cod=empty|event_typ=TECHNICAL|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=Will not secure Ant [pattern='/h2-console/**']
-time=2024-07-09T13:12:35.808+02:00|level=WARN |event_cod=empty|event_typ=TECHNICAL|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=You are asking Spring Security to ignore Ant [pattern='/home/**']. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
-time=2024-07-09T13:12:35.808+02:00|level=INFO |event_cod=empty|event_typ=TECHNICAL|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=Will not secure Ant [pattern='/home/**']
-time=2024-07-09T13:12:35.808+02:00|level=WARN |event_cod=empty|event_typ=TECHNICAL|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=You are asking Spring Security to ignore Ant [pattern='/swagger-ui/**']. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
-time=2024-07-09T13:12:35.808+02:00|level=INFO |event_cod=empty|event_typ=TECHNICAL|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=Will not secure Ant [pattern='/swagger-ui/**']
-time=2024-07-09T13:12:35.808+02:00|level=WARN |event_cod=empty|event_typ=TECHNICAL|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=You are asking Spring Security to ignore Ant [pattern='/v3/api-docs/**']. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
-time=2024-07-09T13:12:35.808+02:00|level=INFO |event_cod=empty|event_typ=TECHNICAL|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=Will not secure Ant [pattern='/v3/api-docs/**']
-time=2024-07-09T13:12:37.239+02:00|level=WARN |event_cod=empty|event_typ=TECHNICAL|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=
+    @Autowired
+    private EntrepriseService entrepriseService;
 
-Using generated security password: 16939002-4c20-45b4-a14d-454da82b8ea7
-
-This generated password is for development use only. Your security configuration must be updated before running your application in production.
-
-time=2024-07-09T13:12:37.293+02:00|level=INFO |event_cod=empty|event_typ=TECHNICAL|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=Initializing Spring TestDispatcherServlet ''
-time=2024-07-09T13:12:37.293+02:00|level=INFO |event_cod=empty|event_typ=TECHNICAL|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=Initializing Servlet ''
-time=2024-07-09T13:12:37.296+02:00|level=INFO |event_cod=empty|event_typ=TECHNICAL|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=Completed initialization in 3 ms
-time=2024-07-09T13:12:37.426+02:00|level=INFO |event_cod=empty|event_typ=TECHNICAL|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=Started EntrepriseControllerTest in 14.469 seconds (process running for 17.699)
-
-MockHttpServletRequest:
-      HTTP Method = GET
-      Request URI = /api/v1/clients/entreprise/12345
-       Parameters = {}
-          Headers = [Content-Type:"application/json;charset=UTF-8", Origin:"http://localhost:8081"]
-             Body = null
-    Session Attrs = {}
-
-Handler:
-             Type = null
-
-Async:
-    Async started = false
-     Async result = null
-
-Resolved Exception:
-             Type = null
-
-ModelAndView:
-        View name = null
-             View = null
-            Model = null
-
-FlashMap:
-       Attributes = null
-
-MockHttpServletResponse:
-           Status = 401
-    Error message = null
-          Headers = [Vary:"Origin", "Access-Control-Request-Method", "Access-Control-Request-Headers", Access-Control-Allow-Origin:"http://localhost:8081", Access-Control-Allow-Credentials:"true", WWW-Authenticate:"Basic realm="CREDITINST - Crédits Instantanés"", X-Content-Type-Options:"nosniff", X-XSS-Protection:"0", Cache-Control:"no-cache, no-store, max-age=0, must-revalidate", Pragma:"no-cache", Expires:"0", X-Frame-Options:"DENY"]
-     Content type = null
-             Body = HTTP Status 401 - Full authentication is required to access this resource
-
-    Forwarded URL = null
-   Redirected URL = null
-          Cookies = []
-
-java.lang.AssertionError: Status expected:<500> but was:<401>
-Expected :500
-Actual   :401
-<Click to see difference>
+    private final CommonLogger commonLogger = CommonLoggerFactory.getLogger(EntrepriseController.class);
+    
+    @Operation(description = "returns the legal_name and siren of professional and business client")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successful operation"),
+            @ApiResponse(responseCode = "404", description = "Not Found",content = @Content(schema = @Schema(implementation =ErrorResponse.class))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized",content = @Content(schema = @Schema())),
+            @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(schema = @Schema(implementation =ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation =ErrorResponse.class))),
+    })
+    
+    @GetMapping("/clients/entreprise/{idReper}")
+    public ResponseEntity<ClientEntreprise> getClient(
+    		@Parameter(description = "unique client identifier", required = true)
+    		@PathVariable(value = "idReper") String idReper) throws IOException, ExecutionException, InterruptedException {
+    	commonLogger.eventTyp(EventTyp.APPLICATIVE).secEventTyp(SecEventTyp.METIER).logger().info("getClient Entreprise ayant l'id : {}", idReper);
+            ClientEntreprise entrepriseByIdReper = entrepriseService.getClient(idReper);
+            return ResponseEntity.ok(entrepriseByIdReper);
 
 
-	at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:59)
-	at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:122)
-	at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$9(StatusResultMatchers.java:637)
-	at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:214)
-	at com.cl.msofd.controller.EntrepriseControllerTest.should_return_500_when_service_throws_Exception(EntrepriseControllerTest.java:84)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+    }
+}	
+//
+package com.cl.msofd.model;
 
+import lombok.*;
 
-MockHttpServletRequest:
-      HTTP Method = GET
-      Request URI = /api/v1/clients/entreprise/unknownId
-       Parameters = {}
-          Headers = [Content-Type:"application/json;charset=UTF-8", Origin:"http://localhost:8081"]
-             Body = null
-    Session Attrs = {}
+import java.io.Serializable;
 
-Handler:
-             Type = null
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class ClientEntreprise implements Serializable {
+    private static final long serialVersionUID = 1L;
 
-Async:
-    Async started = false
-     Async result = null
+    private String idReper;
+    private String typePerson;
 
-Resolved Exception:
-             Type = null
+    private String siren;
+    private String legalName;
 
-ModelAndView:
-        View name = null
-             View = null
-            Model = null
+    private String usuaLastName;
+    private String firstName;
+    private String civilite;
 
-FlashMap:
-       Attributes = null
-
-MockHttpServletResponse:
-           Status = 401
-    Error message = null
-          Headers = [Vary:"Origin", "Access-Control-Request-Method", "Access-Control-Request-Headers", Access-Control-Allow-Origin:"http://localhost:8081", Access-Control-Allow-Credentials:"true", WWW-Authenticate:"Basic realm="CREDITINST - Crédits Instantanés"", X-Content-Type-Options:"nosniff", X-XSS-Protection:"0", Cache-Control:"no-cache, no-store, max-age=0, must-revalidate", Pragma:"no-cache", Expires:"0", X-Frame-Options:"DENY"]
-     Content type = null
-             Body = HTTP Status 401 - Full authentication is required to access this resource
-
-    Forwarded URL = null
-   Redirected URL = null
-          Cookies = []
-
-java.lang.AssertionError: Status expected:<404> but was:<401>
-Expected :404
-Actual   :401
-<Click to see difference>
-
-
-	at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:59)
-	at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:122)
-	at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$9(StatusResultMatchers.java:637)
-	at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:214)
-	at com.cl.msofd.controller.EntrepriseControllerTest.should_return_404_when_idReper_does_not_exist(EntrepriseControllerTest.java:73)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
-
-
-MockHttpServletRequest:
-      HTTP Method = GET
-      Request URI = /api/v1/clients/entreprise/12345
-       Parameters = {}
-          Headers = [Content-Type:"application/json;charset=UTF-8", Origin:"http://localhost:8081"]
-             Body = null
-    Session Attrs = {}
-
-Handler:
-             Type = null
-
-Async:
-    Async started = false
-     Async result = null
-
-Resolved Exception:
-             Type = null
-
-ModelAndView:
-        View name = null
-             View = null
-            Model = null
-
-FlashMap:
-       Attributes = null
-
-MockHttpServletResponse:
-           Status = 401
-    Error message = null
-          Headers = [Vary:"Origin", "Access-Control-Request-Method", "Access-Control-Request-Headers", Access-Control-Allow-Origin:"http://localhost:8081", Access-Control-Allow-Credentials:"true", WWW-Authenticate:"Basic realm="CREDITINST - Crédits Instantanés"", X-Content-Type-Options:"nosniff", X-XSS-Protection:"0", Cache-Control:"no-cache, no-store, max-age=0, must-revalidate", Pragma:"no-cache", Expires:"0", X-Frame-Options:"DENY"]
-     Content type = null
-             Body = HTTP Status 401 - Full authentication is required to access this resource
-
-    Forwarded URL = null
-   Redirected URL = null
-          Cookies = []
-
-java.lang.AssertionError: Status expected:<200> but was:<401>
-Expected :200
-Actual   :401
-<Click to see difference>
-
-
-	at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:59)
-	at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:122)
-	at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$9(StatusResultMatchers.java:637)
-	at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:214)
-	at com.cl.msofd.controller.EntrepriseControllerTest.should_return_ClientEntreprise_when_idReper_exists(EntrepriseControllerTest.java:55)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
-
-time=2024-07-09T13:12:38.202+02:00|level=INFO |event_cod=empty|event_typ=TECHNICAL|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=Closing JPA EntityManagerFactory for persistence unit 'default'
-time=2024-07-09T13:12:38.207+02:00|level=INFO |event_cod=empty|event_typ=TECHNICAL|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=HikariPool-1 - Shutdown initiated...
-time=2024-07-09T13:12:38.211+02:00|level=INFO |event_cod=empty|event_typ=TECHNICAL|sec_event_typ=METIER|usr_id=empty|uom_cod=20001|app_id=TestApp|component_id=empty|corr_id=empty|sess_id=empty|src_client_id=empty|layer_id=empty|httpMethod=empty|httpStatus=empty|httpRoute=empty|httpRoutePattern=empty|msg=HikariPool-1 - Shutdown completed.
-
-Process finished with exit code -1
+}
+je veux creer une classe de teste pour ce controlleur EntrepriseController
