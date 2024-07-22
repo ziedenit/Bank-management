@@ -425,4 +425,343 @@
       </div>
       </div>           
 </div>
-j'ai un composant angular qui traite un seul objet financement je vais vous envoyer le ts apres et le modele et j'aimerai bien crée  un nouveau composant basé sur le meme mais qui permet d'afficher sur ce meme html plusieurs objet sous forme de file ariane 
+j'ai un composant angular qui traite un seul objet financement je vais vous envoyer le ts apres et le modele et j'aimerai bien crée  un nouveau composant basé sur le meme mais qui permet d'afficher sur ce meme html plusieurs objet sous forme de file ariane
+                        this.financementService.getFinancementbyId(this.id).subscribe(
+(responseFinancement) => {
+	console.log("le financement récupéré par l'id de contexte est :", responseFinancement);
+	
+		this.idRepers=responseFinancement.intervenant.idReper;
+		this.codeApplicatifOrigine=responseFinancement.codeApplicatifOrigine;
+		this.familleObjet=responseFinancement.objetFinancement.codeFamilleObjet;
+		this.typeObjetFinancement=responseFinancement.objetFinancement.codeObjetFinancement;
+		this.agenceCompte=responseFinancement.agenceCompte;
+		
+		if(this.familleObjet=="01"){this.selectedFamilleObjet ="option1";}
+		if(this.familleObjet=="05"){this.selectedFamilleObjet="option4"}
+
+
+		switch (this.typeObjetFinancement) {
+			case "02":
+				this.objetFinance = "Acquisition de bâtiment";
+				break;
+			case "03":
+				this.objetFinance = "Rénovation de bâtiment";
+				this.depExist = true;
+				break;
+			default:
+				break;
+		}
+
+		this.isfirstDebranchement=responseFinancement.firstDisconnectionOfd;
+		this.checkAndHighlightRequiredField(
+			responseFinancement.objetFinancement != null &&
+			responseFinancement.objetFinancement.bien != null &&
+			responseFinancement.objetFinancement.bien.etatBien == null,
+			"natureBien"
+		);
+		
+		this.checkAndHighlightRequiredField(
+			responseFinancement.objetFinancement != null &&
+			responseFinancement.objetFinancement.bien != null &&
+			responseFinancement.objetFinancement.bien.codeBatiment == null,
+			"categorieBatiment"
+		);
+		
+		this.checkAndHighlightRequiredField(
+			responseFinancement.objetFinancement != null &&
+			responseFinancement.objetFinancement.bien != null &&
+			responseFinancement.objetFinancement.bien.partLCL == null,
+			"partLcl"
+		);
+		
+		this.checkAndHighlightRequiredField(
+			responseFinancement.objetFinancement != null &&
+			responseFinancement.objetFinancement.bien != null &&
+			responseFinancement.objetFinancement.bien.prixBien == null,
+			"prixAquisitionBien"
+		);
+		
+		this.checkAndHighlightRequiredField(
+			responseFinancement.objetFinancement != null &&
+			responseFinancement.objetFinancement.bien != null &&
+			responseFinancement.objetFinancement.bien.montantFinanceLCL == null,
+			"montantLclFinance"
+		);
+		
+		this.checkAndHighlightRequiredField(
+			responseFinancement.objetFinancement != null &&
+			responseFinancement.objetFinancement.bien != null &&
+			responseFinancement.objetFinancement.bien.etatBien == "Ancien" &&
+			responseFinancement.objetFinancement.bien.dpeActuel != null &&
+			(responseFinancement.objetFinancement.bien.dpeActuel.numeroDpe == null ||
+				responseFinancement.objetFinancement.bien.dpeActuel.numeroDpe == ""),
+			"numeroDpeAdeme"
+		);
+		
+		this.checkAndHighlightRequiredField(
+			responseFinancement.objetFinancement != null &&
+			responseFinancement.objetFinancement.bien != null &&
+			responseFinancement.objetFinancement.bien.etatBien == "Ancien" &&
+			responseFinancement.objetFinancement.bien.dpeActuel != null &&
+			(responseFinancement.objetFinancement.bien.dpeActuel.sirenDiagnostiqueur == null ||
+				(responseFinancement.objetFinancement.bien.dpeActuel.numeroDpe != null &&
+					responseFinancement.objetFinancement.bien.dpeActuel.sirenDiagnostiqueur == null)),
+			"SirenDPE"
+		);
+		
+		this.checkAndHighlightRequiredField(
+			responseFinancement.objetFinancement != null &&
+			responseFinancement.objetFinancement.bien != null &&
+			responseFinancement.objetFinancement.bien.etatBien == "Neuf" &&
+			responseFinancement.objetFinancement.bien.dateDepotPc == null,
+			"dateDepot"
+		);
+		
+		this.checkAndHighlightRequiredField(
+			responseFinancement.objetFinancement != null &&
+			responseFinancement.objetFinancement.bien != null &&
+			responseFinancement.objetFinancement.bien.etatBien == "Ancien" &&
+			responseFinancement.objetFinancement.bien.anneeConstruction == null,
+			"anneeConstruction"
+		);
+		
+		this.checkAndHighlightRequiredField(
+			responseFinancement.objetFinancement != null &&
+			responseFinancement.objetFinancement.bien != null &&
+			(responseFinancement.objetFinancement.bien.etatBien == "Neuf" ||
+				responseFinancement.objetFinancement.bien.etatBien == "Ancien") &&
+			(responseFinancement.objetFinancement.bien.numeroNomRue == null ||
+				responseFinancement.objetFinancement.bien.numeroNomRue == ""),
+			"numeroNomRue"
+		);
+		
+		this.checkAndHighlightRequiredField(
+			responseFinancement.objetFinancement != null &&
+			responseFinancement.objetFinancement.bien != null &&
+			(responseFinancement.objetFinancement.bien.etatBien == "Neuf" ||
+				responseFinancement.objetFinancement.bien.etatBien == "Ancien") &&
+			(responseFinancement.objetFinancement.bien.codePostal == null ||
+				responseFinancement.objetFinancement.bien.codePostal == ""),
+			"codePostal"
+		);
+		
+		this.checkAndHighlightRequiredField(
+			responseFinancement.objetFinancement != null &&
+			responseFinancement.objetFinancement.bien != null &&
+			(responseFinancement.objetFinancement.bien.etatBien == "Neuf" ||
+				responseFinancement.objetFinancement.bien.etatBien == "Ancien") &&
+			(responseFinancement.objetFinancement.bien.nomCommune == null ||
+				responseFinancement.objetFinancement.bien.nomCommune == ""),
+			"ville"
+		);
+		
+		this.checkAndHighlightRequiredField(
+			responseFinancement.objetFinancement != null &&
+			responseFinancement.objetFinancement.bien != null &&
+			responseFinancement.objetFinancement.bien.etatBien == "Ancien" &&
+			responseFinancement.objetFinancement.bien.dpeActuel != null &&
+			(responseFinancement.objetFinancement.bien.dpeActuel.classeCep == null ||
+				responseFinancement.objetFinancement.bien.dpeActuel.classeCep == ""),
+			"LettreCEP"
+		);
+		
+		this.checkAndHighlightRequiredField(
+			responseFinancement.objetFinancement != null &&
+			responseFinancement.objetFinancement.bien != null &&
+			responseFinancement.objetFinancement.bien.etatBien == "Ancien" &&
+			responseFinancement.objetFinancement.bien.dpeActuel != null &&
+			(responseFinancement.objetFinancement.bien.dpeActuel.classeGes == null ||
+				responseFinancement.objetFinancement.bien.dpeActuel.classeGes == ""),
+			"LettreGES"
+		);
+		
+		this.checkAndHighlightRequiredField(
+			responseFinancement.objetFinancement != null &&
+			responseFinancement.objetFinancement.bien != null &&
+			responseFinancement.objetFinancement.bien.etatBien == "Ancien" &&
+			responseFinancement.objetFinancement.bien.dpeActuel != null &&
+			responseFinancement.objetFinancement.bien.dpeActuel.estimationCep == null,
+			"ValeurCEP"
+		);
+		
+		this.checkAndHighlightRequiredField(
+			responseFinancement.objetFinancement != null &&
+			responseFinancement.objetFinancement.bien != null &&
+			responseFinancement.objetFinancement.bien.etatBien == "Ancien" &&
+			responseFinancement.objetFinancement.bien.dpeActuel != null &&
+			responseFinancement.objetFinancement.bien.dpeActuel.estimationGes == null,
+			"ValeurGES"
+		);
+		
+		this.checkAndHighlightRequiredField(
+			responseFinancement.objetFinancement != null &&
+			responseFinancement.objetFinancement.bien != null &&
+			(responseFinancement.objetFinancement.bien.etatBien == "Neuf" ||
+				responseFinancement.objetFinancement.bien.etatBien == "Ancien") &&
+			responseFinancement.objetFinancement.bien.surfaceBien == null,
+			"SurfaceDuBien"
+		);
+
+	
+		this.checkAndHighlightRequiredField(
+			responseFinancement.objetFinancement.codeObjetFinancement==null,
+			"selectedObjetFinancement"
+		);
+			
+ // Restitution des données sur l'écran depuis la BDD 
+		const codeBatimentMapping = {
+			"00001": "option1",
+			"00002": "option2",
+			"00003": "option3",
+			"00004": "option4",
+			"00005": "option5",
+			"00006": "option6",
+			"99999": "option7"
+		};	
+	    const eligibleDpeMapping = {
+			"99": { type: "option1", hideFieldForm: false },
+			"01": { type: "option2", hideFieldForm: true },
+			"02": { type: "option3", hideFieldForm: true },
+			"03": { type: "option4", hideFieldForm: true },
+			"04": { type: "option5", hideFieldForm: true },
+			"05": { type: "option6", hideFieldForm: true },
+			"06": { type: "option7", hideFieldForm: true },
+			"07": { type: "option8", hideFieldForm: true },
+			"08": { type: "option9", hideFieldForm: true },
+			"09": { type: "option10", hideFieldForm: true }
+		};	
+		const alignementMapping = {
+			"01": "éligible et aligné à la Taxonomie",
+			"06": "éligible et non aligné à la Taxonomie",
+			"07": "éligible et alignement à la Taxonomie non évalué"
+		};	
+		const etatBienMapping = {
+			"Ancien": "option1",
+			"Neuf": "option2"
+		};
+		const codeNormeThermiqueMapping = {
+			"01": "option1",
+			"02": "option2",
+			"99": "option3"
+		};
+   if(responseFinancement.objetFinancement!=null &&responseFinancement.objetFinancement.bien!=null
+				&& responseFinancement.objetFinancement.bien.codeBatiment!=null){
+					const codeBatiment = responseFinancement.objetFinancement.bien.codeBatiment;
+					this.codeBatimentSelected = codeBatimentMapping[codeBatiment];
+				}
+
+  if(responseFinancement.objetFinancement!=null &&responseFinancement.objetFinancement.bien!=null
+				&& responseFinancement.objetFinancement.bien.eligibleDpe!=null){
+				const eligibleDpe = responseFinancement.objetFinancement.bien.eligibleDpe;	
+				this.selectedType = eligibleDpeMapping[eligibleDpe].type;
+				this.hideFieldForm = eligibleDpeMapping[eligibleDpe].hideFieldForm;
+				}
+
+    if(responseFinancement.objetFinancement!=null &&responseFinancement.objetFinancement.alignement!=null
+		&& responseFinancement.objetFinancement.alignement.topAlignement!=null){
+			this.DpeResults=true;
+			const topAlignement = responseFinancement.objetFinancement.alignement.topAlignement;
+			this.alignementResultText = alignementMapping[topAlignement];
+			}
+				
+    // Vérifier les pièces justificatives ==>restitution			
+	if (responseFinancement.objetFinancement != null && responseFinancement.objetFinancement.piecesJustificatives != null) {
+		this.presenceJustifDPE = responseFinancement.objetFinancement.piecesJustificatives.some(piece => piece.typePiece === 'DPE')
+		|| responseFinancement.objetFinancement.piecesJustificatives.some(piece => piece.typePiece === 'Compromis de vente');
+		this.presenceJustifDateDepotPC=responseFinancement.objetFinancement.piecesJustificatives.some(piece => piece.typePiece === 'Permis de construire');
+		this.presenceJustifNormeThermique=responseFinancement.objetFinancement.piecesJustificatives.some(piece => piece.typePiece === 'Norme thermique');
+		}
+
+		if(this.presenceJustifDPE && responseFinancement.objetFinancement.bien.dpeActuel!=null){
+		this.isDpe= responseFinancement.objetFinancement.piecesJustificatives.some(piece => piece.typePiece === 'DPE');
+		this.isCompromis=responseFinancement.objetFinancement.piecesJustificatives.some(piece => piece.typePiece === 'Compromis de vente');
+		if(this.isDpe){this.selectedOptionJustif='DPE'}
+		if(this.isCompromis){this.selectedOptionJustif='Compromis de vente'}
+		this.isDpeChecked=true
+		
+		}
+	
+		if(!this.presenceJustifDPE && responseFinancement.objetFinancement.bien.dpeActuel!=null && responseFinancement.objetFinancement.bien.dpeActuel.numeroDpe!=null )
+		{this.errorDpeMessage='Justificatif DPE manquant'}
+		if(this.presenceJustifDateDepotPC)
+		{this.isDateDepotChecked=true;  this.isNormeThermiqueChecked=true; 
+		}
+				
+		if(!this.presenceJustifDateDepotPC &&responseFinancement.objetFinancement.bien.dateDepotPc!=null)
+		{this.errorDateDepotMessage='Justificatif attestant de la date de dépôt du permis de construire manquant';}	
+		if(this.presenceJustifNormeThermique && !this.presenceJustifDateDepotPC){this.isNormeThermiqueChecked=true }
+		if(!this.presenceJustifNormeThermique && !this.presenceJustifDateDepotPC && !this.errorDateDepotMessage
+		&&responseFinancement.objetFinancement.bien.codeNormeThermique!=null){this.errorNormeThermiqueMessage='Justificatif Norme thermique manquant'}
+
+
+// Restitution des données de bloc Objet de financement
+			  if(responseFinancement.objetFinancement!=null && responseFinancement.objetFinancement.bien!=null && responseFinancement.objetFinancement.bien.dateDepotPc!=null){
+			  this.dateDepot=formatDate(responseFinancement.objetFinancement.bien['dateDepotPc'],'yyyy-MM-dd',"en-US")}
+			  if(responseFinancement.objetFinancement!=null && responseFinancement.objetFinancement.bien!=null && responseFinancement.objetFinancement.bien.dpeActuel!=null&& responseFinancement.objetFinancement.bien.dpeActuel.numeroDpe!=null){
+			  this.numeroDpeAdeme=responseFinancement.objetFinancement.bien.dpeActuel.numeroDpe
+			  }
+			  if( responseFinancement.objetFinancement!=null && responseFinancement.objetFinancement.bien!=null && responseFinancement.objetFinancement.bien.partLCL!==null ){
+				this.partLcl=responseFinancement.objetFinancement.bien.partLCL;
+			  }
+			  if( responseFinancement.objetFinancement!=null && responseFinancement.objetFinancement.bien!=null && responseFinancement.objetFinancement.bien.prixBien!==null ){
+				this.prixAquisitionBien=responseFinancement.objetFinancement.bien.prixBien;
+			  }
+			  if( responseFinancement.objetFinancement!=null && responseFinancement.objetFinancement.bien!=null && responseFinancement.objetFinancement.bien.montantFinanceLCL!==null ){
+				this.montantLclFinance=responseFinancement.objetFinancement.bien.montantFinanceLCL;
+		        }
+              if( responseFinancement.objetFinancement!=null && responseFinancement.objetFinancement.bien!=null && responseFinancement.objetFinancement.bien.etatBien!==null ){
+				const etatBien = responseFinancement.objetFinancement.bien.etatBien;
+				this.selectedNatBatiment = etatBienMapping[etatBien];
+			}			
+			if(responseFinancement.objetFinancement!=null && responseFinancement.objetFinancement.bien!=null && responseFinancement.objetFinancement.bien.dpeActuel!=null&& responseFinancement.objetFinancement.bien.dpeActuel.sirenDiagnostiqueur!=null){
+				this.SirenDPE=responseFinancement.objetFinancement.bien.dpeActuel.sirenDiagnostiqueur;
+				}
+			if( responseFinancement.objetFinancement!=null && responseFinancement.objetFinancement.bien!=null && responseFinancement.objetFinancement.bien.codeNormeThermique!==null ){
+				const codeNormeThermique = responseFinancement.objetFinancement.bien.codeNormeThermique;
+				this.normeThermique = codeNormeThermiqueMapping[codeNormeThermique];	
+				}
+			if(responseFinancement.objetFinancement!=null && responseFinancement.objetFinancement.bien!=null && responseFinancement.objetFinancement.bien.dpeActuel!=null&& responseFinancement.objetFinancement.bien.dpeActuel.sirenDiagnostiqueur!=null){
+					this.SirenDPE=responseFinancement.objetFinancement.bien.dpeActuel.sirenDiagnostiqueur;
+					}
+
+//Si un numéro dpe est existant alors un dpe est enregistré dans la base de données // Restitution des données de bloc Objet de financement
+if(responseFinancement.objetFinancement!=null && responseFinancement.objetFinancement.bien!=null &&
+				   responseFinancement.objetFinancement.bien.dpeActuel!=null){
+
+	this.dateReceptionDpe=responseFinancement.objetFinancement.bien.dpeActuel.dateReceptionDpe;
+	this.dateFinValiditeDpe=responseFinancement.objetFinancement.bien.dpeActuel.dateFinValiditeDpe;
+	this.depExist=true
+
+    this.formGroup = this.fb.group({
+	numeroNomRue: responseFinancement.objetFinancement &&
+	responseFinancement.objetFinancement.bien && responseFinancement.objetFinancement.bien.numeroNomRue? responseFinancement.objetFinancement.bien['numeroNomRue']: null,
+    codePostal: responseFinancement.objetFinancement && responseFinancement.objetFinancement.bien ? responseFinancement.objetFinancement.bien['codePostal'] : null,
+    ville: responseFinancement.objetFinancement && responseFinancement.objetFinancement.bien ? responseFinancement.objetFinancement.bien['nomCommune'] : null,
+    dateDiangnostique: responseFinancement.objetFinancement && responseFinancement.objetFinancement.bien && responseFinancement.objetFinancement.bien.dpeActuel && responseFinancement.objetFinancement.bien.dpeActuel['dateEtablissementDpe'] ?responseFinancement.objetFinancement.bien.dpeActuel['dateEtablissementDpe'].toString().substring(0, 10) : null,
+    anneeConstruction: responseFinancement.objetFinancement && responseFinancement.objetFinancement.bien ? responseFinancement.objetFinancement.bien['anneeConstruction'] : null,
+    typeBatiment: responseFinancement.objetFinancement && responseFinancement.objetFinancement.bien ? responseFinancement.objetFinancement.bien['typeBatiment'] : null,
+    lettreCEP: responseFinancement.objetFinancement && responseFinancement.objetFinancement.bien && responseFinancement.objetFinancement.bien.dpeActuel ? responseFinancement.objetFinancement.bien.dpeActuel['classeCep'] : null,
+    lettreGES: responseFinancement.objetFinancement && responseFinancement.objetFinancement.bien && responseFinancement.objetFinancement.bien.dpeActuel ? responseFinancement.objetFinancement.bien.dpeActuel['classeGes'] : null,
+    surfaceBien: responseFinancement.objetFinancement && responseFinancement.objetFinancement.bien ? responseFinancement.objetFinancement.bien['surfaceBien'] : null,
+    valeurCEP: responseFinancement.objetFinancement && responseFinancement.objetFinancement.bien && responseFinancement.objetFinancement.bien.dpeActuel ? responseFinancement.objetFinancement.bien.dpeActuel['estimationCep'] : null,
+    valeurGES: responseFinancement.objetFinancement && responseFinancement.objetFinancement.bien && responseFinancement.objetFinancement.bien.dpeActuel ? responseFinancement.objetFinancement.bien.dpeActuel['estimationGes'] : null,
+    EnergieType: responseFinancement.objetFinancement && responseFinancement.objetFinancement.bien ? responseFinancement.objetFinancement.bien['typeEnergie'] : null,
+});
+
+this.formGroup.get('numeroNomRue').valueChanges.subscribe(numeroNomRue=>
+	{	this.searchAddress();});
+this.formGroup.get('codePostal').valueChanges.subscribe(codePostal=>
+	{	this.searchAddress();});
+this.formGroup.get('ville').valueChanges.subscribe(ville=>
+	{	this.searchAddress();});
+}
+
+// traiter le cas de la présence ou non de l'adresse de bien
+		if(
+		(this.addresseBien==null||this.addresseBien=="" || this.addresseBien== "null null")  &&
+		(this.addresseBienCodePostal==null || this.addresseBienCodePostal=="")&&
+		(this.addresseBienVille ==null || this.addresseBienVille =="")
+		)
+		{
+		this.presenceadresse=false}  else  {this.presenceadresse=true;}
+ });
