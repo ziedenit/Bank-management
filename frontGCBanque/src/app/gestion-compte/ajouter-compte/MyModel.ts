@@ -1,40 +1,95 @@
-.breadcrumb {
+<div class="container-fluid">
+  <!-- File d'Ariane pour les objets de financement -->
+  <nav aria-label="breadcrumb" *ngIf="showFileAriane == true">
+    <ol class="breadcrumb-custom">
+      <li class="breadcrumb-item-custom" *ngFor="let objet of objetsFinancements; let i = index">
+        <a [routerLink]=""
+          queryParamsHandling="preserve" (click)="onBreadcrumbClick(i, objet)">
+          {{ i + 1 }} <span>Objet de financement</span>
+        </a>
+      </li>
+    </ol>
+  </nav>
+  <div class="col-auto text-end">
+    <button class="btn btn-primary btn-sm" (click)="ajouterObjetFinancement()">Ajouter un nouvel objet de financement
+      <img src="../../../assets/icons/plus.svg" />
+    </button>
+  </div>
+</div>
+.breadcrumb-custom {
   display: flex;
-  flex-wrap: wrap;
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
-.breadcrumb-item {
+.breadcrumb-item-custom {
   position: relative;
-  padding: 10px;
-  margin-right: 10px;
-}
-
-.breadcrumb-item a {
-  position: relative;
-  display: block;
-  padding: 10px;
-  background: #007bff;
-  color: white;
-  text-decoration: none;
+  padding: 10px 20px;
+  background: #e9ecef;
+  color: #495057;
   text-align: center;
-  border-radius: 5px;
-  clip-path: polygon(50% 0%, 100% 25%, 75% 100%, 25% 100%, 0% 25%);
+  border-right: 1px solid #dee2e6;
 }
 
-.breadcrumb-item a:hover {
-  background: #0056b3;
+.breadcrumb-item-custom a {
+  color: #495057;
+  text-decoration: none;
 }
 
-.breadcrumb-item a::before {
+.breadcrumb-item-custom span {
+  display: block;
+}
+
+.breadcrumb-item-custom:first-child {
+  border-radius: 4px 0 0 4px;
+}
+
+.breadcrumb-item-custom:last-child {
+  border-radius: 0 4px 4px 0;
+  border-right: none;
+}
+
+.breadcrumb-item-custom:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: -10px;
+  width: 0;
+  height: 0;
+  border-top: 20px solid transparent;
+  border-bottom: 20px solid transparent;
+  border-left: 10px solid #e9ecef;
+  z-index: 1;
+}
+
+.breadcrumb-item-custom:not(:first-child)::before {
   content: '';
   position: absolute;
   top: 0;
   left: -10px;
-  border-top: 10px solid transparent;
-  border-bottom: 10px solid transparent;
-  border-right: 10px solid #007bff;
+  width: 0;
+  height: 0;
+  border-top: 20px solid transparent;
+  border-bottom: 20px solid transparent;
+  border-left: 10px solid white;
+  z-index: 2;
 }
 
-.breadcrumb-item a:hover::before {
-  border-right-color: #0056b3;
+.breadcrumb-item-custom a:hover {
+  background-color: #00aaff;
+  color: white;
+}
+
+.breadcrumb-item-custom a:hover::after {
+  border-left-color: #00aaff;
+}
+
+.breadcrumb-item-custom a:hover::before {
+  border-left-color: white;
+}
+
+.breadcrumb-item-custom a.active {
+  background-color: #00aaff;
+  color: white;
 }
