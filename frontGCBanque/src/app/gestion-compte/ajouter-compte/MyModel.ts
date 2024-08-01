@@ -21,6 +21,7 @@
   list-style: none;
   padding: 0;
   margin: 0;
+  align-items: center;
 }
 
 .breadcrumb-item-custom {
@@ -30,10 +31,12 @@
   color: #495057;
   text-align: center;
   border-right: 1px solid #dee2e6;
+  font-size: 14px; /* Taille de police plus petite */
+  flex: 1; /* S'assurer que les items prennent toute la largeur */
 }
 
 .breadcrumb-item-custom a {
-  color: #495057;
+  color: #007bff; /* Couleur bleu clair */
   text-decoration: none;
 }
 
@@ -77,12 +80,12 @@
 }
 
 .breadcrumb-item-custom a:hover {
-  background-color: #00aaff;
+  background-color: #00aaff; /* Bleu clair */
   color: white;
 }
 
 .breadcrumb-item-custom a:hover::after {
-  border-left-color: #00aaff;
+  border-left-color: #00aaff; /* Bleu clair */
 }
 
 .breadcrumb-item-custom a:hover::before {
@@ -90,6 +93,16 @@
 }
 
 .breadcrumb-item-custom a.active {
-  background-color: #00aaff;
+  background-color: #00aaff; /* Bleu clair */
   color: white;
+}
+
+.text-end {
+  text-align: end;
+}
+
+.button-container {
+  margin-top: 10px;
+  display: flex;
+  justify-content: flex-end;
 }
