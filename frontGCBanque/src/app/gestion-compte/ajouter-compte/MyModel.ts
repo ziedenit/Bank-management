@@ -62,11 +62,11 @@
 .breadcrumb-item-custom .close-btn {
     position: absolute;
     top: 10px; /* Ajuster la position pour correspondre au nouveau padding */
-    right: 10px;
+    right: 25px; /* Décaler un peu à gauche */
     background: none;
-    color: black;
+    color: red; /* Changer la couleur en rouge */
     border: none;
-    font-size: 12px;
+    font-size: 14px; /* Agrandir un peu le "x" */
     cursor: pointer;
     padding: 0;
     line-height: 1;
