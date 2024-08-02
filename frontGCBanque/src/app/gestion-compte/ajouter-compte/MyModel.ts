@@ -19,12 +19,16 @@
     padding: 10px 20px;
     position: relative;
     margin-right: 10px;
-      clip-path: polygon(0% 0%, 90% 0%, 100% 50%, 90% 100%, 0% 100%);
+    clip-path: polygon(0% 0%, 90% 0%, 100% 50%, 90% 100%, 0% 100%);
+    transition: box-shadow 0.3s ease, color 0.3s ease; /* Add transition for smooth effect */
+    font-weight: normal; /* Default font weight */
 }
 
 .breadcrumb-item-custom a {
     color: rgb(1, 0, 14);
     text-decoration: none;
+    font-weight: bold; /* Make text bold */
+    color: darkblue; /* Dark blue color */
 }
 
 .breadcrumb-item-custom a:hover {
@@ -51,8 +55,24 @@
     border-left-color: transparent;
 }
 
-.breadcrumb-item-custom:last-child::after {
-    border-left-color: #6c7a89;
+.breadcrumb-item-custom:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Add shadow on hover */
+}
+
+.breadcrumb-item-custom .close-btn {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: red;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
 }
 
 .button-container {
