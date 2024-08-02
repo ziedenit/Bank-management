@@ -63,16 +63,16 @@
     position: absolute;
     top: 5px;
     right: 5px;
-    background: red;
-    color: white;
+    background: none;
+    color: black;
     border: none;
-    border-radius: 50%;
-    width: 20px;
-    height: 20px;
+    font-size: 12px;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
     display: flex;
     align-items: center;
     justify-content: center;
-    cursor: pointer;
 }
 
 .button-container {
@@ -92,7 +92,3 @@ button.btn {
 button.btn img {
     margin-left: 5px;
 }
-
-  removeBreadcrumbItem(index: number) {
-    this.objetsFinancements.splice(index, 1);
-  }
