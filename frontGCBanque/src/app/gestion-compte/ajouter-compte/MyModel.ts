@@ -16,7 +16,7 @@
 .breadcrumb-item-custom {
     background-color: #bde1f8;
     color: rgb(12, 12, 12);
-    padding: 10px 20px;
+    padding: 15px 25px; /* Augmenter le padding pour agrandir l'item */
     position: relative;
     margin-right: 10px;
     clip-path: polygon(0% 0%, 90% 0%, 100% 50%, 90% 100%, 0% 100%);
@@ -43,11 +43,11 @@
     content: "";
     width: 0;
     height: 0;
-    border-top: 20px solid transparent;
-    border-bottom: 20px solid transparent;
-    border-left: 10px solid #2c3e50;
+    border-top: 25px solid transparent; /* Ajuster pour correspondre au nouveau padding */
+    border-bottom: 25px solid transparent;
+    border-left: 15px solid #2c3e50;
     position: absolute;
-    right: -10px;
+    right: -15px;
     top: 0;
 }
 
@@ -61,8 +61,8 @@
 
 .breadcrumb-item-custom .close-btn {
     position: absolute;
-    top: 5px;
-    right: 5px;
+    top: 10px; /* Ajuster la position pour correspondre au nouveau padding */
+    right: 10px;
     background: none;
     color: black;
     border: none;
