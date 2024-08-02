@@ -16,7 +16,7 @@
 .breadcrumb-item-custom {
   background-color: #bde1f8;
   color: rgb(12, 12, 12);
-  padding: 15px 25px; /* Augmenter le padding pour agrandir l'item */
+  padding: 15px 25px;
   position: relative;
   margin-right: 10px;
   clip-path: polygon(0% 0%, 90% 0%, 100% 50%, 90% 100%, 0% 100%);
@@ -27,6 +27,7 @@
   color: rgb(1, 0, 14);
   text-decoration: none;
   font-weight: normal;
+  padding-left: 10px; /* Décaler un peu le texte vers la gauche */
 }
 
 .breadcrumb-item-custom a:hover {
@@ -43,7 +44,7 @@
   content: "";
   width: 0;
   height: 0;
-  border-top: 25px solid transparent; /* Ajuster pour correspondre au nouveau padding */
+  border-top: 25px solid transparent;
   border-bottom: 25px solid transparent;
   border-left: 10px solid #2c3e50;
   position: absolute;
@@ -61,8 +62,8 @@
 
 .breadcrumb-item-custom .close-btn {
   position: absolute;
-  top: 3px; /* Ajuster la position pour correspondre au nouveau padding */
-  right: 15px; /* Décaler un peu à gauche */
+  top: 3px;
+  right: 15px;
   background: none;
   color: red; 
   border: none;
@@ -73,6 +74,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-left: 5px; /* Ajouter une marge à gauche pour espacer le "x" */
 }
 
 .button-container {
