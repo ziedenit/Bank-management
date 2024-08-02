@@ -27,6 +27,7 @@
     color: rgb(1, 0, 14);
     text-decoration: none;
     font-weight: normal;
+    padding-left: 10px; /* Ajouter du padding pour décaler l'écriture */
 }
 
 .breadcrumb-item-custom a:hover {
