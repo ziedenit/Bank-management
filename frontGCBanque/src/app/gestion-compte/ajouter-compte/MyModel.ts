@@ -1,11 +1,14 @@
-core.js:5980  ERROR TypeError: Cannot set properties of undefined (setting 'sirenDiagnostiqueur')
-    at push.hG0Z.FilArianeComponent.updateCurrentObjetData (fil-ariane.component.ts:1047:52)
-    at push.hG0Z.FilArianeComponent.onBreadcrumbClick (fil-ariane.component.ts:1013:9)
-    at FilArianeComponent_ol_6_li_1_Template_a_click_1_listener (fil-ariane.component.html:17:42)
-    at executeListenerWithErrorHandling (core.js:14994:16)
-    at wrapListenerIn_markDirtyAndPreventDefault (core.js:15035:22)
-    at HTMLAnchorElement.<anonymous> (dom_renderer.ts:66:34)
-    at ZoneDelegate.invokeTask (zone.js:421:35)
-    at Object.onInvokeTask (core.js:28289:33)
-    at ZoneDelegate.invokeTask (zone.js:420:40)
-    at Zone.runTask (zone.js:188:51)
+  const currentObjet = this.objetsFinancements[this.selectedObjetIndex];
+
+    if (!currentObjet) {
+        console.error("currentObjet est indéfini");
+        return;
+    }
+
+    if (!currentObjet.bien) {
+        currentObjet.bien = {};
+    }
+
+    if (!currentObjet.bien.dpeActuel) {
+        currentObjet.bien.dpeActuel = {};
+    }
