@@ -1,14 +1,11 @@
-updateCurrentObjetData() {
-    if (this.selectedObjetIndex >= 0 && this.selectedObjetIndex < this.objetsFinancements.length) {
-        const currentObjet = this.objetsFinancements[this.selectedObjetIndex];
-        currentObjet.bien.prixBien = this.prixAquisitionBien;
-        currentObjet.bien.dateDepotPc = this.dateDepot;
-        currentObjet.bien.eligibleDpe = this.selectedType;
-        currentObjet.bien.etatBien = this.selectedNatBatiment;
-        currentObjet.bien.montantFinanceLCL = this.montantLclFinance;
-        currentObjet.bien.partLCL = this.partLcl;
-        currentObjet.bien.sirenDiagnostiqueur = this.SirenDPE;
-        currentObjet.bien.codeNormeThermique = this.normeThermique;
-        // Add any other fields that need to be updated
-    }
-}
+core.js:5980  ERROR TypeError: Cannot read properties of undefined (reading 'type')
+    at push.hG0Z.FilArianeComponent.setObjetFinancementProperties (fil-ariane.component.ts:343:71)
+    at push.hG0Z.FilArianeComponent.onBreadcrumbClick (fil-ariane.component.ts:1017:14)
+    at FilArianeComponent_ol_6_li_1_Template_a_click_1_listener (fil-ariane.component.html:17:42)
+    at executeListenerWithErrorHandling (core.js:14994:16)
+    at wrapListenerIn_markDirtyAndPreventDefault (core.js:15035:22)
+    at HTMLAnchorElement.<anonymous> (dom_renderer.ts:66:34)
+    at ZoneDelegate.invokeTask (zone.js:421:35)
+    at Object.onInvokeTask (core.js:28289:33)
+    at ZoneDelegate.invokeTask (zone.js:420:40)
+    at Zone.runTask (zone.js:188:51)
