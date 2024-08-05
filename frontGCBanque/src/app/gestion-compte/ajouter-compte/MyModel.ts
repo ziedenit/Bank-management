@@ -1,12 +1,2 @@
-updateCurrentObjetData() {
-    const currentObjet = this.objetsFinancements[this.selectedObjetIndex];
-    currentObjet.bien.prixBien = this.prixAquisitionBien;
-    currentObjet.bien.dateDepotPc = this.dateDepot;
-    currentObjet.bien.eligibleDpe = this.selectedType;
-    currentObjet.bien.etatBien = this.selectedNatBatiment;
-    currentObjet.bien.montantFinanceLCL = this.montantLclFinance;
-    currentObjet.bien.partLCL = this.partLcl;
-    currentObjet.bien.sirenDiagnostiqueur = this.SirenDPE;
-    currentObjet.bien.codeNormeThermique = this.normeThermique;
-    // Add any other fields that need to be updated
-}
+les adaptation fonctionne partialement l'objet current est modifie avec succes mais en basculant vers un autre objet par example je vous que les modif de l'ancien s'applique sur le nouveau objet 
+ce qui n'est pas souhaité : example si j'ai un fil ariane avec deux objet j'ai prix de bien = 10000 pour le premier et un prix de bien = 20000 si je me positionne sur premier objet et je click je modifie le 10000 en 30000 il faut que lorsque je quitte le premier objet et je clique par example sur le deuxieme je dois avoir 30000 sur permier objet sans impacter le deuxieme 
