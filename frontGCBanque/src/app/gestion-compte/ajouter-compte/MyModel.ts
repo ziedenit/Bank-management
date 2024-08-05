@@ -1,49 +1,11 @@
-private setObjetFinancementProperties(objetFinancement: any): void {
-    if (!objetFinancement || !objetFinancement.bien) return;
-    
-    switch (objetFinancement.codeObjetFinancement) {
-        case "02":
-            this.objetFinance = "Acquisition de bâtiment";
-            break;
-        case "03":
-            this.objetFinance = "Rénovation de bâtiment";
-            this.depExist = true;
-            break;
-        default:
-            this.objetFinance = "";
-            break;
-    }
-
-    const bien = objetFinancement.bien;
-
-    if (bien.eligibleDpe && this.eligibleDpeMapping[bien.eligibleDpe]) {
-        this.selectedType = this.eligibleDpeMapping[bien.eligibleDpe].type;
-        this.hideFieldForm = this.eligibleDpeMapping[bien.eligibleDpe].hideFieldForm;
-    } else {
-        this.selectedType = null;
-        this.hideFieldForm = false;
-    }
-
-    this.selectedNatBatiment = bien.etatBien ? this.etatBienMapping[bien.etatBien] : null;
-    this.codeBatimentSelected = bien.codeBatiment ? this.codeBatimentMapping[bien.codeBatiment] : null;
-    this.partLcl = bien.partLCL || 0;
-    this.montantLclFinance = bien.montantFinanceLCL || 0;
-    this.prixAquisitionBien = bien.prixBien || 0;
-
-    this.dateDepot = bien.dateDepotPc ? formatDate(bien.dateDepotPc, 'yyyy-MM-dd', "en-US") : undefined;
-    this.normeThermique = bien.codeNormeThermique ? this.codeNormeThermiqueMapping[bien.codeNormeThermique] : null;
-    this.SirenDPE = bien.dpeActuel && bien.dpeActuel.sirenDiagnostiqueur ? bien.dpeActuel.sirenDiagnostiqueur : null;
-    this.numeroDpeAdeme = bien.dpeActuel && bien.dpeActuel.numeroDpe ? bien.dpeActuel.numeroDpe : null;
-
-    if (objetFinancement.alignement && objetFinancement.alignement.topAlignement) {
-        this.DpeResults = true;
-        this.alignementResultText = this.alignementMapping[objetFinancement.alignement.topAlignement];
-    } else {
-        this.DpeResults = false;
-        this.alignementResultText = "";
-    }
-}
-  if (!currentObjet) {
-        console.error("currentObjet est indéfini");
-        return;
-    }
+core.js:5980  ERROR TypeError: Cannot set properties of undefined (setting 'sirenDiagnostiqueur')
+    at push.hG0Z.FilArianeComponent.updateCurrentObjetData (fil-ariane.component.ts:1047:52)
+    at push.hG0Z.FilArianeComponent.onBreadcrumbClick (fil-ariane.component.ts:1013:9)
+    at FilArianeComponent_ol_6_li_1_Template_a_click_1_listener (fil-ariane.component.html:17:42)
+    at executeListenerWithErrorHandling (core.js:14994:16)
+    at wrapListenerIn_markDirtyAndPreventDefault (core.js:15035:22)
+    at HTMLAnchorElement.<anonymous> (dom_renderer.ts:66:34)
+    at ZoneDelegate.invokeTask (zone.js:421:35)
+    at Object.onInvokeTask (core.js:28289:33)
+    at ZoneDelegate.invokeTask (zone.js:420:40)
+    at Zone.runTask (zone.js:188:51)
