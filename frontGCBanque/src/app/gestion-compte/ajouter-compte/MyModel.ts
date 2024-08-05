@@ -1,24 +1,24 @@
-package com.cl.msofd.service;
-import org.springframework.stereotype.Service;
+import { Injectable } from '@angular/core';
 
-import java.security.SecureRandom;
+@Injectable({
+  providedIn: 'root'
+})
+export class IdGeneratorService {
+  constructor() { }
 
-@Service
-public class IdGeneratorService {
-    private IdGeneratorService() {
+  generateId(objet: string): string {
+    const characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
+    let idfdBuilder = '';
+    const secureRandom = new Uint8Array(8);
+
+    window.crypto.getRandomValues(secureRandom);
+
+    for (let i = 0; i < 8; i++) {
+      const randomIndex = secureRandom[i] % characters.length;
+      const randomChar = characters.charAt(randomIndex);
+      idfdBuilder += randomChar;
     }
 
-    public String generateId(String objet) {
-    	
-        StringBuilder idfdBuilder = new StringBuilder();
-        String characters = "abcdefghijklmnopqrstuvwxyz0123456789";
-        SecureRandom secureRandom = new SecureRandom();
-        for (int i = 0; i < 8; i++) {
-            int randomIndex = (int) (secureRandom.nextDouble() * characters.length());
-            char randomChar = characters.charAt(randomIndex);
-            idfdBuilder.append(randomChar);
-        }
-        return objet+idfdBuilder.toString().toUpperCase();
-    }
+    return objet + idfdBuilder.toUpperCase();
+  }
 }
-
