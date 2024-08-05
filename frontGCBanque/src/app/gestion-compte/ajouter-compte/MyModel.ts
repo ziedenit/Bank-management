@@ -1,16 +1,21 @@
-  generateIdObjetFinancement(): Observable<string> {
-    return this.http.get(`${this.baseUrl}/generate_idObjetFinancement`, { 
-      headers: this.getHeaders() ,
-      responseType: 'text'
-    })
-      .pipe(
-        tap(data => console.log('ID Objet Financement généré :', data)),
-        catchError(error => {
-          console.error('Erreur lors de la génération d\'ID Objet Financement :', error);
-          return this.handleError(error);
-        })
-      );
-  }
-nouvelObjet.idObjetFinancement=this.idGeneratorService.generateIdObjetFinancement();
-Type 'Observable<string>' is not assignable to type 'string'.ts(2322)
-(property) ObjetFinancement.idObjetFinancement: string
+// Supposons que vous avez une méthode pour obtenir un nouvel objet
+getNewObjetFinancement() {
+  let nouvelObjet: any = {}; // Remplacez 'any' par le type réel de votre objet
+
+  // Appelez la méthode generateIdObjetFinancement et abonnez-vous pour obtenir l'ID
+  this.idGeneratorService.generateIdObjetFinancement().subscribe(
+    id => {
+      nouvelObjet.idObjetFinancement = id; // Assignez l'ID à la propriété
+      console.log('ID Objet Financement généré :', id);
+      
+      // Maintenant, vous pouvez utiliser `nouvelObjet` avec son `idObjetFinancement` assigné
+    },
+    error => {
+      console.error('Erreur lors de la génération d\'ID Objet Financement :', error);
+      // Gérez l'erreur selon vos besoins
+    }
+  );
+
+  // Si vous avez besoin de retourner `nouvelObjet`, vous devrez attendre l'assignation de l'ID.
+  // Une façon de gérer cela pourrait être de retourner un Observable ou de gérer la logique après l'abonnement.
+}
