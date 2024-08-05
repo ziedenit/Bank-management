@@ -1,16 +1,48 @@
-checkAndHighlightRequiredField(condition, elementId) {
-    console.log(this.isfirstDebranchement);
-    const element = document.getElementById(elementId);
-    
-    if (element) {  // Vérifiez si l'élément existe
-        if (condition && !this.isfirstDebranchement) {
-            this.champObligatoire = true;
-            this.donneeObligatoire = 'Donnée obligatoire';
-            element.style.border = "1px solid red";
-        } else {
-            element.style.removeProperty('border');
-        }
-    } else {
-        console.warn(`Element with id ${elementId} not found.`);
-    }
+  extractedInitialFinancement: Financement;
+ objetsFinancements: ObjetFinancement[] = [];
+removeBreadcrumbItem(index: number) {
+			this.objetsFinancements.splice(index, 1);
+			console.log("apres suppression contenue du tablau");
+			console.log(this.objetsFinancements);
+			console.log("le financement au complet avec les objets ajoutés preparation post patch");
+			console.log(this.extractedInitialFinancement);
+		  }
+/////////////////////////
+je veux mettre ajour extractedInitialFinancement avec la nouveau table this.objetsFinancements comment faire quel instruction sachant que le model et le suivant 
+export class Financement {
+
+idFinancement: string;
+objetFinancement: ObjetFinancement[] ;
+alignement: Alignement;
+eligibilite: Eligibilite;
+
+intervenant: Intervenant;
+indicateurFinancementDedie:string;
+indicateurNatureDurable:string;
+typeRisqueClimatiqueAttenue:string;
+
+codeApplicatifOrigine: string;
+indicateurReprise: boolean;
+statut: number ;
+agenceCompte:string;
+
+
+}
+export class ObjetFinancement {
+	
+    idObjetFinancement:string;
+	codeObjetFinancement:string;// 02=Acquisition  03=Travaux
+	quotePartObjet:number;
+	gainCEP:number;
+	dateFinTravaux: Date;
+	bien:Bien;
+	dpeAvantTravaux: Dpe;
+	dpeApresTravaux: Dpe;
+	alignement: Alignement;
+    eligibilite: Eligibilite;
+	piecesJustificatives : Piece [] ;
+	codeFamilleObjet: string;	
+	garantie: Garantie[]; 
+	firstDisconnectionOfd:boolean;
+
 }
