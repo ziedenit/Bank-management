@@ -1,24 +1,16 @@
-import { Injectable } from '@angular/core';
-
-@Injectable({
-  providedIn: 'root'
-})
-export class IdGeneratorService {
-  constructor() { }
-
-  generateId(objet: string): string {
-    const characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
-    let idfdBuilder = '';
-    const secureRandom = new Uint8Array(8);
-
-    window.crypto.getRandomValues(secureRandom);
-
-    for (let i = 0; i < 8; i++) {
-      const randomIndex = secureRandom[i] % characters.length;
-      const randomChar = characters.charAt(randomIndex);
-      idfdBuilder += randomChar;
-    }
-
-    return objet + idfdBuilder.toUpperCase();
+  generateIdObjetFinancement(): Observable<string> {
+    return this.http.get(`${this.baseUrl}/generate_idObjetFinancement`, { 
+      headers: this.getHeaders() ,
+      responseType: 'text'
+    })
+      .pipe(
+        tap(data => console.log('ID Objet Financement généré :', data)),
+        catchError(error => {
+          console.error('Erreur lors de la génération d\'ID Objet Financement :', error);
+          return this.handleError(error);
+        })
+      );
   }
-}
+nouvelObjet.idObjetFinancement=this.idGeneratorService.generateIdObjetFinancement();
+Type 'Observable<string>' is not assignable to type 'string'.ts(2322)
+(property) ObjetFinancement.idObjetFinancement: string
