@@ -1,29 +1,3 @@
-package com.cl.msofd.controller;
-
-import com.cl.logs.commun.CommonLogger;
-import com.cl.logs.commun.CommonLoggerFactory;
-import com.cl.logs.types.EventTyp;
-import com.cl.logs.types.SecEventTyp;
-import com.cl.msofd.exception.DpeAdemeNotFoundException;
-import com.cl.msofd.exception.ErrorResponse;
-import com.cl.msofd.model.DpeAdeme;
-import com.cl.msofd.service.DpeAdemeService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import jakarta.annotation.Resource;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.io.IOException;
-import java.util.concurrent.ExecutionException;
-
 @RestController
 @RequestMapping("/api/v1")
 public class AdemeController {
@@ -60,23 +34,28 @@ public class AdemeController {
             return ResponseEntity.status(500).body(null);
         } catch (DpeAdemeNotFoundException ademeE) {
             try {
+                // Essayez de récupérer d'abord le DPE Neuf
                 DpeAdeme dpeAdemeNeuf = dpeAdemeService.getDpeNeuf(numDpe);
                 return ResponseEntity.ok(dpeAdemeNeuf);
-            } catch (Exception e) {
-                 if (e instanceof InterruptedException) {
-                    Thread.currentThread().interrupt();
+            } catch (Exception e1) {
+                // Si ça échoue, essayez de récupérer le DPE Neuf Tertiaire
+                try {
+                    DpeAdeme dpeAdemeNeufTertiaire = dpeAdemeService.getDpeNeufTertiaire(numDpe);
+                    return ResponseEntity.ok(dpeAdemeNeufTertiaire);
+                } catch (Exception e2) {
+                    // Si ça échoue, essayez de récupérer le DPE Ancien Tertiaire
+                    try {
+                        DpeAdeme dpeAdemeAncienTertiaire = dpeAdemeService.getDpeAncienTertiaire(numDpe);
+                        return ResponseEntity.ok(dpeAdemeAncienTertiaire);
+                    } catch (Exception e3) {
+                        if (e3 instanceof InterruptedException) {
+                            Thread.currentThread().interrupt();
+                        }
+                        commonLogger.eventTyp(EventTyp.APPLICATIVE).secEventTyp(SecEventTyp.METIER).logger().error("Exception: ", e3);
+                        return ResponseEntity.status(500).body(null);
+                    }
                 }
-                commonLogger.eventTyp(EventTyp.APPLICATIVE).secEventTyp(SecEventTyp.METIER).logger().error("Exception: ", e);
-                return ResponseEntity.status(500).body(null);
             }
         }
     }
 }
-je veux modifier ce controlleur pour faire appel a ce deux aussi dans ce controlleur apres l'appel   DpeAdeme dpeAdemeNeuf = dpeAdemeService.getDpeNeuf(numDpe);
-    public DpeAdeme getDpeNeufTertiaire(String numDpe) throws ExecutionException, InterruptedException, IOException {
-        return getDpeByUrl(Constants.ADEME_URL_Tertiaire_Neuf, numDpe);
-    }
-    
-    public DpeAdeme getDpeAncienTertiaire(String numDpe) throws ExecutionException, InterruptedException, IOException {
-        return getDpeByUrl(Constants.ADEME_URL_Tertiaire_Ancien, numDpe);
-    }
