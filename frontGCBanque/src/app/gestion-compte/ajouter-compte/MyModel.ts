@@ -1,50 +1,22 @@
-<div class="col-lg-3 col-md-6">
-                        <label for="anneeConstruction" class="d-block dpeLabel">Année de construction  <span class="required" *ngIf="selectedNatBatiment=='option1'">*</span></label>
-                       
-                        <input type="text" id="anneeConstruction"  formControlName="anneeConstruction" name="anneeConstruction" class="form-control">
-                      </div>
+import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 
+export function dateInferieureAujourdhuiValidator(): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    const inputDate = new Date(control.value);
+    const currentDate = new Date();
 
-                          j'ai ce champs dans un formulaire anneeConstruction je veux ajouter un controle pour que ce champs ne soit pas superieure a la date du jour date courant 
-                          ce champs fait partie de ce model ( c'est u_n champs string )
-import { Dpe } from './dpe';
-export class Bien {
-    idBien:string;
-    codeBatiment:string;
-    codeNormeThermique:string;
-    typeBatiment:string;
-    codePostal:string;
-    nomCommune:string;
-    adresseComplete:string;
-    anneeConstruction:string;
-    dateDepotPc:string;
-    surfaceBien:number;
-    bienFinanceLCL:boolean;
-    dpeActuel:Dpe;
-    etatBien:string;
-    numeroVoie:string;
-    nomRue:string;
-    prixBien: number;
-    montantFinanceLCL:number;
-    partLCL:number;
-    typeUsage:string;
-    numeroNomRue:string;
+    if (!control.value) {
+      return null; // Pas de valeur, donc pas d'erreur
+    }
 
-    typeEnergie:string;
-    batiment:string;
-    escalier:string;
-    etage: string;
-    porte:string;
+    if (inputDate >= currentDate) {
+      return { invalidDate: true }; // Retourne une erreur si la date est égale ou supérieure à la date actuelle
+    }
 
-    typeVoie:string;
-    codeDepartement:string;
-    codeInseeCommune:string;
-    numeroLot:string;
-    periodeConstruction:string;
-    coordonneeCartographiqueX:number;
-    coordonneeCartographiqueY:number;
-    dateDebutConstruction:Date;
-
-    eligibleDpe:string;
-
+    return null; // Pas d'erreur si la date est valide
+  };
 }
+ anneeConstruction: ['', [Validators.required, dateInferieureAujourdhuiValidator()]],
+   <div *ngIf="formGroup.get('anneeConstruction').hasError('invalidDate') && formGroup.get('anneeConstruction').touched" class="text-danger">
+    L'année de construction doit être antérieure à la date du jour.
+  </div>
