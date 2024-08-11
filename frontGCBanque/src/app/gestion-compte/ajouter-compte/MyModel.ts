@@ -10,14 +10,11 @@ export class ValidationService {
 
   dateInferieureAujourdhuiValidator(): ValidatorFn {
     return (control: AbstractControl): ValidationErrors | null => {
-      const currentDate = new Date();
+      const currentYear = new Date().getFullYear();
       const inputYear = parseInt(control.value, 10);
 
-      if (!control.value || isNaN(inputYear)) {
-        return null; // No validation error if there's no value or if the value is not a number
-      }
-
-      if (inputYear > currentDate.getFullYear()) {
+      // Check if the value is a valid number and if it is greater than the current year
+      if (inputYear > currentYear) {
         control.setValue(''); // Clear the field if the year is in the future
         return { invalidDate: true };
       }
@@ -25,4 +22,9 @@ export class ValidationService {
       return null;
     };
   }
+}
+if (inputYear > currentYear) {
+    console.log('Année invalide, champ réinitialisé');
+    control.setValue(''); // Clear the field if the year is in the future
+    return { invalidDate: true };
 }
