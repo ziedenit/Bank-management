@@ -8,44 +8,20 @@ export class ValidationService {
 
   constructor() { }
 
-  // Example: Validator to check if a date is before today's date
   dateInferieureAujourdhuiValidator(): ValidatorFn {
     return (control: AbstractControl): ValidationErrors | null => {
-      const inputDate = new Date(control.value);
       const currentDate = new Date();
+      const inputYear = parseInt(control.value, 10);
 
-      if (!control.value) {
-        return null;
+      if (!control.value || isNaN(inputYear)) {
+        return null; // No validation error if there's no value or if the value is not a number
       }
 
-      if (inputDate >= currentDate) {
+      if (inputYear > currentDate.getFullYear()) {
+        control.setValue(''); // Clear the field if the year is in the future
         return { invalidDate: true };
       }
 
-      return null;
-    };
-  }
-
-  // Example: Validator to check if a value is a valid email
-  emailValidator(): ValidatorFn {
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
-    return (control: AbstractControl): ValidationErrors | null => {
-      if (!control.value) {
-        return null;
-      }
-
-      const valid = emailRegex.test(control.value);
-      return valid ? null : { invalidEmail: true };
-    };
-  }
-
-  // Example: Validator to check if a string's length is within a specific range
-  lengthValidator(min: number, max: number): ValidatorFn {
-    return (control: AbstractControl): ValidationErrors | null => {
-      const length = control.value ? control.value.length : 0;
-      if (length < min || length > max) {
-        return { invalidLength: true };
-      }
       return null;
     };
   }
