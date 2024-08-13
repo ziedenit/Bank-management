@@ -1,1 +1,1 @@
-import { ChangeDetectorRef } from '@angular/core';
+private cdr: ChangeDetectorRef
