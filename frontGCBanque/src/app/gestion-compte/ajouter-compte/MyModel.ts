@@ -1,128 +1,99 @@
- onBreadcrumbClick(index: number ) {
-			this.selectedObjetIndex=index;
-		
-       this.setObjetFinancementProperties(this.extractedInitialFinancement.objetFinancement[index]);
-       this.mapFinancementDataMultiOfd(this.extractedInitialFinancement,index)
-			this.setupFormGroup(this.extractedInitialFinancement.objetFinancement[index].bien,index); 
-      this.setFinancementDataOnScreenMultiOfd(this.extractedInitialFinancement,index)
-			this.depExist=true; 
-		  }
+private setObjetFinancementProperties(objetFinancement: any): void {
+    switch (objetFinancement.codeObjetFinancement) {
+        case "02":
+            this.objetFinance = "Acquisition de bâtiment";
+            break;
+        case "03":
+            this.objetFinance = "Rénovation de bâtiment";
+            this.depExist = true;
+            break;
+        default:
+            break;
+    }
 
-j'appel cette fonction en clickant sur un element de fil ariane pour triter un ensemble d'objet financement en se basant sur l'index j'applique la métthode dedant   this.setObjetFinancementProperties(this.extractedInitialFinancement.objetFinancement[index]);
-sur les champs traité à l'interieur de cette méthode je veux mettre de ecouteur pour sauvgarder les changement sur le valeur
-    private setObjetFinancementProperties(objetFinancement: any): void {
-	switch (objetFinancement.codeObjetFinancement) {
-  
-		case "02":
-			this.objetFinance = "Acquisition de bâtiment";
-			break;
-		case "03":
-			this.objetFinance = "Rénovation de bâtiment";
-			this.depExist = true;
-			break;
-		default:
-			break;
-	}
     if (!objetFinancement || !objetFinancement.bien) return;
     const bien = objetFinancement.bien;
 
-	if (bien.eligibleDpe) {
+    // Mise à jour des propriétés avec écouteurs
+    if (bien.eligibleDpe) {
         this.selectedType = this.eligibleDpeMapping[bien.eligibleDpe].type;
-        this.hideFieldForm = this.eligibleDpeMapping[bien.eligibleDpe].hideFieldForm;}
+        this.hideFieldForm = this.eligibleDpeMapping[bien.eligibleDpe].hideFieldForm;
 
-	if (bien.etatBien) {this.selectedNatBatiment = this.etatBienMapping[bien.etatBien];}
-    if (bien.codeBatiment) {this.codeBatimentSelected = this.codeBatimentMapping[bien.codeBatiment];}
-    
-    this.partLcl = bien?.partLCL;
-    this.montantLclFinance = bien?.montantFinanceLCL;
-	this.prixAquisitionBien = bien?.prixBien;
+        // Écouteur pour `eligibleDpe`
+        this.watchPropertyChanges(bien, 'eligibleDpe', (newValue) => {
+            this.selectedType = this.eligibleDpeMapping[newValue].type;
+            this.hideFieldForm = this.eligibleDpeMapping[newValue].hideFieldForm;
+        });
+    }
 
-	this.dateDepot = bien?.dateDepotPc ? formatDate(bien.dateDepotPc, 'yyyy-MM-dd', "en-US") : undefined;
-    if (bien.codeNormeThermique) {this.normeThermique = this.codeNormeThermiqueMapping[bien.codeNormeThermique];}
-    if (bien.dpeActuel && bien.dpeActuel.sirenDiagnostiqueur) { this.SirenDPE = bien.dpeActuel.sirenDiagnostiqueur;}
-    this.numeroDpeAdeme = bien.dpeActuel?.numeroDpe;
+    if (bien.etatBien) {
+        this.selectedNatBatiment = this.etatBienMapping[bien.etatBien];
+        this.watchPropertyChanges(bien, 'etatBien', (newValue) => {
+            this.selectedNatBatiment = this.etatBienMapping[newValue];
+        });
+    }
 
-	if (objetFinancement.alignement && objetFinancement.alignement.topAlignement) {
-        this.DpeResults = true;
-        this.alignementResultText = this.alignementMapping[objetFinancement.alignement.topAlignement];}
+    if (bien.codeBatiment) {
+        this.codeBatimentSelected = this.codeBatimentMapping[bien.codeBatiment];
+        this.watchPropertyChanges(bien, 'codeBatiment', (newValue) => {
+            this.codeBatimentSelected = this.codeBatimentMapping[newValue];
+        });
+    }
 
-// ecouteur sur les champs pour detecter et sauvgarder les changements sur l'objet lors de changement d'un element a un  autre du fil ariane
-
-      }
-par anologie comme ici mais sauf que ici je traite un formgroup
-private setupFormGroup(bien: any , index:number): void {
-    if (!bien) return;
-    this.formGroup = this.fb.group({
-        numeroNomRue: [bien.numeroNomRue || null],
-        codePostal: [bien.codePostal || null],
-        ville: [bien.nomCommune || null],
-        dateDiangnostique: [bien.dpeActuel?.dateEtablissementDpe?.toString().substring(0, 10) || null],
-        anneeConstruction: [bien.anneeConstruction || null],
-        typeBatiment: [bien.typeBatiment || null],
-        lettreCEP: [bien.dpeActuel?.classeCep || null],
-        lettreGES: [bien.dpeActuel?.classeGes || null],
-        surfaceBien: [bien.surfaceBien || null],
-        valeurCep: [bien.dpeActuel?.estimationCep || null],
-        valeurGes: [bien.dpeActuel?.estimationGes || null],
-		energieType:[bien.typeEnergie || null]
+    // Écouteur pour chaque champ individuel
+    this.watchPropertyChanges(bien, 'partLCL', (newValue) => {
+        this.partLcl = newValue;
     });
 
-    // Écoute des changements pour chaque champ du formulaire
-    this.formGroup.get('numeroNomRue').valueChanges.subscribe(value => {
-      this.extractedInitialFinancement.objetFinancement[index].bien.numeroNomRue = value;
-  });
+    this.watchPropertyChanges(bien, 'montantFinanceLCL', (newValue) => {
+        this.montantLclFinance = newValue;
+    });
 
-  this.formGroup.get('codePostal').valueChanges.subscribe(value => {
-      this.extractedInitialFinancement.objetFinancement[index].bien.codePostal = value;
-  });
+    this.watchPropertyChanges(bien, 'prixBien', (newValue) => {
+        this.prixAquisitionBien = newValue;
+    });
 
-  this.formGroup.get('ville').valueChanges.subscribe(value => {
-      this.extractedInitialFinancement.objetFinancement[index].bien.nomCommune = value;
-  });
+    this.watchPropertyChanges(bien, 'dateDepotPc', (newValue) => {
+        this.dateDepot = newValue ? formatDate(newValue, 'yyyy-MM-dd', "en-US") : undefined;
+    });
 
-  this.formGroup.get('dateDiangnostique').valueChanges.subscribe(value => {
-      if (this.extractedInitialFinancement.objetFinancement[index].bien.dpeActuel) {
-          this.extractedInitialFinancement.objetFinancement[index].bien.dpeActuel.dateEtablissementDpe = value;
-      }
-  });
+    this.watchPropertyChanges(bien, 'codeNormeThermique', (newValue) => {
+        this.normeThermique = this.codeNormeThermiqueMapping[newValue];
+    });
 
-  this.formGroup.get('anneeConstruction').valueChanges.subscribe(value => {
-      this.extractedInitialFinancement.objetFinancement[index].bien.anneeConstruction = value;
-  });
+    if (bien.dpeActuel && bien.dpeActuel.sirenDiagnostiqueur) {
+        this.SirenDPE = bien.dpeActuel.sirenDiagnostiqueur;
+        this.watchPropertyChanges(bien.dpeActuel, 'sirenDiagnostiqueur', (newValue) => {
+            this.SirenDPE = newValue;
+        });
+    }
 
-  this.formGroup.get('typeBatiment').valueChanges.subscribe(value => {
-      this.extractedInitialFinancement.objetFinancement[index].bien.typeBatiment = value;
-  });
+    this.watchPropertyChanges(bien.dpeActuel, 'numeroDpe', (newValue) => {
+        this.numeroDpeAdeme = newValue;
+    });
 
-  this.formGroup.get('lettreCEP').valueChanges.subscribe(value => {
-      if (this.extractedInitialFinancement.objetFinancement[index].bien.dpeActuel) {
-          this.extractedInitialFinancement.objetFinancement[index].bien.dpeActuel.classeCep = value;
-      }
-  });
+    if (objetFinancement.alignement && objetFinancement.alignement.topAlignement) {
+        this.DpeResults = true;
+        this.alignementResultText = this.alignementMapping[objetFinancement.alignement.topAlignement];
 
-  this.formGroup.get('lettreGES').valueChanges.subscribe(value => {
-      if (this.extractedInitialFinancement.objetFinancement[index].bien.dpeActuel) {
-          this.extractedInitialFinancement.objetFinancement[index].bien.dpeActuel.classeGes = value;
-      }
-  });
+        this.watchPropertyChanges(objetFinancement.alignement, 'topAlignement', (newValue) => {
+            this.alignementResultText = this.alignementMapping[newValue];
+        });
+    }
+}
 
-  this.formGroup.get('surfaceBien').valueChanges.subscribe(value => {
-      this.extractedInitialFinancement.objetFinancement[index].bien.surfaceBien = value;
-  });
-
-  this.formGroup.get('valeurCep').valueChanges.subscribe(value => {
-      if (this.extractedInitialFinancement.objetFinancement[index].bien.dpeActuel) {
-          this.extractedInitialFinancement.objetFinancement[index].bien.dpeActuel.estimationCep = value;
-      }
-  });
-
-  this.formGroup.get('valeurGes').valueChanges.subscribe(value => {
-      if (this.extractedInitialFinancement.objetFinancement[index].bien.dpeActuel) {
-          this.extractedInitialFinancement.objetFinancement[index].bien.dpeActuel.estimationGes = value;
-      }
-  });
-
-  this.formGroup.get('energieType').valueChanges.subscribe(value => {
-      this.extractedInitialFinancement.objetFinancement[index].bien.typeEnergie = value;
-  });
+// Méthode pour surveiller les changements de propriété
+private watchPropertyChanges(obj: any, prop: string, callback: (newValue: any) => void): void {
+    let value = obj[prop];
+    Object.defineProperty(obj, prop, {
+        get: () => value,
+        set: (newValue) => {
+            if (value !== newValue) {
+                value = newValue;
+                callback(newValue);
+            }
+        },
+        enumerable: true,
+        configurable: true,
+    });
 }
