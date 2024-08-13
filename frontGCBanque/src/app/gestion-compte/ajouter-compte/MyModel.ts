@@ -1,147 +1,208 @@
-import { Component } from '@angular/core';
+<div class="container-fluid"  >  
+  <div class="row" >
+    <div class="col-12">
 
-@Component({
-  selector: 'app-my-component',
-  templateUrl: './my-component.component.html',
-  styleUrls: ['./my-component.component.css']
-})
-export class MyComponent {
+      <div class="card border-0">
+        <div class="card-body" style="border: 1px solid #b1bfeb; box-shadow: 0 2px 10px  #b1bfeb;">
+          <div class="blockSize">
+          <h3 class="d-inline-block font-weight-bold"  style="font-size: 17px;">Objet de financement {{ selectedObjetIndex+1 }}</h3>
+        <span class="float-right" >
+            <img *ngIf="hiddenObjetfinancement==false" src="../../../assets/icons/arrow-up.svg" alt="Fleche haut" (click)="hideDataObjetFinancement()">
+            <img *ngIf="hiddenObjetfinancement==true" src="../../../assets/icons/arrow-down.svg" alt="Fleche bas" (click)="showDataObjetFinancement()">
+          </span> 
+         <div *ngIf="elementObjetfinancement == true"> 
+          <div class="row">
+            <div class="col-lg-4" *ngIf="hideFieldForm==false && typeObjetFinancement !=null">
+                <div class="form-group">
+                    <div class="custom-label">
+                        <label for="input1">Objet financé</label>
+                        <input type="text" disabled class="form-control form-control-sm disable-cursor" id="input1" [(ngModel)]="objetFinance">
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4" *ngIf="typeObjetFinancement==null">
+            </div>
+            <div class="col-lg-4">
+                <div class="form-group" *ngIf="!hideFieldForm">
+                    <div class="custom-label">
+                        <label for="prixAquisitionBien">Prix du bien <em>(en euro)</em></label>
+                        <span class="required"> *</span>
+                        <input type="text"
+                               [(ngModel)]="prixAquisitionBien"
+                               (ngModelChange)="onPriceChange($event)"
+                               class="form-control form-control-sm"
+                               id="prixAquisitionBien"
+                               name="description"
+                               [disabled]="isFieldsDisabled" />
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="form-group" *ngIf="hideFieldForm==false">
+                    <div class="custom-label">
+                        <label for="dateDepot">Date de dépôt de permis de construire <span class="required" *ngIf="selectedNatBatiment=='option2'"> *</span></label>
+                        <input type="date" class="form-control form-control-sm" id="dateDepot" [(ngModel)]="dateDepot" placeholder="yyyy/MM/dd" [disabled]="isFieldsDisabled" />
+                    </div>
+                </div>
+            </div>
+        </div>
+                                
+            <div class="row">
+              <div class="col-lg-4" [ngStyle]="typeObjetFinancement==null && {'margin-top': '-73px'}">
+                <div class="form-group" >
+                  <div class="custom-label">
+                  <label for="select2" >Eligibilité au DPE </label>                 
+                  <select class="form-control form-control-sm"  (mouseenter)="showDescription($event)" id="select2" [(ngModel)]="selectedType">
+                    <option *ngFor="let option of options" [value]="option.value" [title]="option.description"> {{ option.label }}</option>
+                  </select>
+              </div>
+              </div>
+                <div class="alertArea" *ngIf="showFirstEligiblite==true"> 
+                <p style="color: rgb(45, 61, 133); font-size: 14px; font-weight: bold;">Description:</p>  {{messageAlert}}
+                </div>
+              </div> 
+              <div class="col-lg-4">
+                <div  class="form-group"  *ngIf="hideFieldForm==false ">
+                  <div class="custom-label">
+                  <label for="montantFinance" >Montant financé toute banque <em>(en euro)</em></label>
+                  <span class="required"> *</span>       
+                  <input type="text"
+                   [ngModel]="montantLclFinance | number:'1.0-2':'fr'" 
+                   (ngModelChange)="onMontantChange($event)"
+                    class="form-control form-control-sm" 
+                     id=montantLclFinance 
+                      name="description" 
+                      [disabled]="isFieldsDisabled" />                  
+              </div>
+              </div> 
+              </div> 
+              <div class="col-lg-4"  *ngIf="hideFieldForm==false ">
+                <div class="form-group" *ngIf="hideFieldForm==false"  [ngClass]="{ 'disabled': isFieldsDisabled }" >
+                  <div class="custom-label">
+                <label for="NormeThermique" class="labelFormulaire" >Norme Thermique </label>
+                <select class="form-control form-control-sm" id="NormeThermique" required [(ngModel)]="normeThermique"    name="NormeThermique" [disabled]="isFieldsDisabled">
+                  <option value='option0' selected> </option>
+                  <option value='option1'> RT2012  </option>
+                  <option value='option2'> RE2020 </option>
+                  <option value='option3' >Autre</option>
+                </select>     
+              </div>
+            </div>
+            </div>
+            </div>
+            <div class="row">
+              <div class="col-lg-4" [ngStyle]="typeObjetFinancement==null && {'margin-top': '-73px'}">
+                <div class="form-group" *ngIf="hideFieldForm==false">
+                  <div class="custom-label">
+                  <label for="categorieBatiment" >État du bien</label>&nbsp;<span class="required" >*</span>                
+                  <select class="form-control form-control-sm" id="natureBien" name="natureBien" [(ngModel)]="selectedNatBatiment" (change)="onChangeEtatBien()" >              
+                    <option value='option0' selected>--Sélectionner une valeur--</option>
+                    <option value='option1'> Ancien</option>
+                    <option value='option2'>Neuf</option>           
+                  </select>
+                </div>
+              </div>
+              </div>
+              <div class="col-lg-4"  *ngIf="hideFieldForm==false ">
+                <div  class="form-group">
+                  <div class="custom-label">
+                  <label for="partLcl"  >Part LCL <em> (en euro)</em></label>
+                  <span class="required"> *</span>             
+                  <input type="text" [ngModel]="partLcl | number:'1.0-2':'fr'" 
+                  (ngModelChange)="onPartChange($event)"
+                   class="form-control form-control-sm" 
+                    id=partLcl  name="description" 
+                    [disabled]="isFieldsDisabled" />    
+                </div>
+              </div> 
+            </div>
+              <div class="col-lg-4"  *ngIf="hideFieldForm==false ">
+                <div class="form-group" *ngIf="hideFieldForm==false"  [ngClass]="{ 'disabled': isFieldsDisabled }" >
+                  <div class="custom-label">
+                  <label class="labelFormulaire" for="dpe">Siren du diagnostiqueur</label>     
+                  <span class="required" *ngIf="selectedNatBatiment=='option1' || numeroDpeAdeme!=null" > *</span>                    
+                  <input type="text" class="form-control form-control-sm" placeholder="Ex: 123456789"  id ="SirenDPE" [(ngModel)]="SirenDPE"   [disabled]="isFieldsDisabled" /> 
+              </div>
+            </div>
+              <div class="erreurDpe" *ngIf="hideFieldForm==false"   fxLayoutAlign="left center"  style="margin-top: -2px;">
+               {{messageSiren}}
+              </div>
+              <div *ngIf="isValid !== null">
+                <p class="erreurDpe" *ngIf="!isValid && hideFieldForm==false">Le numéro SIREN {{ siren }} est invalide.</p>
+              </div>      
+          </div>
 
-  selectedType: string;
-  hideFieldForm: boolean;
-  selectedNatBatiment: string;
-  codeBatimentSelected: string;
-  partLcl: number;
-  montantLclFinance: number;
-  prixAquisitionBien: number;
-  dateDepot: string;
-  normeThermique: string;
-  SirenDPE: string;
-  numeroDpeAdeme: string;
-  DpeResults: boolean;
-  alignementResultText: string;
+            </div >
+            <div class="row">
+              <div class="col-lg-4" *ngIf=" presenceadresse &&hideFieldForm==false"  [ngClass]="{ 'disabled': isFieldsDisabled }">                  
+                      <label for="addressBien"  ></label>
+                      <input type="text" class="form-control form-control-sm" (ngModelChange)="onFieldChange()" placeholder="Adresse du bien" id="addressBien" [(ngModel)]="addresseBien" name="description" [disabled]="isFieldsDisabled" />
+                      <div class="form-group">
+                        <div  class="listeAdress">
+                          <ul>
+                            <li *ngFor="let result of addressResult">
+                              <button (click)="selectAddres(result)">
+                                {{ result.properties.label }}
+                              </button>
+                            </li>
+                          </ul>
+                        </div>
+                      </div>                     
+              </div>
+              <div class="col-lg-2"   *ngIf="presenceadresse&& hideFieldForm==false"   [ngClass]="{ 'disabled': isFieldsDisabled }">              
+                  <label for="addressBien" ></label> <span class="required">*</span>
+                  <input type="text" id="codePostal"  class="form-control form-control-sm"   [(ngModel)]="addresseBienCodePostal" (ngModelChange)="onFieldChange()" placeholder="Code postal"  name="codePostal"   [ngClass]="{ 'disabled': isFieldsDisabled }">                             
+              </div>
+              <div class="col-lg-2"  *ngIf="presenceadresse&&hideFieldForm==false"  [ngClass]="{ 'disabled': isFieldsDisabled }">               
+                  <label for="addressBien" ></label> <span class="required">*</span>
+                  <input   type="text" id="ville"  class="form-control form-control-sm"   [(ngModel)]="addresseBienVille" (ngModelChange)="onFieldChange()" placeholder="Ville"   name="Ville"  [ngClass]="{ 'disabled': isFieldsDisabled }">                                
+              </div>             
+       </div> 
+       <div class="row">
+        <div class="col-lg-4" [ngStyle]="typeObjetFinancement==null && {'margin-top': '-73px'}">   
+          <div class="form-group " *ngIf="hideFieldForm==false">
+            <div class="custom-label">
+            <label for="categorieBatiment" > Nature du bien</label>&nbsp;<span class="required">*</span>
+            <select class="form-control form-control-sm"  [(ngModel)]="codeBatimentSelected" id="categorieBatiment" >
+              <option value='option0' selected >--Sélectionner une valeur--</option>
+              <option value='option1' > Résidentiel</option>
+              <option value='option2'  >Bureaux</option>
+              <option value='option3'>Bureaux IGH (hauteur >28 m)</option>
+              <option value='option4'>Hôtels</option>
+              <option value='option5'>Santé (centres hospitaliers, EHPAD, Etabl. Médicaux sociaux…)</option> 
+              <option value='option6'>Centres commerciaux</option>
+              <option value='option7'>Autre</option>
+            </select>
+          </div>
+        </div> 
+      </div>      
+      <div class="col-lg-4"   > </div>
 
-  private eligibleDpeMapping = {}; // Assurez-vous que ces mappings sont bien définis
-  private etatBienMapping = {};
-  private codeBatimentMapping = {};
-  private codeNormeThermiqueMapping = {};
-  private alignementMapping = {};
+      <div class="col-lg-2"  *ngIf="hideFieldForm==false " >
+        <div [ngClass]="{ 'disabled': isFieldsDisabled }">
+          <div class="custom-label">
+          <label class="labelDPE" for="dpe" >N° du DPE <span class="required" *ngIf="selectedNatBatiment=='option1'"> *</span></label>
+          <input type="text" class="form-control form-control-sm" id="numeroDpeAdeme" placeholder="Ex: 2100E0981916Z" [(ngModel)]="numeroDpeAdeme"   [disabled]="isFieldsDisabled" />
+          <div class="erreurDpe"  fxLayoutAlign="left center" >
+            {{message}}
+          </div>
+          </div></div>
+             
+        
+      </div>
+      <div class="col-lg-2" *ngIf="hideFieldForm==false ">    
+     <br><br>
+        <img   src="../../../assets/images/search.png"  (click)="showAdemeResult(numeroDpeAdeme)" style=" width:20px; height: 20px;">  
+      
+      </div>
 
-  private setObjetFinancementProperties(objetFinancement: any): void {
-    switch (objetFinancement.codeObjetFinancement) {
-      case "02":
-        this.objetFinance = "Acquisition de bâtiment";
-        break;
-      case "03":
-        this.objetFinance = "Rénovation de bâtiment";
-        this.depExist = true;
-        break;
-      default:
-        break;
-    }
+     </div>
+    
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
-    if (!objetFinancement || !objetFinancement.bien) return;
-
-    let bien = { ...objetFinancement.bien }; // Cloner l'objet
-
-    if (bien.eligibleDpe) {
-      this.selectedType = this.eligibleDpeMapping[bien.eligibleDpe].type;
-      this.hideFieldForm = this.eligibleDpeMapping[bien.eligibleDpe].hideFieldForm;
-      this.watchPropertyChanges(bien, 'eligibleDpe', (newValue) => {
-        this.selectedType = this.eligibleDpeMapping[newValue].type;
-        this.hideFieldForm = this.eligibleDpeMapping[newValue].hideFieldForm;
-        bien = { ...bien }; // Cloner à nouveau pour forcer la détection de changement
-      });
-    }
-
-    if (bien.etatBien) {
-      this.selectedNatBatiment = this.etatBienMapping[bien.etatBien];
-      this.watchPropertyChanges(bien, 'etatBien', (newValue) => {
-        this.selectedNatBatiment = this.etatBienMapping[newValue];
-        bien = { ...bien }; // Cloner à nouveau pour forcer la détection de changement
-      });
-    }
-
-    if (bien.codeBatiment) {
-      this.codeBatimentSelected = this.codeBatimentMapping[bien.codeBatiment];
-      this.watchPropertyChanges(bien, 'codeBatiment', (newValue) => {
-        this.codeBatimentSelected = this.codeBatimentMapping[newValue];
-        bien = { ...bien }; // Cloner à nouveau pour forcer la détection de changement
-      });
-    }
-
-    this.partLcl = bien.partLCL;
-    this.watchPropertyChanges(bien, 'partLCL', (newValue) => {
-      this.partLcl = newValue;
-      bien = { ...bien }; // Cloner à nouveau pour forcer la détection de changement
-    });
-
-    this.montantLclFinance = bien.montantFinanceLCL;
-    this.watchPropertyChanges(bien, 'montantFinanceLCL', (newValue) => {
-      this.montantLclFinance = newValue;
-      bien = { ...bien }; // Cloner à nouveau pour forcer la détection de changement
-    });
-
-    this.prixAquisitionBien = bien.prixBien;
-    this.watchPropertyChanges(bien, 'prixBien', (newValue) => {
-      this.prixAquisitionBien = newValue;
-      bien = { ...bien }; // Cloner à nouveau pour forcer la détection de changement
-    });
-
-    this.dateDepot = bien.dateDepotPc ? formatDate(bien.dateDepotPc, 'yyyy-MM-dd', "en-US") : undefined;
-    this.watchPropertyChanges(bien, 'dateDepotPc', (newValue) => {
-      this.dateDepot = newValue ? formatDate(newValue, 'yyyy-MM-dd', "en-US") : undefined;
-      bien = { ...bien }; // Cloner à nouveau pour forcer la détection de changement
-    });
-
-    if (bien.codeNormeThermique) {
-      this.normeThermique = this.codeNormeThermiqueMapping[bien.codeNormeThermique];
-      this.watchPropertyChanges(bien, 'codeNormeThermique', (newValue) => {
-        this.normeThermique = this.codeNormeThermiqueMapping[newValue];
-        bien = { ...bien }; // Cloner à nouveau pour forcer la détection de changement
-      });
-    }
-
-    if (bien.dpeActuel && bien.dpeActuel.sirenDiagnostiqueur) {
-      this.SirenDPE = bien.dpeActuel.sirenDiagnostiqueur;
-      this.watchPropertyChanges(bien.dpeActuel, 'sirenDiagnostiqueur', (newValue) => {
-        this.SirenDPE = newValue;
-        bien = { ...bien }; // Cloner à nouveau pour forcer la détection de changement
-      });
-    }
-
-    this.numeroDpeAdeme = bien.dpeActuel?.numeroDpe;
-    this.watchPropertyChanges(bien.dpeActuel, 'numeroDpe', (newValue) => {
-      this.numeroDpeAdeme = newValue;
-      bien = { ...bien }; // Cloner à nouveau pour forcer la détection de changement
-    });
-
-    if (objetFinancement.alignement && objetFinancement.alignement.topAlignement) {
-      this.DpeResults = true;
-      this.alignementResultText = this.alignementMapping[objetFinancement.alignement.topAlignement];
-      this.watchPropertyChanges(objetFinancement.alignement, 'topAlignement', (newValue) => {
-        this.alignementResultText = this.alignementMapping[newValue];
-        objetFinancement.alignement = { ...objetFinancement.alignement }; // Cloner pour forcer la détection
-      });
-    }
-
-    // Réassigner l'objet cloné à l'original
-    objetFinancement.bien = bien;
-  }
-
-  // Méthode pour surveiller les changements de propriété
-  private watchPropertyChanges(obj: any, prop: string, callback: (newValue: any) => void): void {
-    let value = obj[prop];
-    Object.defineProperty(obj, prop, {
-      get: () => value,
-      set: (newValue) => {
-        if (value !== newValue) {
-          value = newValue;
-          callback(newValue);
-        }
-      },
-      enumerable: true,
-      configurable: true,
-    });
-  }
-}
+</div> 
+</div>
