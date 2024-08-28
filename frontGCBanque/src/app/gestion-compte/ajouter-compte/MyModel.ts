@@ -3,12 +3,22 @@ const missingIndexes = [];
 
 for (let i = 0; i < allObjects; i++) {
     if (!this.calculedAlignementIndexObjects.includes(i)) {
-        missingIndexes.push(i);
+        missingIndexes.push(i + 1);
     }
 }
 
+let message = '';
 if (missingIndexes.length > 0) {
-    console.log("Les indices non inclus dans calculedAlignementIndexObjects sont : ", missingIndexes);
+    message = `Les indices non inclus dans calculedAlignementIndexObjects sont : `;
+    missingIndexes.forEach((index, i) => {
+        message += `indice (${index})`;
+        if (i < missingIndexes.length - 1) {
+            message += ' , '; // Add comma and space for separation
+        }
+    });
 } else {
-    console.log("Tous les indices sont inclus dans calculedAlignementIndexObjects.");
+    message = "Tous les indices sont inclus dans calculedAlignementIndexObjects.";
 }
+
+// Now you can bind this `message` variable to your HTML
+console.log(message);
