@@ -1,5 +1,14 @@
-const allObjects=this.objetsFinancements.length;
-		if(this.calculedAlignementIndexObjects.length<allObjects)
-            console.log("les indexs non inclus dans allObjects  ")
-si allObjects objet egal a 4 par example et this.calculedAlignementIndexObjects = [0,1,2] il faut que j'afficher l'indice 3 qui n'est pas inclus dans
- calculedAlignementIndexObjects        
+const allObjects = this.objetsFinancements.length;
+const missingIndexes = [];
+
+for (let i = 0; i < allObjects; i++) {
+    if (!this.calculedAlignementIndexObjects.includes(i)) {
+        missingIndexes.push(i);
+    }
+}
+
+if (missingIndexes.length > 0) {
+    console.log("Les indices non inclus dans calculedAlignementIndexObjects sont : ", missingIndexes);
+} else {
+    console.log("Tous les indices sont inclus dans calculedAlignementIndexObjects.");
+}
