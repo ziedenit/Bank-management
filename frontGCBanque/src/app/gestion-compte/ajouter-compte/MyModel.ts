@@ -1,1 +1,1 @@
-[disabled]="isButtonDisabled"
+je veux maintenant  ajouter un  bulle d'info en rapprochant le curseur sur le button deja grisé qui permets d'afficher le message suivant Merci de calculer l'alignement pour chaque objet ajouté a  la liste 
