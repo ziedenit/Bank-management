@@ -1,70 +1,99 @@
-import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 
-@Component({
-  selector: 'app-client-section',
-  templateUrl: './client-section.component.html',
-  styleUrls: ['./client-section.component.css']
-})
-export class ClientSectionComponent implements OnInit, OnChanges {
-  @Input() clients: any[] = [];
-  @Input() errors: any[] = [];
-  @Input() hidden: boolean = false;
-  @Input() title: string = '';
-  @Input() errorMessage: string = '';
-  @Input() errorId: string = '';
-  @Input() showLegalName: boolean = false;
-  @Input() showClientName: boolean = false;
-  @Input() showClientDOB: boolean = false;
-  @Input() showClientSiren: boolean = false;
+ngOnInit() {
+    this.initializeFormSubscriptions();
+}
 
-  @Output() toggle = new EventEmitter<void>();
-
-  filteredClients: any[] = [];
-
-  ngOnInit(): void {
-    // Initialisation si nécessaire
-  }
-
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['clients'] || changes['errors']) {
-      this.processClientsData();
-    }
-  }
-
-  processClientsData() {
-    this.filteredClients = this.clients.map(client => {
-      return {
-        ...client,
-        // Vous pouvez également ajouter des traitements de données ici si nécessaire
-        displayName: this.getClientDisplayName(client),
-        displayDOB: this.getClientDisplayDOB(client),
-        displaySiren: this.getClientDisplaySiren(client)
-      };
+private initializeFormSubscriptions(): void {
+    this.formGroup.get('surfaceBien').valueChanges.subscribe(value => {
+        this.bien.surface = value;
+        this.saveCurrentObjectValues(this.currentObject);
     });
-  }
+    
+    this.formGroup.get('valeurCep').valueChanges.subscribe(value => {
+        this.bien.dpeActuel.valeurCep = value;
+        this.saveCurrentObjectValues(this.currentObject);
+    });
 
-  onToggle() {
-    this.toggle.emit();
-  }
+    this.formGroup.get('valeurGes').valueChanges.subscribe(value => {
+        this.bien.dpeActuel.valeurGes = value;
+        this.saveCurrentObjectValues(this.currentObject);
+    });
 
-  private getClientDisplayName(client: any): string {
-    if (this.showClientName) {
-      return `${client.civility}. ${client.nomUsageClient} ${client.prenomClient}`;
+    // Souscriptions pour les autres champs du formulaire
+    this.formGroup.get('numeroNomRue').valueChanges.subscribe(value => {
+        this.bien.dpeActuel.numeroNomRue = value;
+        this.saveCurrentObjectValues(this.currentObject);
+    });
+
+    this.formGroup.get('codePostal').valueChanges.subscribe(value => {
+        this.bien.dpeActuel.codePostal = value;
+        this.saveCurrentObjectValues(this.currentObject);
+    });
+
+    this.formGroup.get('ville').valueChanges.subscribe(value => {
+        this.bien.dpeActuel.ville = value;
+        this.saveCurrentObjectValues(this.currentObject);
+    });
+
+    this.formGroup.get('dateDiangnostique').valueChanges.subscribe(value => {
+        this.bien.dpeActuel.dateDiangnostique = value;
+        this.saveCurrentObjectValues(this.currentObject);
+    });
+
+    this.formGroup.get('anneeConstruction').valueChanges.subscribe(value => {
+        this.bien.dpeActuel.anneeConstruction = value;
+        this.saveCurrentObjectValues(this.currentObject);
+    });
+
+    this.formGroup.get('typeBatiment').valueChanges.subscribe(value => {
+        this.bien.dpeActuel.typeBatiment = value;
+        this.saveCurrentObjectValues(this.currentObject);
+    });
+
+    this.formGroup.get('lettreCEP').valueChanges.subscribe(value => {
+        this.bien.dpeActuel.lettreCEP = value;
+        this.saveCurrentObjectValues(this.currentObject);
+    });
+
+    this.formGroup.get('lettreGES').valueChanges.subscribe(value => {
+        this.bien.dpeActuel.lettreGES = value;
+        this.saveCurrentObjectValues(this.currentObject);
+    });
+
+    this.formGroup.get('energieType').valueChanges.subscribe(value => {
+        this.bien.dpeActuel.energieType = value;
+        this.saveCurrentObjectValues(this.currentObject);
+    });
+}
+
+private saveCurrentObjectValues(currentObject: ObjetFinancement): void {
+    if (!currentObject || !currentObject.bien) return;
+
+    const bien = currentObject.bien;
+
+    if (!bien.dpeActuel) {
+        bien.dpeActuel = new Dpe();
     }
-    return '';
-  }
 
-  private getClientDisplayDOB(client: any): string {
-    if (this.showClientDOB) {
-      return `né(e) le : ${client.dateNaissanceClient}`;
-    }
-    return '';
-  }
-
-  private getClientDisplaySiren(client: any): string {
-    if (this.showClientSiren) {
-      return `SIREN : ${client.siren}`;
-    }
-    return '';
-  }
+    bien.partLCL = this.partLcl;
+    bien.montantFinanceLCL = this.montantLclFinance;
+    bien.prixBien = this.prixAquisitionBien;
+    bien.dateDepotPc = this.dateDepot ? new Date(this.dateDepot).toISOString() : null;
+    bien.codeNormeThermique = this.getCodeFromNormeThermique(this.normeThermique);
+    bien.dpeActuel.sirenDiagnostiqueur = this.SirenDPE;
+    bien.dpeActuel.numeroDpe = this.numeroDpeAdeme;
+    bien.etatBien = this.getCodeEtatBien(this.selectedNatBatiment);
+    bien.codeBatiment = this.getCodeEtatBatiment(this.codeBatimentSelected);
+    bien.surface = this.formGroup.get('surfaceBien').value;
+    bien.dpeActuel.valeurCep = this.formGroup.get('valeurCep').value;
+    bien.dpeActuel.valeurGes = this.formGroup.get('valeurGes').value;
+    bien.dpeActuel.numeroNomRue = this.formGroup.get('numeroNomRue').value;
+    bien.dpeActuel.codePostal = this.formGroup.get('codePostal').value;
+    bien.dpeActuel.ville = this.formGroup.get('ville').value;
+    bien.dpeActuel.dateDiangnostique = this.formGroup.get('dateDiangnostique').value;
+    bien.dpeActuel.anneeConstruction = this.formGroup.get('anneeConstruction').value;
+    bien.dpeActuel.typeBatiment = this.formGroup.get('typeBatiment').value;
+    bien.dpeActuel.lettreCEP = this.formGroup.get('lettreCEP').value;
+    bien.dpeActuel.lettreGES = this.formGroup.get('lettreGES').value;
+    bien.dpeActuel.energieType = this.formGroup.get('energieType').value;
 }
