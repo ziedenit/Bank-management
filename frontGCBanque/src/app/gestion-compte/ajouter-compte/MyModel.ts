@@ -1,7 +1,7 @@
-this.evalutedIndex.push(index);
-			if(index==this.newIndex ||index==0 && this.manuallyAddedIndices....condition)
-			{
-			this.ajoutFinancementDisabled=false;
-			}
+this.evaluatedIndex.push(index);
+// Vérifie si tous les éléments de evaluatedIndex sont présents dans manuallyAddedIndices
+const allEvaluatedAreAdded = this.evaluatedIndex.every(evalIndex => this.manuallyAddedIndices.includes(evalIndex));
 
-je veux ajouter une condtion pour checker si dans le tableau manuallyAddesIndices j'ai tous ce qui dans evalutedIndex
+if ((index == this.newIndex || index == 0) && allEvaluatedAreAdded) {
+    this.ajoutFinancementDisabled = false;
+}
