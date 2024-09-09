@@ -1,71 +1,17 @@
-export class Piece {
-
-    id: any;
-    origineCreation: string;
-    dateCreation: Date;
-    origineModification: string;
-    dateModification: Date;
-    idPiece: string;
-    referenceGed: string;
-    typePiece: string;
-    sousTypePiece: string;
-    numeroDpe: string;
-    dpeActuel: boolean;
-
-    constructor() {
-        this.id = 0;
-        this.origineCreation = '';
-        this.dateCreation = new Date(); // Initialise avec la date actuelle
-        this.origineModification = '';
-        this.dateModification = new Date(); // Initialise avec la date actuelle
-        this.idPiece = '';
-        this.referenceGed = '';
-        this.typePiece= '';
-        this.sousTypePiece= '';
-        this.numeroDpe='';
-        this.dpeActuel= null;
-        
-    }
-    
-}
- ajouterObjetFinancement() {
-	  
-    this.showDeleteIcon =true;
-    this.showFileAriane = true;
-    const nouvelObjet: ObjetFinancement = {
-      idObjetFinancement: null,
-      codeObjetFinancement: "02",
-      quotePartObjet: null,
-      gainCEP: null,
-      dateFinTravaux: null,
-      bien: new Bien(),
-      dpeAvantTravaux: new Dpe(),
-      dpeApresTravaux: new Dpe(),
-      alignement: Alignement.createDefault(),
-      eligibilite: new Eligibilite(),
-      piecesJustificatives: new Piece(), (instantation a corriger )
-      codeFamilleObjet: "01",
-      garantie: [],
-     firstDisconnectionOfd: true,
-	 
-     
-    };
-export class ObjetFinancement {
-	[x: string]: any;
-
-    idObjetFinancement:string;
-	codeObjetFinancement:string;// 02=Acquisition  03=Travaux
-	quotePartObjet:number;
-	gainCEP:number;
-	dateFinTravaux: Date;
-	bien:Bien;
-	dpeAvantTravaux: Dpe;
-	dpeApresTravaux: Dpe;
-	alignement: Alignement;
-    eligibilite: Eligibilite;
-	piecesJustificatives : Piece [] ;
-	codeFamilleObjet: string;	
-	garantie: Garantie[]; 
-	firstDisconnectionOfd:boolean;
-
-} comment je corrige piecesJustificatives: new Piece()
+ private saveCurrentObjectValues(currentObject: ObjetFinancement)
+.......
+if (this.isDpeChecked) {
+			currentObject.piecesJustificatives.push({
+            typePiece: this.selectedOptionJustif === "DPE" ? "DPE" : "Compromis de vente",
+            dpeActuel: this.selectedOptionJustif === "DPE",
+            numeroDpe: this.numeroDpeAdeme
+          });
+        }    
+        if (this.isNormeThermiqueChecked) {
+			currentObject.piecesJustificatives.push({ typePiece: "Norme thermique" });
+        }
+        if (this.isDateDepotChecked) {
+			currentObject.piecesJustificatives.push({ typePiece: "Permis de construire" });
+        }
+Argument of type '{ typePiece: string; dpeActuel: boolean; numeroDpe: string; }' is not assignable to parameter of type 'Piece'.
+  Type '{ typePiece: string; dpeActuel: boolean; numeroDpe: string; }' is missing the following properties from type 'Piece': id, origineCreation, dateCreation, origineModification, and 4 more.
