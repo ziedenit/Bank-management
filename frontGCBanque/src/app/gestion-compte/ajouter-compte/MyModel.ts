@@ -1,21 +1,71 @@
-<ErrorResponse>
-    <code>TECHNICAL_EXCEPTION_OCCURED </code>
-    <message>
-        <message>JSON parse error: Cannot deserialize value of type `java.util.Date` from String "30/09/2012": not a valid representation (error: Failed to parse Date value '30/09/2012': Cannot parse date "30/09/2012": not compatible with any of standard forms ("yyyy-MM-dd'T'HH:mm:ss.SSSX", "yyyy-MM-dd'T'HH:mm:ss.SSS", "EEE, dd MMM yyyy HH:mm:ss zzz", "yyyy-MM-dd"))</message>
-    </message>
-</ErrorResponse>
+export class Piece {
 
-        je suis en train de tester un service et mon json et le suivant dans postman
-{
-        "eligibileDPE" : true,
-        "dateDepotPc" : "30/09/2012",
-        "dpePresent" :true,
-        "presenceDpeJustificatif" : true,
-        "dateConstructionDpe":null,
-        "etiquetteDpe" : "A",
-        "valeurCep": 0.0,
-        "normeThermique" : "",
-        "presenceNormeThermiqueJustificatif" : null
+    id: any;
+    origineCreation: string;
+    dateCreation: Date;
+    origineModification: string;
+    dateModification: Date;
+    idPiece: string;
+    referenceGed: string;
+    typePiece: string;
+    sousTypePiece: string;
+    numeroDpe: string;
+    dpeActuel: boolean;
+
+    constructor() {
+        this.id = 0;
+        this.origineCreation = '';
+        this.dateCreation = new Date(); // Initialise avec la date actuelle
+        this.origineModification = '';
+        this.dateModification = new Date(); // Initialise avec la date actuelle
+        this.idPiece = '';
+        this.referenceGed = '';
+        this.typePiece= '';
+        this.sousTypePiece= '';
+        this.numeroDpe='';
+        this.dpeActuel= null;
+        
+    }
+    
 }
+ ajouterObjetFinancement() {
+	  
+    this.showDeleteIcon =true;
+    this.showFileAriane = true;
+    const nouvelObjet: ObjetFinancement = {
+      idObjetFinancement: null,
+      codeObjetFinancement: "02",
+      quotePartObjet: null,
+      gainCEP: null,
+      dateFinTravaux: null,
+      bien: new Bien(),
+      dpeAvantTravaux: new Dpe(),
+      dpeApresTravaux: new Dpe(),
+      alignement: Alignement.createDefault(),
+      eligibilite: new Eligibilite(),
+      piecesJustificatives: new Piece(), (instantation a corriger )
+      codeFamilleObjet: "01",
+      garantie: [],
+     firstDisconnectionOfd: true,
+	 
+     
+    };
+export class ObjetFinancement {
+	[x: string]: any;
 
-je veux que le champs date depot pc soit accepté 
+    idObjetFinancement:string;
+	codeObjetFinancement:string;// 02=Acquisition  03=Travaux
+	quotePartObjet:number;
+	gainCEP:number;
+	dateFinTravaux: Date;
+	bien:Bien;
+	dpeAvantTravaux: Dpe;
+	dpeApresTravaux: Dpe;
+	alignement: Alignement;
+    eligibilite: Eligibilite;
+	piecesJustificatives : Piece [] ;
+	codeFamilleObjet: string;	
+	garantie: Garantie[]; 
+	firstDisconnectionOfd:boolean;
+
+} comment je corrige piecesJustificatives: new Piece()
