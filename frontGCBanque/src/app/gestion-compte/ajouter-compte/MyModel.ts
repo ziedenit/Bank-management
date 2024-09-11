@@ -1,123 +1,99 @@
-import { Alignement } from './alignement';
-import { Eligibilite } from './eligibilite';
-import { Intervenant } from './intervenant';
-import { ObjetFinancement } from './objetFinancement';
-
-
-export class Financement {
-
-idFinancement: string;
-objetFinancement: ObjetFinancement[] ;
-alignement: Alignement;
-eligibilite: Eligibilite;
-
-intervenant: Intervenant;
-indicateurFinancementDedie:string;
-indicateurNatureDurable:string;
-typeRisqueClimatiqueAttenue:string;
-
-codeApplicatifOrigine: string;
-indicateurReprise: boolean;
-statut: number ;
-agenceCompte:string;
-firstDisconnectionOfd:boolean;
-
+private createNewObjetFinancement(): ObjetFinancement {
+    return {
+        idObjetFinancement: null,
+        codeObjetFinancement: "02",
+        quotePartObjet: null,
+        gainCEP: null,
+        dateFinTravaux: null,
+        bien: this.createNewBien(),
+        dpeAvantTravaux: this.createNewDpe(),
+        dpeApresTravaux: this.createNewDpe(),
+        alignement: Alignement.createDefault(),
+        eligibilite: new Eligibilite(),
+        piecesJustificatives: [],
+        codeFamilleObjet: "01", // Famille par défaut
+        garantie: [],
+        firstDisconnectionOfd: true
+    };
 }
-xport class ObjetFinancement {
-	[x: string]: any;
-
-    idObjetFinancement:string;
-	codeObjetFinancement:string;// 02=Acquisition  03=Travaux
-	quotePartObjet:number;
-	gainCEP:number;
-	dateFinTravaux: Date;
-	bien:Bien;
-	dpeAvantTravaux: Dpe;
-	dpeApresTravaux: Dpe;
-	alignement: Alignement;
-    eligibilite: Eligibilite;
-	piecesJustificatives : Piece [] ;
-	codeFamilleObjet: string;	
-	garantie: Garantie[]; 
-	firstDisconnectionOfd:boolean;
-
+private createNewBien(): Bien {
+    return {
+        idBien: null,
+        surfaceBien: null, // Réinitialisé à vide
+        prixBien: null, // Réinitialisé à vide
+        montantFinanceLCL: null, // Réinitialisé à vide
+        partLCL: null, // Réinitialisé à vide
+        dateDepotPc: null, // Réinitialisé à vide
+        anneeConstruction: null, // Réinitialisé à vide
+        typeBatiment: null, // Réinitialisé à vide
+        etatBien: null, // Réinitialisé à vide
+        codeBatiment: null, // Réinitialisé à vide
+        codeNormeThermique: null, // Réinitialisé à vide
+        dpeActuel: this.createNewDpe(),
+        numeroNomRue: null, // Réinitialisé à vide
+        codePostal: null, // Réinitialisé à vide
+        nomCommune: null, // Réinitialisé à vide
+        typeEnergie: null // Réinitialisé à vide
+    };
 }
-export class Piece {
-
-    id: any;
-    origineCreation: string;
-    dateCreation: Date;
-    origineModification: string;
-    dateModification: Date;
-    idPiece: string;
-    referenceGed: string;
-    typePiece: string;
-    sousTypePiece: string;
-    numeroDpe: string;
-    dpeActuel: boolean;   
-
-    constructor() {
-        this.id = 0;
-        this.origineCreation = '';
-        this.dateCreation = new Date(); // Initialise avec la date actuelle
-        this.origineModification = '';
-        this.dateModification = new Date(); // Initialise avec la date actuelle
-        this.id= 0;
-        this.origineCreation= ' ';
-        this.dateCreation=  new Date();
-        this.origineModification=' ';
-        this.dateModification= new Date();
-        this.idPiece= ' ';
-        this.referenceGed= ' ';
-        this.typePiece= ' ';
-        this.sousTypePiece= ' ';
-        this.numeroDpe= ' ';
-        this.dpeActuel= false;   
-    }
-
-
+private createNewDpe(): Dpe {
+    return {
+        id: null,
+        origineCreation: '',
+        dateCreation: new Date(),
+        origineModification: '',
+        dateModification: new Date(),
+        idDpe: null,
+        numeroDpe: null,
+        estimationCep: null,
+        classeCep: null,
+        estimationGes: null,
+        classeGes: null,
+        dateEtablissementDpe: null,
+        dateReceptionDpe: null,
+        dateFinValiditeDpe: null,
+        sirenDiagnostiqueur: null,
+        etatBien: null,
+        modelDpe: null,
+        numeroDpeRemplace: null,
+        versionDpe: null,
+        methodeDpeApplique: null
+    };
 }
-export class Justificatif {
-    id: any;
-    origineCreation: string;
-    dateCreation: Date;
-    origineModification: string;
-    dateModification: Date;
-    idPiece: string;
-    referenceGed: string;
-    typePiece: string;
-    sousTypePiece: string;
-    numeroDpe: string;
-    dpeActuel: boolean;
-  
-}
-export class Dpe {
-          id  :  number ;
-          origineCreation  : string;
-          dateCreation  : Date  ;
-          origineModification  : string  ;
-          dateModification: Date  ;
-          idDpe  : string  ;
-          numeroDpe  :   string  ;
-          estimationCep  : number ;
-          classeCep  :  string    ;
-          estimationGes  : number ;
-          classeGes  :  string ;
+ajouterObjetFinancement() {
+    // Sauvegarde des données de l'objet actuel avant d'ajouter un nouveau
+    this.saveCurrentObjectValues(this.extractedInitialFinancement.objetFinancement[this.selectedObjetIndex]);
 
-          dateEtablissementDpe  : Date  ;
-          dateReceptionDpe  : Date ;
-          dateFinValiditeDpe  : Date;
-          sirenDiagnostiqueur : string;
-          
-          etatBien:string;
+    // Réinitialisation des variables pour un nouvel objet vide
+    this.isDateDepotChecked = false;
+    this.isNormeThermiqueChecked = false;
+    this.isDpeChecked = false;
+    this.showBlocResult = false;
+    this.showDeleteIcon = true;
+    this.showFileAriane = true;
 
+    // Crée un nouvel objet de financement vierge
+    const nouvelObjet = this.createNewObjetFinancement();
 
+    // Générer un nouvel ID pour l'objet de financement
+    this.idGeneratorService.generateIdObjetFinancement().subscribe(id => {
+        nouvelObjet.idObjetFinancement = id;
 
+        // Ajouter le nouvel objet à la liste
+        this.objetsFinancements.push(nouvelObjet);
 
-          modelDpe:string;
-          numeroDpeRemplace:string;
-          versionDpe: string;
-          methodeDpeApplique:string;
-       
+        // Mettre à jour l'objet dans extractedInitialFinancement avec des champs initialisés
+        this.extractedInitialFinancement.objetFinancement = [...this.objetsFinancements];
 
+        // Mettre à jour les indices des objets créés manuellement
+        this.manuallyAddedIndices.push(this.objetsFinancements.length - 1);
+        this.newIndex = this.objetsFinancements.length - 1;
+        this.ajoutFinancementDisabled = true;
+
+        // Réinitialiser le formulaire pour le nouvel objet vide
+        this.setupFormGroup(nouvelObjet.bien);
+    }, error => {
+        console.error('Erreur lors de la génération d\'ID Objet Financement :', error);
+        this.ajoutFinancementDisabled = false;
+    });
 }
