@@ -1,8 +1,8 @@
 <div *ngIf="showConfirmDialog" class="confirm-dialog">
   <div class="confirm-dialog-content">
     <p>Êtes-vous sûr de vouloir supprimer cet objet de financement ?</p>
-    <button (click)="confirmDelete(true)">Oui</button>
-    <button (click)="confirmDelete(false)">Non</button>
+    <button mat-raised-button color="primary" class="confirm-btn" (click)="confirmDelete(true)">Oui</button>
+    <button mat-raised-button color="warn" class="confirm-btn" (click)="confirmDelete(false)">Non</button>
   </div>
 </div>
 .confirm-dialog {
@@ -23,28 +23,13 @@
   border-radius: 8px;
   text-align: center;
 }
-export class AppComponent {
-  showConfirmDialog = false;
-  deleteIndex: number | null = null;
 
-  removeBreadcrumbItem(index: number): void {
-    // Affiche le pop-up de confirmation
-    this.showConfirmDialog = true;
-    this.deleteIndex = index;
-  }
-
-  confirmDelete(confirm: boolean): void {
-    if (confirm && this.deleteIndex !== null) {
-      // Supprimer l'élément si l'utilisateur a confirmé
-      this.objetsFinancements.splice(this.deleteIndex, 1);
-      if (this.objetsFinancements.length >= 1) {
-        this.ajoutFinancementDisabled = false;
-      }
-      this.extractedInitialFinancement.objetFinancement = this.objetsFinancements;
-    }
-    // Réinitialise les variables
-    this.showConfirmDialog = false;
-    this.deleteIndex = null;
-  }
+.confirm-btn {
+  margin: 0 10px;
+  min-width: 100px; /* Pour que les boutons ne soient pas trop petits */
+  font-size: 16px; /* Ajuster la taille du texte */
 }
-<button class="close-btn" *ngIf="showDeleteIcon && manuallyAddedIndices.includes(i)" (click)="removeBreadcrumbItem(i)">x</button>
+
+p {
+  margin-bottom: 20px; /* Ajouter de l'espace entre le texte et les boutons */
+}
