@@ -1,7 +1,27 @@
-En utilisant un fichier XSL pour la gestion des règles, les équipes métiers peuvent ajouter ou modifier des règles sous forme de tableau structuré, ce qui est intuitif et ne nécessite pas de connaissances approfondies en développement.
-    Les règles sont représentées sous forme de lignes et colonnes dans un tableau, ce qui est une représentation compréhensible et facilement manipulable par les experts métier. Ils n'ont pas besoin d'apprendre la syntaxe DRL de Drools, ce qui réduit la barrière d'adoption.
-    Le processus de conversion du fichier XSL en fichier DRL est automatisé, ce qui signifie que dès que le fichier XSL est mis à jour par le métier, il peut être rapidement transformé en DRL sans nécessiter d’intervention manuelle supplémentaire.
-    Cette approche réduit considérablement le temps de développement, car l'ajout ou la modification de règles ne nécessite pas de recompilation de l’application ou de modification manuelle du code source.
-    Une fois le fichier XSL modifié, les nouvelles règles peuvent être intégrées rapidement dans l'application via Drools, grâce à la génération automatique du DRL. Cette méthode permet de dynamiser la gestion des règles et d'accélérer leur déploiement en production.
-    Étant donné que les règles sont gérées séparément dans des fichiers XSL, leur modification ne nécessite pas un redéploiement complet de l’application. Une simple mise à jour des règles suffit, ce qui est un gros avantage en termes d’agilité.
-    Grâce à cette approche, les équipes métier peuvent directement intervenir sur le fichier XSL sans impliquer les développeurs pour chaque changement. Cela accélère non seulement la prise de décision, mais aussi la mise en œuvre de nouvelles règles ou la correction de règles existantes.
+ removeBreadcrumbItem(index: number) {
+			this.objetsFinancements.splice(index, 1);
+			if(this.objetsFinancements.length>=1)
+				{
+					this.ajoutFinancementDisabled=false;
+				}
+			this.extractedInitialFinancement.objetFinancement=this.objetsFinancements;
+		  }
+
+j'ai cette fonction qui s'appplique pour suprimmer un objet de fil ariane 
+<nav aria-label="breadcrumb" class="breadcrumb-nav" >
+    <ol class="breadcrumb-custom" >
+      <li class="breadcrumb-item-custom" *ngFor="let objet of objetsFinancements; let i = index" >
+        <a [routerLink]=""
+          queryParamsHandling="preserve" (click)="onBreadcrumbClick(i, objet)">
+         <span>Objet de financement</span>  {{ i + 1 }}
+        </a>
+        <button class="close-btn" *ngIf="showDeleteIcon && manuallyAddedIndices.includes(i)"(click)="removeBreadcrumbItem(i)">x</button>
+      </li>
+    </ol>
+    <div class="button-container" >
+      <button class="btn btn-primary btn-sm" (click)="ajouterObjetFinancement()"  [disabled]="ajoutFinancementDisabled " title="Merci de calculer l'alignement pour chaque objet ajouté à la liste" >Ajouter un nouvel objet de financement
+        <img src="../../../assets/icons/plus.svg" />
+      </button>
+    </div>
+  </nav>
+    je veux ajouter un pop angular et non pas en JS up en clicant sur ce button pour avertir avec le message etes vous sur de supprimer 
