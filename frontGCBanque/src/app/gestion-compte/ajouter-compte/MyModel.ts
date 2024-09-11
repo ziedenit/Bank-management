@@ -1,26 +1,32 @@
-private resetFormWithCurrentObject(currentObject: ObjetFinancement): void {
+private getEtatBienFromCode(code: string): string {
+    return this.etatBienMapping[code] || 'option0';
+}
+private getEtatBatimentFromCode(code: string): string {
+    return this.codeBatimentMapping[code] || 'option0';
+}
+private getNormeThermiqueFromCode(code: string): string {
+    return this.codeNormeThermiqueMapping[code] || 'option0';
+}
+private saveCurrentObjectValues(currentObject: ObjetFinancement): void {
+    if (!currentObject || !currentObject.bien) return;
+
     const bien = currentObject.bien;
 
-    // Réinitialisation du formulaire avec les données de l'objet de financement actuel
-    this.formGroup.reset({
-        numeroNomRue: bien.numeroNomRue || '',
-        codePostal: bien.codePostal || '',
-        ville: bien.nomCommune || '',
-        dateDiangnostique: bien.dpeActuel?.dateEtablissementDpe || null,
-        anneeConstruction: bien.anneeConstruction || '',
-        typeBatiment: bien.typeBatiment || '',
-        lettreCEP: bien.dpeActuel?.classeCep || '',
-        lettreGES: bien.dpeActuel?.classeGes || '',
-        surfaceBien: bien.surfaceBien || '',
-        valeurCep: bien.dpeActuel?.estimationCep || '',
-        valeurGes: bien.dpeActuel?.estimationGes || '',
-        energieType: bien.typeEnergie || '',
-    });
+    // Mise à jour des données du bien avec les valeurs du formulaire
+    bien.numeroNomRue = this.formGroup.get('numeroNomRue').value || '';
+    bien.codePostal = this.formGroup.get('codePostal').value || '';
+    bien.nomCommune = this.formGroup.get('ville').value || '';
+    bien.anneeConstruction = this.formGroup.get('anneeConstruction').value || '';
+    bien.typeBatiment = this.formGroup.get('typeBatiment').value || '';
+    bien.surfaceBien = this.formGroup.get('surfaceBien').value || '';
+    bien.dpeActuel.estimationCep = this.formGroup.get('valeurCep').value || '';
+    bien.dpeActuel.estimationGes = this.formGroup.get('valeurGes').value || '';
+    bien.dpeActuel.dateEtablissementDpe = this.formGroup.get('dateDiangnostique').value || null;
 
-    // Réinitialiser les champs de sélection spécifiques
-    this.selectedNatBatiment = this.getEtatBienFromCode(bien.etatBien) || 'option0';
-    this.codeBatimentSelected = this.getEtatBatimentFromCode(bien.codeBatiment) || 'option0';
-    this.normeThermique = this.getNormeThermiqueFromCode(bien.codeNormeThermique) || 'option0';
-    this.numeroDpeAdeme = bien.dpeActuel?.numeroDpe || '';
-    this.SirenDPE = bien.dpeActuel?.sirenDiagnostiqueur || '';
+    // Sauvegarder les valeurs spécifiques des champs sélectionnés
+    bien.etatBien = this.getCodeEtatBien(this.selectedNatBatiment);
+    bien.codeBatiment = this.getCodeEtatBatiment(this.codeBatimentSelected);
+    bien.codeNormeThermique = this.getCodeFromNormeThermique(this.normeThermique);
+    bien.dpeActuel.numeroDpe = this.numeroDpeAdeme;
+    bien.dpeActuel.sirenDiagnostiqueur = this.SirenDPE;
 }
