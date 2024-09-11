@@ -10,7 +10,7 @@ ajouterObjetFinancement() {
     this.showDeleteIcon = true;
     this.showFileAriane = true;
 
-    // Création d'un nouvel objet de financement vierge avec des champs spécifiques bien réinitialisés
+    // Création d'un nouvel objet de financement vierge sans copier l'objet précédent
     const nouvelObjet: ObjetFinancement = {
         idObjetFinancement: null,
         codeObjetFinancement: "02",
@@ -19,12 +19,12 @@ ajouterObjetFinancement() {
         dateFinTravaux: null,
         bien: {
             idBien: null,
-            surfaceBien: null,
-            prixBien: null,
-            montantFinanceLCL: null,
-            partLCL: null,
-            dateDepotPc: null,
-            anneeConstruction: null,
+            surfaceBien: null, // Réinitialisé
+            prixBien: null, // Réinitialisé
+            montantFinanceLCL: null, // Réinitialisé
+            partLCL: null, // Réinitialisé
+            dateDepotPc: null, // Réinitialisé
+            anneeConstruction: null, // Réinitialisé
             typeBatiment: null, // Vide (réinitialisé)
             etatBien: null, // Vide (réinitialisé)
             codeBatiment: null, // Vide (Nature du bien réinitialisé)
@@ -36,12 +36,12 @@ ajouterObjetFinancement() {
                 estimationGes: null,
                 classeCep: null,
                 classeGes: null,
-                dateEtablissementDpe: null,
+                dateEtablissementDpe: null, // Vide
             },
-            numeroNomRue: null,
-            codePostal: null,
-            nomCommune: null,
-            typeEnergie: null
+            numeroNomRue: null, // Réinitialisé
+            codePostal: null, // Réinitialisé
+            nomCommune: null, // Réinitialisé
+            typeEnergie: null // Réinitialisé
         },
         dpeAvantTravaux: new Dpe(),
         dpeApresTravaux: new Dpe(),
@@ -50,7 +50,7 @@ ajouterObjetFinancement() {
         codeFamilleObjet: "01", // Famille par défaut
         garantie: [],
         firstDisconnectionOfd: true,
-        piecesJustificatives: [], // Vide par défaut
+        piecesJustificatives: [] // Vide par défaut
     };
 
     // Générer un nouvel ID pour l'objet de financement
@@ -59,7 +59,9 @@ ajouterObjetFinancement() {
 
         // Ajouter le nouvel objet à la liste
         this.objetsFinancements.push(nouvelObjet);
-        this.extractedInitialFinancement.objetFinancement = this.objetsFinancements;
+
+        // Mettre à jour l'objet dans extractedInitialFinancement avec des champs initialisés
+        this.extractedInitialFinancement.objetFinancement = [...this.objetsFinancements];
 
         // Mettre à jour les indices des objets créés manuellement
         this.manuallyAddedIndices.push(this.objetsFinancements.length - 1);
@@ -74,7 +76,6 @@ ajouterObjetFinancement() {
     });
 }
 private setupFormGroup(bien: Bien): void {
-    // Réinitialiser le formulaire avec des valeurs vides ou nulles
     this.formGroup = this.fb.group({
         numeroNomRue: [bien.numeroNomRue || null],
         codePostal: [bien.codePostal || null],
@@ -92,29 +93,4 @@ private setupFormGroup(bien: Bien): void {
         sirenDiagnostiqueur: [bien.dpeActuel?.sirenDiagnostiqueur || null], // SIREN réinitialisé à vide
         energieType: [bien.typeEnergie || null]
     });
-}
-onBreadcrumbClick(index: number) {
-    // Sauvegarde des données de l'objet actuel avant de basculer vers un autre objet
-    this.saveCurrentObjectValues(this.extractedInitialFinancement.objetFinancement[this.selectedObjetIndex]);
-
-    // Mise à jour de l'index de l'objet sélectionné
-    this.selectedObjetIndex = index;
-
-    // Charger les données de l'objet sélectionné et les réinitialiser si nécessaire
-    const objetFinancement = this.extractedInitialFinancement.objetFinancement[index];
-
-    // Réinitialiser les champs critiques pour s'assurer qu'ils sont vides
-    objetFinancement.bien.etatBien = null;
-    objetFinancement.bien.codeBatiment = null;
-    objetFinancement.bien.codeNormeThermique = null;
-    objetFinancement.bien.dpeActuel.sirenDiagnostiqueur = null;
-
-    // Appliquer les nouvelles données au formulaire
-    this.setupFormGroup(objetFinancement.bien);
-
-    // Réinitialiser les variables liées aux champs spécifiques
-    this.isDateDepotChecked = false;
-    this.isNormeThermiqueChecked = false;
-    this.isDpeChecked = false;
-    this.showBlocResult = false;
 }
