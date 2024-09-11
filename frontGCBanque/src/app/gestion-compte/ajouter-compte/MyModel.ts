@@ -1,20 +1,15 @@
-onBreadcrumbClick(index: number): void {
-    this.showBlocResult = true;
+private restoreAlignementResultFromObject(index: number): void {
+    const currentObjet = this.extractedInitialFinancement.objetFinancement[index];
 
-    // Sauvegarder les données de l'objet courant avant de passer à l'objet sélectionné
-    this.saveCurrentObjectValues(this.extractedInitialFinancement.objetFinancement[this.selectedObjetIndex]);
+    if (!currentObjet) return;
 
-    // Mettre à jour l'index de l'objet sélectionné
-    this.selectedObjetIndex = index;
+    // Restaurer les résultats d'alignement depuis l'objet de financement
+    this.alignementContext = currentObjet.alignement;
+    this.alignementResultText = currentObjet.alignementResultText;
+    this.eligibiliteDpeMessage = currentObjet.eligibiliteDpeMessage;
 
-    // Appliquer les règles métiers sur l'élément sélectionné du fil d'Ariane
-    this.setObjetFinancementData(this.extractedInitialFinancement.objetFinancement[index]);
-    this.checkRequiredFields(this.extractedInitialFinancement, index);
-    this.checkPiecesJustificatives(this.extractedInitialFinancement, index);
-    this.setupFormGroup(this.extractedInitialFinancement.objetFinancement[index].bien);
-
-    this.depExist = true; 
-
-    // Restaurer les résultats d'alignement pour l'objet sélectionné
-    this.restoreAlignementResultFromObject(index);
+    // Restaurer l'état UI pour le bloc de résultats
+    this.showBlocResult = currentObjet.showBlocResult;
+    this.DpeResults = currentObjet.DpeResults;
+    this.elementResults = currentObjet.elementResults;
 }
