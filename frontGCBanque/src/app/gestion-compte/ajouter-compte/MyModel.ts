@@ -1,96 +1,123 @@
-ajouterObjetFinancement() {
-    // Sauvegarde des données de l'objet actuel avant d'ajouter un nouveau
-    this.saveCurrentObjectValues(this.extractedInitialFinancement.objetFinancement[this.selectedObjetIndex]);
+import { Alignement } from './alignement';
+import { Eligibilite } from './eligibilite';
+import { Intervenant } from './intervenant';
+import { ObjetFinancement } from './objetFinancement';
 
-    // Réinitialisation des variables pour un nouvel objet vide
-    this.isDateDepotChecked = false;
-    this.isNormeThermiqueChecked = false;
-    this.isDpeChecked = false;
-    this.showBlocResult = false;
-    this.showDeleteIcon = true;
-    this.showFileAriane = true;
 
-    // Création d'un nouvel objet de financement vierge sans copier l'objet précédent
-    const nouvelObjet: ObjetFinancement = {
-        idObjetFinancement: null,
-        codeObjetFinancement: "02",
-        quotePartObjet: null,
-        gainCEP: null,
-        dateFinTravaux: null,
-        bien: {
-            idBien: null,
-            surfaceBien: null, // Réinitialisé
-            prixBien: null, // Réinitialisé
-            montantFinanceLCL: null, // Réinitialisé
-            partLCL: null, // Réinitialisé
-            dateDepotPc: null, // Réinitialisé
-            anneeConstruction: null, // Réinitialisé
-            typeBatiment: null, // Vide (réinitialisé)
-            etatBien: null, // Vide (réinitialisé)
-            codeBatiment: null, // Vide (Nature du bien réinitialisé)
-            codeNormeThermique: null, // Vide (Norme Thermique réinitialisé)
-            dpeActuel: {
-                numeroDpe: null, // Vide (réinitialisé)
-                sirenDiagnostiqueur: null, // Vide (SIREN diagnostiqueur réinitialisé)
-                estimationCep: null,
-                estimationGes: null,
-                classeCep: null,
-                classeGes: null,
-                dateEtablissementDpe: null, // Vide
-            },
-            numeroNomRue: null, // Réinitialisé
-            codePostal: null, // Réinitialisé
-            nomCommune: null, // Réinitialisé
-            typeEnergie: null // Réinitialisé
-        },
-        dpeAvantTravaux: new Dpe(),
-        dpeApresTravaux: new Dpe(),
-        alignement: Alignement.createDefault(),
-        eligibilite: new Eligibilite(),
-        codeFamilleObjet: "01", // Famille par défaut
-        garantie: [],
-        firstDisconnectionOfd: true,
-        piecesJustificatives: [] // Vide par défaut
-    };
+export class Financement {
 
-    // Générer un nouvel ID pour l'objet de financement
-    this.idGeneratorService.generateIdObjetFinancement().subscribe(id => {
-        nouvelObjet.idObjetFinancement = id;
+idFinancement: string;
+objetFinancement: ObjetFinancement[] ;
+alignement: Alignement;
+eligibilite: Eligibilite;
 
-        // Ajouter le nouvel objet à la liste
-        this.objetsFinancements.push(nouvelObjet);
+intervenant: Intervenant;
+indicateurFinancementDedie:string;
+indicateurNatureDurable:string;
+typeRisqueClimatiqueAttenue:string;
 
-        // Mettre à jour l'objet dans extractedInitialFinancement avec des champs initialisés
-        this.extractedInitialFinancement.objetFinancement = [...this.objetsFinancements];
+codeApplicatifOrigine: string;
+indicateurReprise: boolean;
+statut: number ;
+agenceCompte:string;
+firstDisconnectionOfd:boolean;
 
-        // Mettre à jour les indices des objets créés manuellement
-        this.manuallyAddedIndices.push(this.objetsFinancements.length - 1);
-        this.newIndex = this.objetsFinancements.length - 1;
-        this.ajoutFinancementDisabled = true;
-
-        // Réinitialiser le formulaire pour le nouvel objet vide
-        this.setupFormGroup(nouvelObjet.bien);
-    }, error => {
-        console.error('Erreur lors de la génération d\'ID Objet Financement :', error);
-        this.ajoutFinancementDisabled = false;
-    });
 }
-private setupFormGroup(bien: Bien): void {
-    this.formGroup = this.fb.group({
-        numeroNomRue: [bien.numeroNomRue || null],
-        codePostal: [bien.codePostal || null],
-        ville: [bien.nomCommune || null],
-        dateDiangnostique: [bien.dpeActuel?.dateEtablissementDpe?.toString().substring(0, 10) || null],
-        anneeConstruction: [bien.anneeConstruction || null],
-        typeBatiment: [bien.typeBatiment || null], // Réinitialisé à vide
-        etatBien: [bien.etatBien || null], // Réinitialisé à vide
-        codeBatiment: [bien.codeBatiment || null], // Nature du bien réinitialisée à vide
-        lettreCEP: [bien.dpeActuel?.classeCep || null],
-        lettreGES: [bien.dpeActuel?.classeGes || null],
-        surfaceBien: [bien.surfaceBien || null],
-        valeurCep: [bien.dpeActuel?.estimationCep || null],
-        valeurGes: [bien.dpeActuel?.estimationGes || null],
-        sirenDiagnostiqueur: [bien.dpeActuel?.sirenDiagnostiqueur || null], // SIREN réinitialisé à vide
-        energieType: [bien.typeEnergie || null]
-    });
+xport class ObjetFinancement {
+	[x: string]: any;
+
+    idObjetFinancement:string;
+	codeObjetFinancement:string;// 02=Acquisition  03=Travaux
+	quotePartObjet:number;
+	gainCEP:number;
+	dateFinTravaux: Date;
+	bien:Bien;
+	dpeAvantTravaux: Dpe;
+	dpeApresTravaux: Dpe;
+	alignement: Alignement;
+    eligibilite: Eligibilite;
+	piecesJustificatives : Piece [] ;
+	codeFamilleObjet: string;	
+	garantie: Garantie[]; 
+	firstDisconnectionOfd:boolean;
+
+}
+export class Piece {
+
+    id: any;
+    origineCreation: string;
+    dateCreation: Date;
+    origineModification: string;
+    dateModification: Date;
+    idPiece: string;
+    referenceGed: string;
+    typePiece: string;
+    sousTypePiece: string;
+    numeroDpe: string;
+    dpeActuel: boolean;   
+
+    constructor() {
+        this.id = 0;
+        this.origineCreation = '';
+        this.dateCreation = new Date(); // Initialise avec la date actuelle
+        this.origineModification = '';
+        this.dateModification = new Date(); // Initialise avec la date actuelle
+        this.id= 0;
+        this.origineCreation= ' ';
+        this.dateCreation=  new Date();
+        this.origineModification=' ';
+        this.dateModification= new Date();
+        this.idPiece= ' ';
+        this.referenceGed= ' ';
+        this.typePiece= ' ';
+        this.sousTypePiece= ' ';
+        this.numeroDpe= ' ';
+        this.dpeActuel= false;   
+    }
+
+
+}
+export class Justificatif {
+    id: any;
+    origineCreation: string;
+    dateCreation: Date;
+    origineModification: string;
+    dateModification: Date;
+    idPiece: string;
+    referenceGed: string;
+    typePiece: string;
+    sousTypePiece: string;
+    numeroDpe: string;
+    dpeActuel: boolean;
+  
+}
+export class Dpe {
+          id  :  number ;
+          origineCreation  : string;
+          dateCreation  : Date  ;
+          origineModification  : string  ;
+          dateModification: Date  ;
+          idDpe  : string  ;
+          numeroDpe  :   string  ;
+          estimationCep  : number ;
+          classeCep  :  string    ;
+          estimationGes  : number ;
+          classeGes  :  string ;
+
+          dateEtablissementDpe  : Date  ;
+          dateReceptionDpe  : Date ;
+          dateFinValiditeDpe  : Date;
+          sirenDiagnostiqueur : string;
+          
+          etatBien:string;
+
+
+
+
+          modelDpe:string;
+          numeroDpeRemplace:string;
+          versionDpe: string;
+          methodeDpeApplique:string;
+       
+
 }
