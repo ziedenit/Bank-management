@@ -1,27 +1,50 @@
- removeBreadcrumbItem(index: number) {
-			this.objetsFinancements.splice(index, 1);
-			if(this.objetsFinancements.length>=1)
-				{
-					this.ajoutFinancementDisabled=false;
-				}
-			this.extractedInitialFinancement.objetFinancement=this.objetsFinancements;
-		  }
+<div *ngIf="showConfirmDialog" class="confirm-dialog">
+  <div class="confirm-dialog-content">
+    <p>Êtes-vous sûr de vouloir supprimer cet objet de financement ?</p>
+    <button (click)="confirmDelete(true)">Oui</button>
+    <button (click)="confirmDelete(false)">Non</button>
+  </div>
+</div>
+.confirm-dialog {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
-j'ai cette fonction qui s'appplique pour suprimmer un objet de fil ariane 
-<nav aria-label="breadcrumb" class="breadcrumb-nav" >
-    <ol class="breadcrumb-custom" >
-      <li class="breadcrumb-item-custom" *ngFor="let objet of objetsFinancements; let i = index" >
-        <a [routerLink]=""
-          queryParamsHandling="preserve" (click)="onBreadcrumbClick(i, objet)">
-         <span>Objet de financement</span>  {{ i + 1 }}
-        </a>
-        <button class="close-btn" *ngIf="showDeleteIcon && manuallyAddedIndices.includes(i)"(click)="removeBreadcrumbItem(i)">x</button>
-      </li>
-    </ol>
-    <div class="button-container" >
-      <button class="btn btn-primary btn-sm" (click)="ajouterObjetFinancement()"  [disabled]="ajoutFinancementDisabled " title="Merci de calculer l'alignement pour chaque objet ajouté à la liste" >Ajouter un nouvel objet de financement
-        <img src="../../../assets/icons/plus.svg" />
-      </button>
-    </div>
-  </nav>
-    je veux ajouter un pop angular et non pas en JS up en clicant sur ce button pour avertir avec le message etes vous sur de supprimer 
+.confirm-dialog-content {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+}
+export class AppComponent {
+  showConfirmDialog = false;
+  deleteIndex: number | null = null;
+
+  removeBreadcrumbItem(index: number): void {
+    // Affiche le pop-up de confirmation
+    this.showConfirmDialog = true;
+    this.deleteIndex = index;
+  }
+
+  confirmDelete(confirm: boolean): void {
+    if (confirm && this.deleteIndex !== null) {
+      // Supprimer l'élément si l'utilisateur a confirmé
+      this.objetsFinancements.splice(this.deleteIndex, 1);
+      if (this.objetsFinancements.length >= 1) {
+        this.ajoutFinancementDisabled = false;
+      }
+      this.extractedInitialFinancement.objetFinancement = this.objetsFinancements;
+    }
+    // Réinitialise les variables
+    this.showConfirmDialog = false;
+    this.deleteIndex = null;
+  }
+}
+<button class="close-btn" *ngIf="showDeleteIcon && manuallyAddedIndices.includes(i)" (click)="removeBreadcrumbItem(i)">x</button>
