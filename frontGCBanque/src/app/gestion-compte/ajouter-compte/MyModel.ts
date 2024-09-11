@@ -10,7 +10,7 @@ ajouterObjetFinancement() {
     this.showDeleteIcon = true;
     this.showFileAriane = true;
 
-    // Création d'un nouvel objet de financement vierge
+    // Création d'un nouvel objet de financement vierge avec des champs spécifiques bien réinitialisés
     const nouvelObjet: ObjetFinancement = {
         idObjetFinancement: null,
         codeObjetFinancement: "02",
@@ -25,13 +25,13 @@ ajouterObjetFinancement() {
             partLCL: null,
             dateDepotPc: null,
             anneeConstruction: null,
-            typeBatiment: null, // Vide
-            etatBien: null, // Vide
-            codeBatiment: null, // Vide (Nature du bien)
-            codeNormeThermique: null, // Vide (Norme Thermique)
+            typeBatiment: null, // Vide (réinitialisé)
+            etatBien: null, // Vide (réinitialisé)
+            codeBatiment: null, // Vide (Nature du bien réinitialisé)
+            codeNormeThermique: null, // Vide (Norme Thermique réinitialisé)
             dpeActuel: {
-                numeroDpe: null, // Vide
-                sirenDiagnostiqueur: null, // Vide (SIREN diagnostiqueur)
+                numeroDpe: null, // Vide (réinitialisé)
+                sirenDiagnostiqueur: null, // Vide (SIREN diagnostiqueur réinitialisé)
                 estimationCep: null,
                 estimationGes: null,
                 classeCep: null,
@@ -73,6 +73,26 @@ ajouterObjetFinancement() {
         this.ajoutFinancementDisabled = false;
     });
 }
+private setupFormGroup(bien: Bien): void {
+    // Réinitialiser le formulaire avec des valeurs vides ou nulles
+    this.formGroup = this.fb.group({
+        numeroNomRue: [bien.numeroNomRue || null],
+        codePostal: [bien.codePostal || null],
+        ville: [bien.nomCommune || null],
+        dateDiangnostique: [bien.dpeActuel?.dateEtablissementDpe?.toString().substring(0, 10) || null],
+        anneeConstruction: [bien.anneeConstruction || null],
+        typeBatiment: [bien.typeBatiment || null], // Réinitialisé à vide
+        etatBien: [bien.etatBien || null], // Réinitialisé à vide
+        codeBatiment: [bien.codeBatiment || null], // Nature du bien réinitialisée à vide
+        lettreCEP: [bien.dpeActuel?.classeCep || null],
+        lettreGES: [bien.dpeActuel?.classeGes || null],
+        surfaceBien: [bien.surfaceBien || null],
+        valeurCep: [bien.dpeActuel?.estimationCep || null],
+        valeurGes: [bien.dpeActuel?.estimationGes || null],
+        sirenDiagnostiqueur: [bien.dpeActuel?.sirenDiagnostiqueur || null], // SIREN réinitialisé à vide
+        energieType: [bien.typeEnergie || null]
+    });
+}
 onBreadcrumbClick(index: number) {
     // Sauvegarde des données de l'objet actuel avant de basculer vers un autre objet
     this.saveCurrentObjectValues(this.extractedInitialFinancement.objetFinancement[this.selectedObjetIndex]);
@@ -80,17 +100,19 @@ onBreadcrumbClick(index: number) {
     // Mise à jour de l'index de l'objet sélectionné
     this.selectedObjetIndex = index;
 
-    // Charger les données de l'objet sélectionné
-    this.setObjetFinancementData(this.extractedInitialFinancement.objetFinancement[index]);
+    // Charger les données de l'objet sélectionné et les réinitialiser si nécessaire
+    const objetFinancement = this.extractedInitialFinancement.objetFinancement[index];
 
-    // Vérification des champs obligatoires pour l'objet sélectionné
-    this.checkRequiredFields(this.extractedInitialFinancement, index);
-    this.checkPiecesJustificatives(this.extractedInitialFinancement, this.selectedObjetIndex);
+    // Réinitialiser les champs critiques pour s'assurer qu'ils sont vides
+    objetFinancement.bien.etatBien = null;
+    objetFinancement.bien.codeBatiment = null;
+    objetFinancement.bien.codeNormeThermique = null;
+    objetFinancement.bien.dpeActuel.sirenDiagnostiqueur = null;
 
-    // Mise à jour du formulaire pour refléter l'état de l'objet sélectionné
-    this.setupFormGroup(this.extractedInitialFinancement.objetFinancement[index].bien);
+    // Appliquer les nouvelles données au formulaire
+    this.setupFormGroup(objetFinancement.bien);
 
-    // Réinitialiser les flags pour indiquer que cet objet est en cours d'édition
+    // Réinitialiser les variables liées aux champs spécifiques
     this.isDateDepotChecked = false;
     this.isNormeThermiqueChecked = false;
     this.isDpeChecked = false;
