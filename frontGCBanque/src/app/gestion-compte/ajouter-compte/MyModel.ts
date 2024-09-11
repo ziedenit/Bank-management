@@ -1,6 +1,7 @@
-Drools permet de séparer clairement les règles métier du code applicatif
-les règles peuvent être définies dans des fichiers spécifiques et gérées indépendamment du reste de l'application
-Drools utilise un moteur à base de règles qui peut gérer de manière efficace des arbres de décision complexes. Le moteur applique les règles en fonction des conditions définies et peut enchaîner les règles selon les dépendances, facilitant la gestion de scénarios complexes.
-    Drools permet de modifier ou d’ajouter des règles dynamiquement 
-Les règles dans Drools sont définies de manière déclarative en utilisant un langage de règles (DRL), ce qui les rend plus lisibles pour les analystes métier ou d’autres personnes non techniques.
-     Cela permet à des experts métier de comprendre et potentiellement de contribuer à l'écriture ou à la modification des règles, sans nécessiter des compétences approfondies en développement.
+En utilisant un fichier XSL pour la gestion des règles, les équipes métiers peuvent ajouter ou modifier des règles sous forme de tableau structuré, ce qui est intuitif et ne nécessite pas de connaissances approfondies en développement.
+    Les règles sont représentées sous forme de lignes et colonnes dans un tableau, ce qui est une représentation compréhensible et facilement manipulable par les experts métier. Ils n'ont pas besoin d'apprendre la syntaxe DRL de Drools, ce qui réduit la barrière d'adoption.
+    Le processus de conversion du fichier XSL en fichier DRL est automatisé, ce qui signifie que dès que le fichier XSL est mis à jour par le métier, il peut être rapidement transformé en DRL sans nécessiter d’intervention manuelle supplémentaire.
+    Cette approche réduit considérablement le temps de développement, car l'ajout ou la modification de règles ne nécessite pas de recompilation de l’application ou de modification manuelle du code source.
+    Une fois le fichier XSL modifié, les nouvelles règles peuvent être intégrées rapidement dans l'application via Drools, grâce à la génération automatique du DRL. Cette méthode permet de dynamiser la gestion des règles et d'accélérer leur déploiement en production.
+    Étant donné que les règles sont gérées séparément dans des fichiers XSL, leur modification ne nécessite pas un redéploiement complet de l’application. Une simple mise à jour des règles suffit, ce qui est un gros avantage en termes d’agilité.
+    Grâce à cette approche, les équipes métier peuvent directement intervenir sur le fichier XSL sans impliquer les développeurs pour chaque changement. Cela accélère non seulement la prise de décision, mais aussi la mise en œuvre de nouvelles règles ou la correction de règles existantes.
