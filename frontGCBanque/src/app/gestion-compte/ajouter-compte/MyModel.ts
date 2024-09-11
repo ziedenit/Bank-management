@@ -1,20 +1,26 @@
-onBreadcrumbClick(index: number): void {
-    // Sauvegarder les données de l'objet courant avant de changer
-    this.saveCurrentObjectValues(this.extractedInitialFinancement.objetFinancement[this.selectedObjetIndex]);
+private resetFormWithCurrentObject(currentObject: ObjetFinancement): void {
+    const bien = currentObject.bien;
 
-    // Mettre à jour l'index de l'objet sélectionné
-    this.selectedObjetIndex = index;
+    // Réinitialisation du formulaire avec les données de l'objet de financement actuel
+    this.formGroup.reset({
+        numeroNomRue: bien.numeroNomRue || '',
+        codePostal: bien.codePostal || '',
+        ville: bien.nomCommune || '',
+        dateDiangnostique: bien.dpeActuel?.dateEtablissementDpe || null,
+        anneeConstruction: bien.anneeConstruction || '',
+        typeBatiment: bien.typeBatiment || '',
+        lettreCEP: bien.dpeActuel?.classeCep || '',
+        lettreGES: bien.dpeActuel?.classeGes || '',
+        surfaceBien: bien.surfaceBien || '',
+        valeurCep: bien.dpeActuel?.estimationCep || '',
+        valeurGes: bien.dpeActuel?.estimationGes || '',
+        energieType: bien.typeEnergie || '',
+    });
 
-    // Appliquer les règles métiers sur l'objet sélectionné
-    this.setObjetFinancementData(this.extractedInitialFinancement.objetFinancement[index]);
-
-    // Réinitialiser les champs du formulaire pour l'objet sélectionné
-    this.resetFormWithCurrentObject(this.extractedInitialFinancement.objetFinancement[index]);
-
-    // Restaurer les résultats d'alignement et pièces justificatives pour l'objet
-    this.restoreAlignementResultFromObject(index);
-    this.checkRequiredFields(this.extractedInitialFinancement, index);
-    this.checkPiecesJustificatives(this.extractedInitialFinancement, index);
-
-    this.depExist = true; 
+    // Réinitialiser les champs de sélection spécifiques
+    this.selectedNatBatiment = this.getEtatBienFromCode(bien.etatBien) || 'option0';
+    this.codeBatimentSelected = this.getEtatBatimentFromCode(bien.codeBatiment) || 'option0';
+    this.normeThermique = this.getNormeThermiqueFromCode(bien.codeNormeThermique) || 'option0';
+    this.numeroDpeAdeme = bien.dpeActuel?.numeroDpe || '';
+    this.SirenDPE = bien.dpeActuel?.sirenDiagnostiqueur || '';
 }
