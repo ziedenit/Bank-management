@@ -1,59 +1,98 @@
-showAlignement(index: number): void {
-    // Sauvegarde des données de l'objet actuel avant de calculer l'alignement
+ajouterObjetFinancement() {
+    // Sauvegarde des données de l'objet actuel avant d'ajouter un nouveau
     this.saveCurrentObjectValues(this.extractedInitialFinancement.objetFinancement[this.selectedObjetIndex]);
 
-    // Vérifier si tous les champs obligatoires sont remplis
-    this.checkFormFieldsFormGroup();
+    // Réinitialisation des variables pour un nouvel objet vide
+    this.isDateDepotChecked = false;
+    this.isNormeThermiqueChecked = false;
+    this.isDpeChecked = false;
+    this.showBlocResult = false;
+    this.showDeleteIcon = true;
+    this.showFileAriane = true;
 
-    // Si un champ obligatoire est manquant, arrêter le calcul
-    if (this.champObligatoire) {
-        console.warn("Certains champs obligatoires sont manquants. Impossible de calculer l'alignement.");
-        return;
-    }
+    // Création d'un nouvel objet de financement vierge
+    const nouvelObjet: ObjetFinancement = {
+        idObjetFinancement: null,
+        codeObjetFinancement: "02",
+        quotePartObjet: null,
+        gainCEP: null,
+        dateFinTravaux: null,
+        bien: {
+            idBien: null,
+            surfaceBien: null,
+            prixBien: null,
+            montantFinanceLCL: null,
+            partLCL: null,
+            dateDepotPc: null,
+            anneeConstruction: null,
+            typeBatiment: null, // Vide
+            etatBien: null, // Vide
+            codeBatiment: null, // Vide (Nature du bien)
+            codeNormeThermique: null, // Vide (Norme Thermique)
+            dpeActuel: {
+                numeroDpe: null, // Vide
+                sirenDiagnostiqueur: null, // Vide (SIREN diagnostiqueur)
+                estimationCep: null,
+                estimationGes: null,
+                classeCep: null,
+                classeGes: null,
+                dateEtablissementDpe: null,
+            },
+            numeroNomRue: null,
+            codePostal: null,
+            nomCommune: null,
+            typeEnergie: null
+        },
+        dpeAvantTravaux: new Dpe(),
+        dpeApresTravaux: new Dpe(),
+        alignement: Alignement.createDefault(),
+        eligibilite: new Eligibilite(),
+        codeFamilleObjet: "01", // Famille par défaut
+        garantie: [],
+        firstDisconnectionOfd: true,
+        piecesJustificatives: [], // Vide par défaut
+    };
 
-    // Préparer le contexte pour le calcul de l'alignement
-    this.prepareLigneContext();
+    // Générer un nouvel ID pour l'objet de financement
+    this.idGeneratorService.generateIdObjetFinancement().subscribe(id => {
+        nouvelObjet.idObjetFinancement = id;
 
-    // Vérifier la validité du SIREN
-    this.isValid = this.sirenValidator.verifySiren(this.SirenDPE);
+        // Ajouter le nouvel objet à la liste
+        this.objetsFinancements.push(nouvelObjet);
+        this.extractedInitialFinancement.objetFinancement = this.objetsFinancements;
 
-    // Si le SIREN est invalide, afficher un message et arrêter le calcul
-    if (!this.isValid) {
-        console.error("Le numéro SIREN est invalide. Impossible de calculer l'alignement.");
-        return;
-    }
+        // Mettre à jour les indices des objets créés manuellement
+        this.manuallyAddedIndices.push(this.objetsFinancements.length - 1);
+        this.newIndex = this.objetsFinancements.length - 1;
+        this.ajoutFinancementDisabled = true;
 
-    // Appeler les services d'alignement et gérer les résultats
-    forkJoin([
-        this.engineService.alignement(this.ligneContext),
-        this.engineService.alignementXtra(this.ligneContextXtra)
-    ]).subscribe(([aligne, aligneXtra]) => {
-        // Mise à jour des résultats d'alignement
-        this.alignementResultText = this.alignementMapping[aligne];
-        this.alignementResult = aligne;
-        this.alignementXtraResult = aligneXtra;
-
-        // Calcul des résultats d'alignement avec Xtra
-        this.alignementContext = this.xtraRepriseService.calculXtra(aligne, aligneXtra);
-        console.log("Résultats d'alignement :", this.alignementContext);
-
-        // Sauvegarder les résultats d'alignement dans l'objet actuel
-        this.extractedInitialFinancement.objetFinancement[index].alignement = this.alignementContext;
-        
-        // Réactiver l'ajout d'objet de financement si tous les objets sont évalués
-        this.evaluatedIndex.push(index);
-        const allManuallyAddedAreEvaluated = this.manuallyAddedIndices.every(manualIndex => this.evaluatedIndex.includes(manualIndex));
-        const isManuallyAddedEmpty = this.manuallyAddedIndices.length === 0;
-
-        if ((index == this.newIndex) || (index == 0 && (allManuallyAddedAreEvaluated || isManuallyAddedEmpty))) {
-            this.ajoutFinancementDisabled = false;
-        }
+        // Réinitialiser le formulaire pour le nouvel objet vide
+        this.setupFormGroup(nouvelObjet.bien);
     }, error => {
-        console.error("Erreur lors du calcul de l'alignement :", error);
+        console.error('Erreur lors de la génération d\'ID Objet Financement :', error);
+        this.ajoutFinancementDisabled = false;
     });
+}
+onBreadcrumbClick(index: number) {
+    // Sauvegarde des données de l'objet actuel avant de basculer vers un autre objet
+    this.saveCurrentObjectValues(this.extractedInitialFinancement.objetFinancement[this.selectedObjetIndex]);
 
-    // Mettre à jour les messages d'erreur si des pièces justificatives sont manquantes
-    this.errorDpeMessage = this.checkFileDpeInserted();
-    this.errorNormeThermiqueMessage = this.checkNormeThermique();
-    this.errorDateDepotMessage = this.checkFileDateDepotInserted();
+    // Mise à jour de l'index de l'objet sélectionné
+    this.selectedObjetIndex = index;
+
+    // Charger les données de l'objet sélectionné
+    this.setObjetFinancementData(this.extractedInitialFinancement.objetFinancement[index]);
+
+    // Vérification des champs obligatoires pour l'objet sélectionné
+    this.checkRequiredFields(this.extractedInitialFinancement, index);
+    this.checkPiecesJustificatives(this.extractedInitialFinancement, this.selectedObjetIndex);
+
+    // Mise à jour du formulaire pour refléter l'état de l'objet sélectionné
+    this.setupFormGroup(this.extractedInitialFinancement.objetFinancement[index].bien);
+
+    // Réinitialiser les flags pour indiquer que cet objet est en cours d'édition
+    this.isDateDepotChecked = false;
+    this.isNormeThermiqueChecked = false;
+    this.isDpeChecked = false;
+    this.showBlocResult = false;
 }
