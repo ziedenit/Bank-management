@@ -1,23 +1,160 @@
-// Déclare une map GLOBALEMENT pour stocker les clics par index
-const clickCounts: Map<number, number> = new Map();
+import { Alignement } from './alignement';
+import { Bien } from './bien';
+import { Dpe } from './dpe';
+import { Eligibilite } from './eligibilite';
+import {  Piece } from './piece';
+import {  Garantie } from './garantie';
 
-function onBreadcrumbClick(index: number) {
-    // Vérifie si l'index existe déjà dans la map
-    if (clickCounts.has(index)) {
-        // Si oui, incrémente le nombre de clics pour cet index
-        const currentCount = clickCounts.get(index)!;
-        clickCounts.set(index, currentCount + 1);
-    } else {
-        // Si non, initialise le compteur de cet index à 1
-        clickCounts.set(index, 1);
-    }
+export class ObjetFinancement {
+	[x: string]: any;
 
-    // Affiche le nombre de clics pour l'index actuel
-    console.log(`Index ${index} a été cliqué ${clickCounts.get(index)} fois.`);
+    idObjetFinancement:string;
+	codeObjetFinancement:string;// 02=Acquisition  03=Travaux
+	quotePartObjet:number;
+	gainCEP:number;
+	dateFinTravaux: Date;
+	bien:Bien;
+	dpeAvantTravaux: Dpe;
+	dpeApresTravaux: Dpe;
+	alignement: Alignement;
+    eligibilite: Eligibilite;
+	piecesJustificatives : Piece [] ;
+	codeFamilleObjet: string;	
+	garantie: Garantie[]; 
+	firstDisconnectionOfd:boolean;
+
+}
+import { IdGeneratorService } from '../services/id-generator.service';
+import { Dpe } from './dpe';
+export class Bien {
+    idBien:string;
+    codeBatiment:string;
+    codeNormeThermique:string;
+    typeBatiment:string;
+    codePostal:string;
+    nomCommune:string;
+    adresseComplete:string;
+    anneeConstruction:string;
+    dateDepotPc:string;
+    surfaceBien:number;
+    bienFinanceLCL:boolean;
+    dpeActuel:Dpe;
+    etatBien:string;
+    numeroVoie:string;
+    nomRue:string;
+    prixBien: number;
+    montantFinanceLCL:number;
+    partLCL:number;
+    typeUsage:string;
+    numeroNomRue:string;
+
+    typeEnergie:string;
+    batiment:string;
+    escalier:string;
+    etage: string;
+    porte:string;
+
+    typeVoie:string;
+    codeDepartement:string;
+    codeInseeCommune:string;
+    numeroLot:string;
+    periodeConstruction:string;
+    coordonneeCartographiqueX:number;
+    coordonneeCartographiqueY:number;
+    dateDebutConstruction:Date;
+
+    eligibleDpe:string;
+
+
+
+
 }
 
-// Exemple d'appels pour tester
-onBreadcrumbClick(1); // Devrait dire "Index 1 a été cliqué 1 fois."
-onBreadcrumbClick(1); // Devrait dire "Index 1 a été cliqué 2 fois."
-onBreadcrumbClick(2); // Devrait dire "Index 2 a été cliqué 1 fois."
-onBreadcrumbClick(1); // Devrait dire "Index 1 a été cliqué 3 fois."
+
+export class Dpe {
+          id  :  number ;
+          origineCreation  : string;
+          dateCreation  : Date  ;
+          origineModification  : string  ;
+          dateModification: Date  ;
+          idDpe  : string  ;
+          numeroDpe  :   string  ;
+          estimationCep  : number ;
+          classeCep  :  string    ;
+          estimationGes  : number ;
+          classeGes  :  string ;
+          dateEtablissementDpe  : Date  ;
+          dateReceptionDpe  : Date ;
+          dateFinValiditeDpe  : Date;
+          sirenDiagnostiqueur : string;
+          etatBien:string;
+          modelDpe:string;
+          numeroDpeRemplace:string;
+          versionDpe: string;
+          methodeDpeApplique:string;
+
+
+
+}
+ajouterObjetFinancement() {
+	this.isDateDepotChecked=false;
+	   this.isNormeThermiqueChecked=false;
+	   this.isDpeChecked=false;
+	this.showBlocResult=false;
+    this.showDeleteIcon =true;
+    this.showFileAriane = true;
+    const nouvelObjet: ObjetFinancement = {
+		idObjetFinancement: null,
+		codeObjetFinancement: "02",
+		quotePartObjet: null,
+		gainCEP: null,
+		dateFinTravaux: null,
+		bien: new Bien(),
+		dpeAvantTravaux: new Dpe(),
+		dpeApresTravaux: new Dpe(),
+		alignement: Alignement.createDefault(),
+		eligibilite: new Eligibilite(),
+		codeFamilleObjet: "01",
+		garantie: [],
+		firstDisconnectionOfd: true,
+		piecesJustificatives:[],
+	};
+
+    this.idGeneratorService.generateIdObjetFinancement().subscribe(
+      id => {
+      nouvelObjet.idObjetFinancement = id;
+      this.objetsFinancements.push(nouvelObjet);
+	  console.log("nouveau objet initilisé et cree lors de click sur le button")
+	  console.log(nouvelObjet)
+	 this.ajoutFinancementDisabled=true;
+      this.extractedInitialFinancement.objetFinancement=this.objetsFinancements;
+      this.manuallyAddedIndices.push(this.objetsFinancements.length - 1);
+	  this.newIndex=this.objetsFinancements.length - 1;
+      console.log("le financement apres recupération et ajout des objets")
+      console.log(this.extractedInitialFinancement)
+	
+      },
+      error => {
+      console.error('Erreur lors de la génération d\'ID Objet Financement :', error);
+	  this.ajoutFinancementDisabled=false;
+      }
+	  
+    );
+	
+    }
+ generateIdBien(): Observable<string> {
+    
+    return this.http.get(`${this.baseUrl}/generate_idBien`, {
+      headers: this.getHeaders(),
+      responseType: 'text' 
+    })
+    .pipe(
+      tap(data => console.log('ID Bien généré :', data)),
+      catchError(error => {
+        console.error('Erreur lors de la génération d\'ID Bien :', error);
+        return this.handleError(error);
+      })
+    );
+  }
+j'ai ce code et a travers la fonction ajouterObjetFinancement je veux creer initialisé un objet financement vide a chaque appel de la fonction ajouterObjetFinancement 
+    objet financement c'est objet imbriqué je veux que tous les objet dedans soit renitalisé et au meme temps je veux a chaque initialisation de bien creer son id ( avec la fonction generate id bien ) merci de m'adap
