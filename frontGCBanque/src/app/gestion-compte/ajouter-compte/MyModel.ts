@@ -1,160 +1,120 @@
-import { Alignement } from './alignement';
-import { Bien } from './bien';
-import { Dpe } from './dpe';
-import { Eligibilite } from './eligibilite';
-import {  Piece } from './piece';
-import {  Garantie } from './garantie';
-
-export class ObjetFinancement {
-	[x: string]: any;
-
-    idObjetFinancement:string;
-	codeObjetFinancement:string;// 02=Acquisition  03=Travaux
-	quotePartObjet:number;
-	gainCEP:number;
-	dateFinTravaux: Date;
-	bien:Bien;
-	dpeAvantTravaux: Dpe;
-	dpeApresTravaux: Dpe;
-	alignement: Alignement;
-    eligibilite: Eligibilite;
-	piecesJustificatives : Piece [] ;
-	codeFamilleObjet: string;	
-	garantie: Garantie[]; 
-	firstDisconnectionOfd:boolean;
-
+private createNewBien(): Bien {
+    return {
+        idBien: null, // ID sera généré
+        codeBatiment: null,
+        codeNormeThermique: null,
+        typeBatiment: null,
+        codePostal: null,
+        nomCommune: null,
+        adresseComplete: null,
+        anneeConstruction: null,
+        dateDepotPc: null,
+        surfaceBien: null,
+        bienFinanceLCL: false, // Par défaut à `false`
+        dpeActuel: this.createNewDpe(), // Initialisation d'un objet Dpe vierge
+        etatBien: null,
+        numeroVoie: null,
+        nomRue: null,
+        prixBien: null,
+        montantFinanceLCL: null,
+        partLCL: null,
+        typeUsage: null,
+        numeroNomRue: null,
+        typeEnergie: null,
+        batiment: null,
+        escalier: null,
+        etage: null,
+        porte: null,
+        typeVoie: null,
+        codeDepartement: null,
+        codeInseeCommune: null,
+        numeroLot: null,
+        periodeConstruction: null,
+        coordonneeCartographiqueX: null,
+        coordonneeCartographiqueY: null,
+        dateDebutConstruction: null,
+        eligibleDpe: null
+    };
 }
-import { IdGeneratorService } from '../services/id-generator.service';
-import { Dpe } from './dpe';
-export class Bien {
-    idBien:string;
-    codeBatiment:string;
-    codeNormeThermique:string;
-    typeBatiment:string;
-    codePostal:string;
-    nomCommune:string;
-    adresseComplete:string;
-    anneeConstruction:string;
-    dateDepotPc:string;
-    surfaceBien:number;
-    bienFinanceLCL:boolean;
-    dpeActuel:Dpe;
-    etatBien:string;
-    numeroVoie:string;
-    nomRue:string;
-    prixBien: number;
-    montantFinanceLCL:number;
-    partLCL:number;
-    typeUsage:string;
-    numeroNomRue:string;
-
-    typeEnergie:string;
-    batiment:string;
-    escalier:string;
-    etage: string;
-    porte:string;
-
-    typeVoie:string;
-    codeDepartement:string;
-    codeInseeCommune:string;
-    numeroLot:string;
-    periodeConstruction:string;
-    coordonneeCartographiqueX:number;
-    coordonneeCartographiqueY:number;
-    dateDebutConstruction:Date;
-
-    eligibleDpe:string;
-
-
-
-
-}
-
-
-export class Dpe {
-          id  :  number ;
-          origineCreation  : string;
-          dateCreation  : Date  ;
-          origineModification  : string  ;
-          dateModification: Date  ;
-          idDpe  : string  ;
-          numeroDpe  :   string  ;
-          estimationCep  : number ;
-          classeCep  :  string    ;
-          estimationGes  : number ;
-          classeGes  :  string ;
-          dateEtablissementDpe  : Date  ;
-          dateReceptionDpe  : Date ;
-          dateFinValiditeDpe  : Date;
-          sirenDiagnostiqueur : string;
-          etatBien:string;
-          modelDpe:string;
-          numeroDpeRemplace:string;
-          versionDpe: string;
-          methodeDpeApplique:string;
-
-
-
+private createNewDpe(): Dpe {
+    return {
+        id: null,
+        origineCreation: '',
+        dateCreation: new Date(), // Initialise avec la date actuelle
+        origineModification: '',
+        dateModification: new Date(), // Initialise avec la date actuelle
+        idDpe: null,
+        numeroDpe: null,
+        estimationCep: null,
+        classeCep: null,
+        estimationGes: null,
+        classeGes: null,
+        dateEtablissementDpe: null,
+        dateReceptionDpe: null,
+        dateFinValiditeDpe: null,
+        sirenDiagnostiqueur: null,
+        etatBien: null,
+        modelDpe: null,
+        numeroDpeRemplace: null,
+        versionDpe: null,
+        methodeDpeApplique: null
+    };
 }
 ajouterObjetFinancement() {
-	this.isDateDepotChecked=false;
-	   this.isNormeThermiqueChecked=false;
-	   this.isDpeChecked=false;
-	this.showBlocResult=false;
-    this.showDeleteIcon =true;
+    // Réinitialisation des variables et de l'état
+    this.isDateDepotChecked = false;
+    this.isNormeThermiqueChecked = false;
+    this.isDpeChecked = false;
+    this.showBlocResult = false;
+    this.showDeleteIcon = true;
     this.showFileAriane = true;
-    const nouvelObjet: ObjetFinancement = {
-		idObjetFinancement: null,
-		codeObjetFinancement: "02",
-		quotePartObjet: null,
-		gainCEP: null,
-		dateFinTravaux: null,
-		bien: new Bien(),
-		dpeAvantTravaux: new Dpe(),
-		dpeApresTravaux: new Dpe(),
-		alignement: Alignement.createDefault(),
-		eligibilite: new Eligibilite(),
-		codeFamilleObjet: "01",
-		garantie: [],
-		firstDisconnectionOfd: true,
-		piecesJustificatives:[],
-	};
 
+    // Création de l'objet de financement vierge avec toutes les propriétés du bien et du dpe initialisées
+    const nouvelObjet: ObjetFinancement = {
+        idObjetFinancement: null,
+        codeObjetFinancement: "02",
+        quotePartObjet: null,
+        gainCEP: null,
+        dateFinTravaux: null,
+        bien: this.createNewBien(),  // Initialise l'objet bien avec tous les champs
+        dpeAvantTravaux: this.createNewDpe(), // Initialise DPE avant travaux
+        dpeApresTravaux: this.createNewDpe(), // Initialise DPE après travaux
+        alignement: Alignement.createDefault(), // Alignement par défaut
+        eligibilite: new Eligibilite(), // Eligibilité par défaut
+        codeFamilleObjet: "01", // Famille par défaut
+        garantie: [],
+        firstDisconnectionOfd: true,
+        piecesJustificatives: []
+    };
+
+    // Générer un nouvel ID pour l'objet de financement
     this.idGeneratorService.generateIdObjetFinancement().subscribe(
-      id => {
-      nouvelObjet.idObjetFinancement = id;
-      this.objetsFinancements.push(nouvelObjet);
-	  console.log("nouveau objet initilisé et cree lors de click sur le button")
-	  console.log(nouvelObjet)
-	 this.ajoutFinancementDisabled=true;
-      this.extractedInitialFinancement.objetFinancement=this.objetsFinancements;
-      this.manuallyAddedIndices.push(this.objetsFinancements.length - 1);
-	  this.newIndex=this.objetsFinancements.length - 1;
-      console.log("le financement apres recupération et ajout des objets")
-      console.log(this.extractedInitialFinancement)
-	
-      },
-      error => {
-      console.error('Erreur lors de la génération d\'ID Objet Financement :', error);
-	  this.ajoutFinancementDisabled=false;
-      }
-	  
+        idFinancement => {
+            nouvelObjet.idObjetFinancement = idFinancement;
+
+            // Générer l'ID pour le bien de l'objet avant de l'ajouter
+            this.idGeneratorService.generateIdBien().subscribe(
+                idBien => {
+                    nouvelObjet.bien.idBien = idBien;  // Assigner l'ID du bien
+
+                    // Ajouter le nouvel objet de financement à la liste
+                    this.objetsFinancements.push(nouvelObjet);
+                    this.extractedInitialFinancement.objetFinancement = [...this.objetsFinancements];  // Mise à jour des objets
+
+                    // Marquer l'objet comme ajouté manuellement
+                    this.manuallyAddedIndices.push(this.objetsFinancements.length - 1);
+                    this.newIndex = this.objetsFinancements.length - 1;
+                    this.ajoutFinancementDisabled = true;
+
+                    console.log("Nouvel objet ajouté avec ID bien et financement générés", nouvelObjet);
+                },
+                error => {
+                    console.error("Erreur lors de la génération de l'ID du bien : ", error);
+                }
+            );
+        },
+        error => {
+            console.error("Erreur lors de la génération de l'ID de l'objet de financement : ", error);
+        }
     );
-	
-    }
- generateIdBien(): Observable<string> {
-    
-    return this.http.get(`${this.baseUrl}/generate_idBien`, {
-      headers: this.getHeaders(),
-      responseType: 'text' 
-    })
-    .pipe(
-      tap(data => console.log('ID Bien généré :', data)),
-      catchError(error => {
-        console.error('Erreur lors de la génération d\'ID Bien :', error);
-        return this.handleError(error);
-      })
-    );
-  }
-j'ai ce code et a travers la fonction ajouterObjetFinancement je veux creer initialisé un objet financement vide a chaque appel de la fonction ajouterObjetFinancement 
-    objet financement c'est objet imbriqué je veux que tous les objet dedans soit renitalisé et au meme temps je veux a chaque initialisation de bien creer son id ( avec la fonction generate id bien ) merci de m'adap
+}
