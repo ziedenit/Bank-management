@@ -1,4 +1,49 @@
-ajouterObjetFinancement() {
+checkFormFieldsFormGroup() {
+			const formData=this.formGroup.value;
+			console.log("la valeur de formGroupe est la suivante:", this.formGroup.value)
+			this.champObligatoire = false;
+			this.donneeObligatoire = '';			
+			const validateField = (fieldName: string, condition: boolean) => {
+			  if (condition) {
+				this.champObligatoire = true;
+				this.donneeObligatoire = 'Donnée obligatoire';
+				document.getElementById(fieldName)?.style.setProperty('border', '1px solid red');
+			  } else {
+				document.getElementById(fieldName)?.style.removeProperty('border');
+			  }
+			};		 
+			validateField('prixAquisitionBien', this.prixAquisitionBien == null || this.prixAquisitionBien == 0);
+			validateField('montantLclFinance', this.montantLclFinance == null || this.montantLclFinance == 0);
+			validateField('partLcl', this.partLcl == null || this.partLcl == 0);
+			validateField('numeroDpeAdeme', this.selectedNatBatiment == 'option1' && (!this.numeroDpeAdeme));
+			validateField('SirenDPE', 
+			  (this.selectedNatBatiment == 'option1' && (!this.SirenDPE)) || 
+			  (this.numeroDpeAdeme && (!this.SirenDPE))
+			);
+			if (this.objetFinance == '' || this.objetFinance == null) {
+			validateField('selectedObjetFinancement', this.selectedObjetFinancement == '' || this.selectedObjetFinancement == undefined || this.selectedObjetFinancement == 'option0');
+			}
+			validateField('anneeConstruction', (formData.anneeConstruction == "" || formData.anneeConstruction == null) && this.selectedNatBatiment == "option1");
+			validateField('numeroNomRue', (this.selectedNatBatiment == 'option1' || this.selectedNatBatiment == 'option2') && (!formData.numeroNomRue));
+			validateField('codePostal', (this.selectedNatBatiment == 'option1' || this.selectedNatBatiment == 'option2') && (!formData.codePostal));
+			validateField('ville', (this.selectedNatBatiment == 'option1' || this.selectedNatBatiment == 'option2') && (!formData.ville));
+			validateField('LettreCEP', (formData.lettreCEP == "" || !formData.lettreCEP) && this.selectedNatBatiment == "option1");
+			if (this.hideField) {
+			validateField('LettreCEPlist', (formData.lettreCEP == "" || !formData.lettreCEP || formData.lettreCEP == 'option0') && this.selectedNatBatiment == "option1");
+			}
+			validateField('LettreGES', (formData.lettreGES == "" || !formData.lettreGES) && this.selectedNatBatiment == "option1");
+			if (this.hideField) {
+			validateField('lettreGeslist', (formData.lettreGES == "" || !formData.lettreGES || formData.lettreGES == 'option0') && this.selectedNatBatiment == "option1");
+			}
+			validateField('ValeurGES', (formData.valeurGes == "" || formData.valeurGes==null) && this.selectedNatBatiment == "option1");
+			validateField('ValeurCEP', (formData.valeurCep == "" || formData.valeurCep==null) && this.selectedNatBatiment == "option1");
+			console.log("helooooooo surface", formData.surfaceBien)
+			validateField('SurfaceDuBien', (this.selectedNatBatiment == 'option1' || this.selectedNatBatiment == 'option2') && (!formData.surfaceBien ));
+			validateField('categorieBatiment', !this.codeBatimentSelected || this.codeBatimentSelected == 'option0');
+			validateField('natureBien', !this.selectedNatBatiment || this.selectedNatBatiment == 'option0');
+			validateField('dateDepot', this.selectedNatBatiment == 'option2' && (!this.dateDepot));
+}
+c'est au niveau de cette méthode que se sont encerclé en rouge le controle se fait au debut sur le premier objet en lancent le calcul apres en cliquant sur un nouveau objet le rouge reste pourtant je creer le nouveau objet dans la méthode ajouterObjetFinancement() {
 	this.formGroup.reset();
     // Réinitialisation des variables et de l'état
     this.isDateDepotChecked = false;
@@ -56,167 +101,66 @@ ajouterObjetFinancement() {
             console.error("Erreur lors de la génération de l'ID de l'objet de financement : ", error);
         }
     );
-}//
-ngOnInit(): void {
-
-    this.id = this.route.snapshot.queryParams["idFinancement"];
-    this.Url_Retour_Base64 = this.route.snapshot.queryParams["urlRetour"];
-    if (this.Url_Retour_Base64) {
-		this.Url_Retour_Utf8 = atob(this.Url_Retour_Base64);
-	}
-	else {
-		console.warn("Url_Retour_Base64 est falsy. Impossible de le convertir en Utf8.");
-	}
-    this.financementService.getFinancementbyId(this.id).subscribe(responseFinancement => {
-		this.extractedInitialFinancement = responseFinancement;
-		console.log("le financement récupéré de la BDD est le suivant:",responseFinancement )	
-        this.setFinancementData(responseFinancement);
-        this.setObjetFinancementData(responseFinancement.objetFinancement[0]);
-        this.checkRequiredFields(responseFinancement,0);
-		this.checkPiecesJustificatives(responseFinancement,0);
-        this.setupFormGroup(responseFinancement.objetFinancement[0].bien);
-		  
-    });
-
-	 // Récupérer la liste des objets de financement
-	 this.multiObjetService.getListeObjetsFinancement(this.id).subscribe(objets => {
-		this.objetsFinancements = objets;
-		this.showDeleteIcon = false;
-  
-		// Si plusieurs objets, afficher le fil d'Ariane
-		if (this.objetsFinancements.length > 1) {
-			this.showFileAriane = true;
-		}
-  
-	});
-  
+} 
+private createNewBien(): Bien {
+    return {
+        idBien: null, // ID sera généré
+        codeBatiment: null,
+        codeNormeThermique: null,
+        typeBatiment: null,
+        codePostal: null,
+        nomCommune: null,
+        adresseComplete: null,
+        anneeConstruction: null,
+        dateDepotPc: null,
+        surfaceBien: null,
+        bienFinanceLCL: false, // Par défaut à `false`
+        dpeActuel: this.createNewDpe(), // Initialisation d'un objet Dpe vierge
+        etatBien: null,
+        numeroVoie: null,
+        nomRue: null,
+        prixBien: null,
+        montantFinanceLCL: null,
+        partLCL: null,
+        typeUsage: null,
+        numeroNomRue: null,
+        typeEnergie: null,
+        batiment: null,
+        escalier: null,
+        etage: null,
+        porte: null,
+        typeVoie: null,
+        codeDepartement: null,
+        codeInseeCommune: null,
+        numeroLot: null,
+        periodeConstruction: null,
+        coordonneeCartographiqueX: null,
+        coordonneeCartographiqueY: null,
+        dateDebutConstruction: null,
+        eligibleDpe: null
+    };
 }
-//
-onBreadcrumbClick(index: number ) {
-		this.depExist=false;
-// sauvgarde des données  propre à un objet selectionné  du fil Ariane 
-this.saveCurrentObjectValues(this.extractedInitialFinancement.objetFinancement[this.selectedObjetIndex]);
-this.selectedObjetIndex=index;
-
-
-		this.setObjetFinancementData(this.extractedInitialFinancement.objetFinancement[index]);
-		console.log("this.extractedInitialFinancement.objetFinancement[index]",this.extractedInitialFinancement.objetFinancement[index])
-		 	if(this.clickCalulAlignObject.get(index)>0||this.extractedInitialFinancement.objetFinancement[index].firstDisconnectionOfd==false)
-		   {
-			// Si ce n'est pas la premiere consultation d'un objet et le calcul aligne est déja lance au moin une seule fois 
-		   this.checkRequiredFields(this.extractedInitialFinancement,index);
-		   }  
-		this.showBlocResult=true;
-		
-		
-	  
-	   // Appliquer les regles metier sur l'element selectionné du fil Ariane 
-	   this.checkPiecesJustificatives(this.extractedInitialFinancement,this.selectedObjetIndex);
-        this.setupFormGroup(this.extractedInitialFinancement.objetFinancement[index].bien);
-		
-		  
-			console.log("Contenance du financement actuel")
-			console.log(this.extractedInitialFinancement)
-			
-		  }
-//
-private checkRequiredFields(responseFinancement: Financement, index:number): void {
-    const bien = responseFinancement.objetFinancement[index]?.bien;
-    const dpeActuel = bien?.dpeActuel;
-    this.checkAndHighlightRequiredField(bien && bien.etatBien == null, "natureBien");
-    this.checkAndHighlightRequiredField(bien && bien.codeBatiment == null, "categorieBatiment");
-    this.checkAndHighlightRequiredField(bien && bien.partLCL == null, "partLcl");
-    this.checkAndHighlightRequiredField(bien && bien.prixBien == null, "prixAquisitionBien");
-    this.checkAndHighlightRequiredField(bien && bien.montantFinanceLCL == null, "montantLclFinance");	
-    if (bien?.etatBien == "Ancien" && dpeActuel) {
-        this.checkAndHighlightRequiredField(dpeActuel.numeroDpe == null || dpeActuel.numeroDpe == "", "numeroDpeAdeme");
-        this.checkAndHighlightRequiredField(dpeActuel.sirenDiagnostiqueur == null || (dpeActuel.numeroDpe != null && dpeActuel.sirenDiagnostiqueur == null), "SirenDPE");
-        this.checkAndHighlightRequiredField(dpeActuel.classeCep == null || dpeActuel.classeCep == "", "LettreCEP");
-        this.checkAndHighlightRequiredField(dpeActuel.classeGes == null || dpeActuel.classeGes == "", "LettreGES");
-		this.checkAndHighlightRequiredField((dpeActuel.classeCep == null || dpeActuel.classeCep == "" ) && (this.hideFieldCEP), "LettreCEPlist");
-        this.checkAndHighlightRequiredField((dpeActuel.classeGes == null || dpeActuel.classeGes == "") && this.hideFieldGES, "lettreGeslist");
-        this.checkAndHighlightRequiredField(dpeActuel.estimationCep == null, "ValeurCEP");
-        this.checkAndHighlightRequiredField(dpeActuel.estimationGes == null, "ValeurGES");
-        this.checkAndHighlightRequiredField(bien.anneeConstruction == null, "anneeConstruction");
-    }
-    if (bien?.etatBien == "Neuf") {
-        this.checkAndHighlightRequiredField(bien.dateDepotPc == null, "dateDepot");
-				this.checkAndHighlightRequiredField(bien.dpeActuel.numeroDpe != null&& bien.dpeActuel.sirenDiagnostiqueur == null, "SirenDPE");
-    }
-    this.checkAndHighlightRequiredField(bien && (bien.numeroNomRue == null || bien.numeroNomRue == ""), "numeroNomRue");
-    this.checkAndHighlightRequiredField(bien && (bien.codePostal == null || bien.codePostal == ""), "codePostal");
-    this.checkAndHighlightRequiredField(bien && (bien.nomCommune == null || bien.nomCommune == ""), "ville");
-	this.checkAndHighlightRequiredField(
-		responseFinancement.objetFinancement[index] != null &&responseFinancement.objetFinancement[index].bien != null &&
-		(responseFinancement.objetFinancement[index].bien.etatBien == "Neuf" ||responseFinancement.objetFinancement[index].bien.etatBien == "Ancien") &&
-		responseFinancement.objetFinancement[index].bien.surfaceBien == null,
-		"SurfaceDuBien"
-	);
+private createNewDpe(): Dpe {
+    return {
+        id: null,
+        origineCreation: '',
+        dateCreation: new Date(), // Initialise avec la date actuelle
+        origineModification: '',
+        dateModification: new Date(), // Initialise avec la date actuelle
+        idDpe: null,
+        numeroDpe: null,
+        estimationCep: null,
+        classeCep: null,
+        estimationGes: null,
+        classeGes: null,
+        dateEtablissementDpe: null,
+        dateReceptionDpe: null,
+        dateFinValiditeDpe: null,
+        sirenDiagnostiqueur: null,
+        etatBien: null,
+        modelDpe: null,
+        numeroDpeRemplace: null,
+        versionDpe: null,
+        methodeDpeApplique: null
+    };
 }
-checkAndHighlightRequiredField(condition, elementId) {
-    console.log("condition");
-    console.log(condition);
-    console.log("this.isfirstDebranchement");
-    console.log(this.isfirstDebranchement);
-    console.log("elementId");
-    console.log(elementId);
-
-    const element = document.getElementById(elementId);
-    if (element) {
-        if (condition && !this.isfirstDebranchement) {
-            this.champObligatoire = true;
-            this.donneeObligatoire = 'Donnée obligatoire';
-            element.style.border = "1px solid red";
-        } else {
-            element.style.removeProperty('border');
-        }
-    } else {
-        console.error(`Element not found: ${elementId}`);
-    }
-}
-j'ai ce code lorsque j'ajouter un objet en cliquant en appelant ajouterObjetFinancement au lieu d'avoir un objet vide je recoi les allerte rouge sur le nouveau formulaire comme ci le passage par index et objet ne passe pas sachant que sur le premier objet avant la creation j'ai appeler la méthode calculer ( showAlignement qui ajoute des validattion sur les champs de l'objet le rouge sur les champs du nouveau objet ce qui n'est pas normal car le checkRequiredFields est applelé selon les conditions this.clickCalulAlignObject.get(index)>0||this.extractedInitialFinancement.objetFinancement[index].firstDisconnectionOfd==false ) et checkFormFieldsFormGroup est appélé uniquement lorsque j'appel la méthode showAlignement(index:number): void {
-	this.extractedInitialFinancement.objetFinancement[index].firstDisconnectionOfd=false;
-	this.saveCurrentObjectValues(this.extractedInitialFinancement.objetFinancement[index]);
-	this.checkFormFieldsFormGroup();
-	
-	
-	if (this.clickCalulAlignObject.has(index)) {
-		const currentCountcalcul = this.clickCalulAlignObject.get(index)??0;
-		this.clickCalulAlignObject.set(index, currentCountcalcul + 1);
-	} else {
-		
-		this.clickCalulAlignObject.set(index, 1);
-	}
-
-
-	this.prepareLigneContext();
-
-			
-			this.isValid = this.sirenValidator.verifySiren(this.SirenDPE);
-			this.DpeResults = true;
-			this.elementResults = true;		
-			
-			
-			forkJoin([
-				this.engineService.alignement(this.ligneContext),
-				this.engineService.alignementXtra(this.ligneContextXtra)            
-			]).subscribe(([aligne, aligneXtra]) => {    
-				this.alignementResultText = this.alignementMapping[aligne];
-				this.alignementResult = aligne;
-				this.alignementXtraResult = aligneXtra;
-				this.alignementContext= this.xtraRepriseService.calculXtra(aligne,aligneXtra);
-				this.extractedInitialFinancement.objetFinancement[index].alignement=this.alignementContext;
-	});
-
-		
-			this.errorDpeMessage = this.checkFileDpeInserted();
-			this.errorNormeThermiqueMessage = this.checkNormeThermique();
-			this.errorDateDepotMessage = this.checkFileDateDepotInserted();
-			this.evaluatedIndex.push(index);
-			const allManuallyAddedAreEvaluated = this.manuallyAddedIndices.every(manualIndex => this.evaluatedIndex.includes(manualIndex));
-			const isManuallyAddedEmpty = this.manuallyAddedIndices.length === 0;
-			if ((index == this.newIndex) || (index == 0 && (allManuallyAddedAreEvaluated || isManuallyAddedEmpty))) {
-				this.ajoutFinancementDisabled = false;
-			}			 
-}	
- 
