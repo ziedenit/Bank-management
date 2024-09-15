@@ -1,60 +1,76 @@
-	checkPiecesJustificatives(responseFinancement) {		
-		if (responseFinancement.objetFinancement[0] != null && responseFinancement.objetFinancement[0].piecesJustificatives != null) {
-			this.presenceJustifDPE = responseFinancement.objetFinancement[0].piecesJustificatives.some(piece => piece.typePiece === 'DPE')
-			|| responseFinancement.objetFinancement[0].piecesJustificatives.some(piece => piece.typePiece === 'Compromis de vente');
-			this.presenceJustifDateDepotPC=responseFinancement.objetFinancement[0].piecesJustificatives.some(piece => piece.typePiece === 'Permis de construire');
-			this.presenceJustifNormeThermique=responseFinancement.objetFinancement[0].piecesJustificatives.some(piece => piece.typePiece === 'Norme thermique');
-		}
-		if(this.presenceJustifDPE && responseFinancement.objetFinancement[0].bien.dpeActuel!=null){
-		this.isDpe= responseFinancement.objetFinancement[0].piecesJustificatives.some(piece => piece.typePiece === 'DPE');
-		this.isCompromis=responseFinancement.objetFinancement[0].piecesJustificatives.some(piece => piece.typePiece === 'Compromis de vente');
-		
-		if(this.isDpe){this.selectedOptionJustif='DPE'}
-		if(this.isCompromis){this.selectedOptionJustif='Compromis de vente'}
-		this.isDpeChecked=true
-		}
-		if(!this.presenceJustifDPE && responseFinancement.objetFinancement[0].bien.dpeActuel!=null  && responseFinancement.objetFinancement[0].bien.dpeActuel.numeroDpe!=null){this.errorDpeMessage='Justificatif DPE manquant'}	
-		if(this.presenceJustifDateDepotPC)
-		{this.isDateDepotChecked=true;  this.isNormeThermiqueChecked=true; 
-		}
-		if(!this.presenceJustifDateDepotPC &&responseFinancement.objetFinancement[0].bien.dateDepotPc!=null)
-		{this.errorDateDepotMessage='Justificatif attestant de la date de dépôt du permis de construire manquant';}
-		if(this.presenceJustifNormeThermique && !this.presenceJustifDateDepotPC){this.isNormeThermiqueChecked=true }
-		if(!this.presenceJustifNormeThermique && !this.presenceJustifDateDepotPC && !this.errorDateDepotMessage 
-			&&responseFinancement.objetFinancement[0].bien.codeNormeThermique!=null){this.errorNormeThermiqueMessage='Justificatif Norme thermique manquant'}
-}
-private checkRequiredFields(responseFinancement: Financement): void {
-    const bien = responseFinancement.objetFinancement[0]?.bien;
-    const dpeActuel = bien?.dpeActuel;
-    this.checkAndHighlightRequiredField(bien && bien.etatBien == null, "natureBien");
-    this.checkAndHighlightRequiredField(bien && bien.codeBatiment == null, "categorieBatiment");
-    this.checkAndHighlightRequiredField(bien && bien.partLCL == null, "partLcl");
-    this.checkAndHighlightRequiredField(bien && bien.prixBien == null, "prixAquisitionBien");
-    this.checkAndHighlightRequiredField(bien && bien.montantFinanceLCL == null, "montantLclFinance");	
-    if (bien?.etatBien == "Ancien" && dpeActuel) {
-        this.checkAndHighlightRequiredField(dpeActuel.numeroDpe == null || dpeActuel.numeroDpe == "", "numeroDpeAdeme");
-        this.checkAndHighlightRequiredField(dpeActuel.sirenDiagnostiqueur == null || (dpeActuel.numeroDpe != null && dpeActuel.sirenDiagnostiqueur == null), "SirenDPE");
-        this.checkAndHighlightRequiredField(dpeActuel.classeCep == null || dpeActuel.classeCep == "", "LettreCEP");
-        this.checkAndHighlightRequiredField(dpeActuel.classeGes == null || dpeActuel.classeGes == "", "LettreGES");
-		this.checkAndHighlightRequiredField((dpeActuel.classeCep == null || dpeActuel.classeCep == "" ) && (this.hideFieldCEP), "LettreCEPlist");
-        this.checkAndHighlightRequiredField((dpeActuel.classeGes == null || dpeActuel.classeGes == "") && this.hideFieldGES, "lettreGeslist");
-        this.checkAndHighlightRequiredField(dpeActuel.estimationCep == null, "ValeurCEP");
-        this.checkAndHighlightRequiredField(dpeActuel.estimationGes == null, "ValeurGES");
-        this.checkAndHighlightRequiredField(bien.anneeConstruction == null, "anneeConstruction");
+ onBreadcrumbClick(index: number): void {
+    this.selectedObjetIndex = index;
+
+    // Appliquez les règles métier à l'objet sélectionné
+    this.applyBusinessRules(this.extractedInitialFinancement, index);
+  }
+
+  // Méthode pour appliquer les règles métier à l'objet sélectionné
+  applyBusinessRules(financement: any, index: number): void {
+    // Appliquez vos règles spécifiques ici
+    this.setObjetFinancementData(financement.objetFinancement[index]);
+    this.checkRequiredFields(financement, index);
+    this.checkPiecesJustificatives(financement, index);
+    this.setupFormGroup(financement.objetFinancement[index].bien);
+  }
+
+removeBreadcrumbItem(index: number): void {
+    this.objetsFinancements.splice(index, 1);
+    const manuallyAddedIndex = this.manuallyAddedIndices.indexOf(index);
+    if (manuallyAddedIndex > -1) {
+      this.manuallyAddedIndices.splice(manuallyAddedIndex, 1);
     }
-    if (bien?.etatBien == "Neuf") {
-        this.checkAndHighlightRequiredField(bien.dateDepotPc == null, "dateDepot");
-		console.log ("popopopopopopopop", bien.dpeActuel.numeroDpe, bien.dpeActuel.sirenDiagnostiqueur)
-		this.checkAndHighlightRequiredField(bien.dpeActuel.numeroDpe != null&& bien.dpeActuel.sirenDiagnostiqueur == null, "SirenDPE");
+    if (this.selectedObjetIndex >= index) {
+      this.selectedObjetIndex = Math.max(this.selectedObjetIndex - 1, 0);
     }
-    this.checkAndHighlightRequiredField(bien && (bien.numeroNomRue == null || bien.numeroNomRue == ""), "numeroNomRue");
-    this.checkAndHighlightRequiredField(bien && (bien.codePostal == null || bien.codePostal == ""), "codePostal");
-    this.checkAndHighlightRequiredField(bien && (bien.nomCommune == null || bien.nomCommune == ""), "ville");
-    this.checkAndHighlightRequiredField(responseFinancement.objetFinancement[0]?.codeObjetFinancement == null, "selectedObjetFinancement");
-	this.checkAndHighlightRequiredField(
-		responseFinancement.objetFinancement[0] != null &&responseFinancement.objetFinancement[0].bien != null &&
-		(responseFinancement.objetFinancement[0].bien.etatBien == "Neuf" ||responseFinancement.objetFinancement[0].bien.etatBien == "Ancien") &&
-		responseFinancement.objetFinancement[0].bien.surfaceBien == null,
-		"SurfaceDuBien"
-	);
-}
+    this.applyBusinessRules(this.extractedInitialFinancement, this.selectedObjetIndex); // Recalculer les règles métier après suppression
+  }
+
+  ajouterObjetFinancement(): void {
+    this.isDateDepotChecked = false;
+    this.isNormeThermiqueChecked = false;
+    this.isDpeChecked = false;
+    this.showBlocResult = false;
+    this.showDeleteIcon = true;
+    this.showFileAriane = true;
+
+    const nouvelObjet: ObjetFinancement = {
+      idObjetFinancement: null,
+      codeObjetFinancement: '02',
+      quotePartObjet: null,
+      gainCEP: null,
+      dateFinTravaux: null,
+      bien: this.createNewBien(),
+      dpeAvantTravaux: this.createNewDpe(),
+      dpeApresTravaux: this.createNewDpe(),
+      alignement: Alignement.createDefault(),
+      eligibilite: new Eligibilite(),
+      codeFamilleObjet: '01',
+      garantie: [],
+      firstDisconnectionOfd: true,
+      piecesJustificatives: []
+    };
+
+    this.idGeneratorService.generateIdObjetFinancement().subscribe(
+      idFinancement => {
+        nouvelObjet.idObjetFinancement = idFinancement;
+        this.idGeneratorService.generateIdBien().subscribe(
+          idBien => {
+            nouvelObjet.bien.idBien = idBien;
+            this.objetsFinancements.push(nouvelObjet);
+            this.extractedInitialFinancement.objetFinancement = [...this.objetsFinancements];
+            this.manuallyAddedIndices.push(this.objetsFinancements.length - 1);
+            this.newIndex = this.objetsFinancements.length - 1;
+            this.ajoutFinancementDisabled = true;
+            this.applyBusinessRules(this.extractedInitialFinancement, this.newIndex); // Appliquez les règles métier au nouvel objet ajouté
+          },
+          error => {
+            console.error('Erreur lors de la génération de l\'ID du bien : ', error);
+          }
+        );
+      },
+      error => {
+        console.error('Erreur lors de la génération de l\'ID de l\'objet de financement : ', error);
+      }
+    );
+  }
