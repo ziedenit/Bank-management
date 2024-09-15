@@ -1,41 +1,58 @@
- <!-- File d'Ariane pour les objets de financement -->
-  <nav aria-label="breadcrumb" class="breadcrumb-nav" >
-    <ol class="breadcrumb-custom" >
-      <li class="breadcrumb-item-custom" *ngFor="let objet of objetsFinancements; let i = index" >
-        <a [routerLink]=""
-          queryParamsHandling="preserve" (click)="onBreadcrumbClick(i, objet)">
-         <span>Objet de financement</span>  {{ i + 1 }}
-        </a>
-        <button class="close-btn" *ngIf="showDeleteIcon && manuallyAddedIndices.includes(i)"(click)="removeBreadcrumbItem(i)">x</button>
-      </li>
-    </ol>
-    <div class="button-container" >
-      <button class="btn btn-primary btn-sm" (click)="ajouterObjetFinancement()"  [disabled]="ajoutFinancementDisabled " title="Merci de calculer l'alignement pour chaque objet ajouté à la liste" >Ajouter un nouvel objet de financement
-        <img src="../../../assets/icons/plus.svg" />
-      </button>
-    </div>
-  </nav>
-</div>
-	 mooi j'ai fait ca pour l'ajout d'un objet du fil ariane et ca un  autre extrait de mon html que je dois adapter a ta propo
-	 <div class="container-fluid">  
-  <div class="row" >
-    <div class="col-12">
-      <div class="card border-0">
-        <div class="card-body" style="border: 1px solid #b1bfeb; box-shadow: 0 2px 10px  #b1bfeb;">
-          <div class="blockSize">
-          <h3 class="d-inline-block font-weight-bold"  style="font-size: 17px;">Objet de financement {{ selectedObjetIndex+1 }}</h3>
-        <span class="float-right" >
-            <img *ngIf="hiddenObjetfinancement==false" src="../../../assets/icons/arrow-up.svg" alt="Fleche haut" (click)="hideDataObjetFinancement()">
-            <img *ngIf="hiddenObjetfinancement==true" src="../../../assets/icons/arrow-down.svg" alt="Fleche bas" (click)="showDataObjetFinancement()">
-          </span> 
-         <div *ngIf="elementObjetfinancement == true"> 
-          <div class="row">
-            <div class="col-lg-4" *ngIf="hideFieldForm==false && typeObjetFinancement !=null">
-                <div class="form-group">
-                    <div class="custom-label">
-                        <label for="input1">Objet financé</label>
-                        <input type="text" disabled class="form-control form-control-sm disable-cursor" id="input1" [(ngModel)]="objetFinance">
-                    </div>
-                </div>
-            </div>
-	 en plus stp pour les methode showAlignement et PostContiuer tu peux me fournir le refacto complet 
+  ajouterObjetFinancement() {
+    // Réinitialisation des variables et de l'état
+    this.isDateDepotChecked = false;
+    this.isNormeThermiqueChecked = false;
+    this.isDpeChecked = false;
+    this.showBlocResult = false;
+    this.showDeleteIcon = true;
+    this.showFileAriane = true;
+
+    // Création de l'objet de financement vierge avec toutes les propriétés du bien et du dpe initialisées
+    const nouvelObjet: ObjetFinancement = {
+        idObjetFinancement: null,
+        codeObjetFinancement: "02",
+        quotePartObjet: null,
+        gainCEP: null,
+        dateFinTravaux: null,
+        bien: this.createNewBien(),  // Initialise l'objet bien avec tous les champs
+        dpeAvantTravaux: this.createNewDpe(), // Initialise DPE avant travaux
+        dpeApresTravaux: this.createNewDpe(), // Initialise DPE après travaux
+        alignement: Alignement.createDefault(), // Alignement par défaut
+        eligibilite: new Eligibilite(), // Eligibilité par défaut
+        codeFamilleObjet: "01", // Famille par défaut
+        garantie: [],
+        firstDisconnectionOfd: true,
+        piecesJustificatives: []
+    };
+
+    // Générer un nouvel ID pour l'objet de financement
+    this.idGeneratorService.generateIdObjetFinancement().subscribe(
+        idFinancement => {
+            nouvelObjet.idObjetFinancement = idFinancement;
+
+            // Générer l'ID pour le bien de l'objet avant de l'ajouter
+            this.idGeneratorService.generateIdBien().subscribe(
+                idBien => {
+                    nouvelObjet.bien.idBien = idBien;  // Assigner l'ID du bien
+
+                    // Ajouter le nouvel objet de financement à la liste
+                    this.objetsFinancements.push(nouvelObjet);
+                    this.extractedInitialFinancement.objetFinancement = [...this.objetsFinancements];  // Mise à jour des objets
+
+                    // Marquer l'objet comme ajouté manuellement
+                    this.manuallyAddedIndices.push(this.objetsFinancements.length - 1);
+                    this.newIndex = this.objetsFinancements.length - 1;
+                    this.ajoutFinancementDisabled = true;
+
+                    console.log("Nouvel objet ajouté avec ID bien et financement générés", nouvelObjet);
+                },
+                error => {
+                    console.error("Erreur lors de la génération de l'ID du bien : ", error);
+                }
+            );
+        },
+        error => {
+            console.error("Erreur lors de la génération de l'ID de l'objet de financement : ", error);
+        }
+    );
+}
