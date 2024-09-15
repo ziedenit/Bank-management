@@ -1,67 +1,60 @@
- onBreadcrumbClick(index: number): void {
-    this.selectedObjetIndex = index;
-  }
-
-  removeBreadcrumbItem(index: number): void {
-    this.objetsFinancements.splice(index, 1);
-    const manuallyAddedIndex = this.manuallyAddedIndices.indexOf(index);
-    if (manuallyAddedIndex > -1) {
-      this.manuallyAddedIndices.splice(manuallyAddedIndex, 1);
+	checkPiecesJustificatives(responseFinancement) {		
+		if (responseFinancement.objetFinancement[0] != null && responseFinancement.objetFinancement[0].piecesJustificatives != null) {
+			this.presenceJustifDPE = responseFinancement.objetFinancement[0].piecesJustificatives.some(piece => piece.typePiece === 'DPE')
+			|| responseFinancement.objetFinancement[0].piecesJustificatives.some(piece => piece.typePiece === 'Compromis de vente');
+			this.presenceJustifDateDepotPC=responseFinancement.objetFinancement[0].piecesJustificatives.some(piece => piece.typePiece === 'Permis de construire');
+			this.presenceJustifNormeThermique=responseFinancement.objetFinancement[0].piecesJustificatives.some(piece => piece.typePiece === 'Norme thermique');
+		}
+		if(this.presenceJustifDPE && responseFinancement.objetFinancement[0].bien.dpeActuel!=null){
+		this.isDpe= responseFinancement.objetFinancement[0].piecesJustificatives.some(piece => piece.typePiece === 'DPE');
+		this.isCompromis=responseFinancement.objetFinancement[0].piecesJustificatives.some(piece => piece.typePiece === 'Compromis de vente');
+		
+		if(this.isDpe){this.selectedOptionJustif='DPE'}
+		if(this.isCompromis){this.selectedOptionJustif='Compromis de vente'}
+		this.isDpeChecked=true
+		}
+		if(!this.presenceJustifDPE && responseFinancement.objetFinancement[0].bien.dpeActuel!=null  && responseFinancement.objetFinancement[0].bien.dpeActuel.numeroDpe!=null){this.errorDpeMessage='Justificatif DPE manquant'}	
+		if(this.presenceJustifDateDepotPC)
+		{this.isDateDepotChecked=true;  this.isNormeThermiqueChecked=true; 
+		}
+		if(!this.presenceJustifDateDepotPC &&responseFinancement.objetFinancement[0].bien.dateDepotPc!=null)
+		{this.errorDateDepotMessage='Justificatif attestant de la date de dépôt du permis de construire manquant';}
+		if(this.presenceJustifNormeThermique && !this.presenceJustifDateDepotPC){this.isNormeThermiqueChecked=true }
+		if(!this.presenceJustifNormeThermique && !this.presenceJustifDateDepotPC && !this.errorDateDepotMessage 
+			&&responseFinancement.objetFinancement[0].bien.codeNormeThermique!=null){this.errorNormeThermiqueMessage='Justificatif Norme thermique manquant'}
+}
+private checkRequiredFields(responseFinancement: Financement): void {
+    const bien = responseFinancement.objetFinancement[0]?.bien;
+    const dpeActuel = bien?.dpeActuel;
+    this.checkAndHighlightRequiredField(bien && bien.etatBien == null, "natureBien");
+    this.checkAndHighlightRequiredField(bien && bien.codeBatiment == null, "categorieBatiment");
+    this.checkAndHighlightRequiredField(bien && bien.partLCL == null, "partLcl");
+    this.checkAndHighlightRequiredField(bien && bien.prixBien == null, "prixAquisitionBien");
+    this.checkAndHighlightRequiredField(bien && bien.montantFinanceLCL == null, "montantLclFinance");	
+    if (bien?.etatBien == "Ancien" && dpeActuel) {
+        this.checkAndHighlightRequiredField(dpeActuel.numeroDpe == null || dpeActuel.numeroDpe == "", "numeroDpeAdeme");
+        this.checkAndHighlightRequiredField(dpeActuel.sirenDiagnostiqueur == null || (dpeActuel.numeroDpe != null && dpeActuel.sirenDiagnostiqueur == null), "SirenDPE");
+        this.checkAndHighlightRequiredField(dpeActuel.classeCep == null || dpeActuel.classeCep == "", "LettreCEP");
+        this.checkAndHighlightRequiredField(dpeActuel.classeGes == null || dpeActuel.classeGes == "", "LettreGES");
+		this.checkAndHighlightRequiredField((dpeActuel.classeCep == null || dpeActuel.classeCep == "" ) && (this.hideFieldCEP), "LettreCEPlist");
+        this.checkAndHighlightRequiredField((dpeActuel.classeGes == null || dpeActuel.classeGes == "") && this.hideFieldGES, "lettreGeslist");
+        this.checkAndHighlightRequiredField(dpeActuel.estimationCep == null, "ValeurCEP");
+        this.checkAndHighlightRequiredField(dpeActuel.estimationGes == null, "ValeurGES");
+        this.checkAndHighlightRequiredField(bien.anneeConstruction == null, "anneeConstruction");
     }
-    if (this.selectedObjetIndex >= index) {
-      this.selectedObjetIndex = Math.max(this.selectedObjetIndex - 1, 0);
+    if (bien?.etatBien == "Neuf") {
+        this.checkAndHighlightRequiredField(bien.dateDepotPc == null, "dateDepot");
+		console.log ("popopopopopopopop", bien.dpeActuel.numeroDpe, bien.dpeActuel.sirenDiagnostiqueur)
+		this.checkAndHighlightRequiredField(bien.dpeActuel.numeroDpe != null&& bien.dpeActuel.sirenDiagnostiqueur == null, "SirenDPE");
     }
-  }
-
-  fetchInitialData(): void {
-    this.id = this.route.snapshot.queryParams['idFinancement'];
-    this.financementService.getFinancementbyId(this.id).subscribe(responseFinancement => {
-      this.extractedInitialFinancement = responseFinancement;
-      this.setFinancementData(responseFinancement);
-      this.setObjetFinancementData(responseFinancement.objetFinancement[0]);
-      this.checkRequiredFields(responseFinancement, 0);
-      this.checkPiecesJustificatives(responseFinancement, 0);
-      this.setupFormGroup(responseFinancement.objetFinancement[0].bien);
-    });
-
-    // Récupérer la liste des objets de financement
-    this.multiObjetService.getListeObjetsFinancement(this.id).subscribe(objets => {
-      this.objetsFinancements = objets;
-      if (this.objetsFinancements.length > 1) {
-        this.showFileAriane = true;
-      }
-    });
-  }
-<div class="container-fluid">
-  <!-- File d'Ariane pour les objets de financement -->
-  <nav aria-label="breadcrumb" class="breadcrumb-nav">
-    <ol class="breadcrumb-custom">
-      <li class="breadcrumb-item-custom" *ngFor="let objet of objetsFinancements; let i = index">
-        <a [routerLink]=""
-          queryParamsHandling="preserve"
-          (click)="onBreadcrumbClick(i)">
-          <span>Objet de financement</span> {{ i + 1 }}
-        </a>
-        <button class="close-btn" *ngIf="manuallyAddedIndices.includes(i)" (click)="removeBreadcrumbItem(i)">x</button>
-      </li>
-    </ol>
-    <div class="button-container">
-      <button class="btn btn-primary btn-sm" (click)="ajouterObjetFinancement()" [disabled]="ajoutFinancementDisabled">
-        Ajouter un nouvel objet de financement
-        <img src="../../../assets/icons/plus.svg" />
-      </button>
-    </div>
-  </nav>
-</div>
-  <!-- Contenu pour chaque objet de financement -->
-<div class="container-fluid" *ngFor="let objet of objetsFinancements; let i = index">
-  <div class="row">
-    <div class="col-12">
-      <div class="card border-0">
-        <div class="card-body" style="border: 1px solid #b1bfeb; box-shadow: 0 2px 10px  #b1bfeb;">
-          <div class="blockSize">
-            <h3 class="d-inline-block font-weight-bold" style="font-size: 17px;">Objet de financement {{ i + 1 }}</h3>
-            <span class="float-right">
-              <img *ngIf="hiddenObjetfinancement==false" src="../../../assets/icons/arrow-up.svg" alt="Fleche haut" (click)="hideDataObjetFinancement()">
-              <img *ngIf="hiddenObjetfinancement==true" src="../../../assets/icons/arrow-down.svg" alt="Fleche bas" (click)="showDataObjetFinancement()">
-            </span>
+    this.checkAndHighlightRequiredField(bien && (bien.numeroNomRue == null || bien.numeroNomRue == ""), "numeroNomRue");
+    this.checkAndHighlightRequiredField(bien && (bien.codePostal == null || bien.codePostal == ""), "codePostal");
+    this.checkAndHighlightRequiredField(bien && (bien.nomCommune == null || bien.nomCommune == ""), "ville");
+    this.checkAndHighlightRequiredField(responseFinancement.objetFinancement[0]?.codeObjetFinancement == null, "selectedObjetFinancement");
+	this.checkAndHighlightRequiredField(
+		responseFinancement.objetFinancement[0] != null &&responseFinancement.objetFinancement[0].bien != null &&
+		(responseFinancement.objetFinancement[0].bien.etatBien == "Neuf" ||responseFinancement.objetFinancement[0].bien.etatBien == "Ancien") &&
+		responseFinancement.objetFinancement[0].bien.surfaceBien == null,
+		"SurfaceDuBien"
+	);
+}
