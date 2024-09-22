@@ -1,17 +1,34 @@
-
 	onBreadcrumbClick(index: number ) {
 	
-
+		this.saveCurrentObjectValues(this.extractedInitialFinancement.objetFinancement[this.selectedObjetIndex]);  // Sauvegarder les données de l'objet actuel
 		const alignement = this.extractedInitialFinancement.objetFinancement[index].alignement;
-		console.log("this.extractedInitialFinancement.objetFinancement[index].alignement.resultAlignText",this.extractedInitialFinancement.objetFinancement[index].alignement.resultAlignText)
-  
-		if (alignement) {
-		  this.alignementResultText = this.extractedInitialFinancement.objetFinancement[index].alignement.resultAlignText;
+		this.selectedObjetIndex = index;  // Mettre à jour l'index de l'objet sélectionné
+		if (alignement && alignement.resultAlignText) {
+		  this.alignementResultText = alignement.resultAlignText;
 		} else {
 		  this.alignementResultText = 'Aucun alignement disponible';
 		}
-    //
-    showAlignement(index:number): void {
+		
+		this.depExist=false;
+		if(this.clickCalulAlignObject.has(index))
+		{
+		this.showBlocResult=true;
+	    }
+
+		
+
+	this.setObjetFinancementData(this.extractedInitialFinancement.objetFinancement[index]);  // Charger les données du nouvel objet sélectionné
+	this.setupFormGroup(this.extractedInitialFinancement.objetFinancement[index].bien);  // Initialiser le formulaire avec les données du nouvel objet
+
+	
+
+	// Appliquer les règles métiers sur l'élément sélectionné
+	this.checkPiecesJustificatives(this.extractedInitialFinancement, this.selectedObjetIndex);
+	console.log("Vérification des champs montant finance LCL et part LCL : ", this.montantLclFinance, this.partLcl);
+	this.checkFormFieldsFormGroup();
+}
+//
+showAlignement(index:number): void {
 	this.checkFormFieldsFormGroup();
 	this.showBlocResult=true;
 	this.extractedInitialFinancement.objetFinancement[index].firstDisconnectionOfd=false;
@@ -48,7 +65,9 @@
 				this.alignementContext= this.xtraRepriseService.calculXtra(aligne,aligneXtra);
 				this.alignementContext.resultAlignText=this.alignementResultText;
 				this.extractedInitialFinancement.objetFinancement[index].alignement=this.alignementContext;
+				this.saveCurrentObjectValues(this.extractedInitialFinancement.objetFinancement[index]);
 			});
+		
 
 		
 			this.errorDpeMessage = this.checkFileDpeInserted();
@@ -64,40 +83,81 @@
 			console.log("financement a patcher avec resultat alignement: ",this.extractedInitialFinancement);
 }
 //
-export class Alignement {
-   public topAlignement: string;
-   public xtra275TopAlignement: string;
-   public topAlignementXtra: string;
-   public xtra275TopAlignementXtra: string;
-   public topXtra274: string | null;
-   public topXtra276: string | null;
-   public resultAlignText : string | null;
-  
+  ajouterObjetFinancement() {
+	
+	
 
-   static createDefault(): Alignement {
-      return new Alignement(null, null, null, null, null, null);
-  }
-  
+	
 
-   constructor(
-       topAlignement: string ,
-       xtra275TopAlignement: string ,
-       topAlignementXtra: string ,
-       xtra275TopAlignementXtra: string ,
-       topXtra274: string ,
-       topXtra276: string 
-   ) 
-   
-   {
-       this.topAlignement = topAlignement;
-       this.xtra275TopAlignement = xtra275TopAlignement;
-       this.topAlignementXtra = topAlignementXtra;
-       this.xtra275TopAlignementXtra = xtra275TopAlignementXtra;
-       this.topXtra274 = topXtra274;
-       this.topXtra276 = topXtra276;
-   }
+	// Réinitialisation des bordures d'erreur (en cas de persistance après reset)
+	const fieldsToClear = ['prixAquisitionBien', 'montantLclFinance', 'partLcl', 'numeroDpeAdeme', 'SirenDPE','natureBien','categorieBatiment'];
+	fieldsToClear.forEach(field => {
+		const element = document.getElementById(field);
+		if (element) {
+			element.style.removeProperty('border');
+		}
+	});
+    // Réinitialisation des variables et de l'état
+	this.isValid=null;
+	this.SirenDPE='';
+    this.isDateDepotChecked = false;
+    this.isNormeThermiqueChecked = false;
+    this.isDpeChecked = false;
+    this.showBlocResult = false;
+    this.showDeleteIcon = true;
+    this.showFileAriane = true;
+ 
+    const nouvelObjet: ObjetFinancement = {
+        idObjetFinancement: null,
+        codeObjetFinancement: "02",
+        quotePartObjet: null,
+        gainCEP: null,
+        dateFinTravaux: null,
+        bien: this.createNewBien(),  
+        dpeAvantTravaux: this.createNewDpe(), 
+        dpeApresTravaux: this.createNewDpe(), 
+        alignement: Alignement.createDefault(), 
+        eligibilite: new Eligibilite(), 
+        codeFamilleObjet: "01", 
+        garantie: [],
+        firstDisconnectionOfd: true,
+        piecesJustificatives: []
+    };
 
 
-   
+	this.idGeneratorService.generateIdObjetFinancement().subscribe(
+        idFinancement => {
+            nouvelObjet.idObjetFinancement = idFinancement;
+            this.idGeneratorService.generateIdBien().subscribe(
+                idBien => {
+                    nouvelObjet.bien.idBien = idBien;  
+                    this.objetsFinancements.push(nouvelObjet);
+                    this.extractedInitialFinancement.objetFinancement = [...this.objetsFinancements];  
+                    
+                    this.manuallyAddedIndices.push(this.objetsFinancements.length - 1);
+                    this.newIndex = this.objetsFinancements.length - 1;
+					console.log("this.newIndex ", this.newIndex )
+					this.saveCurrentObjectValues(this.extractedInitialFinancement.objetFinancement[0]);
+                    this.selectedObjetIndex = this.objetsFinancements.length - 1;
+                    this.ajoutFinancementDisabled = true;
+
+                   this.setObjetFinancementData(nouvelObjet);
+				  
+                    console.log("Nouvel objet ajouté", nouvelObjet);
+                },
+                error => {
+                    console.error("Erreur lors de la génération de l'ID du bien : ", error);
+                }
+            );
+        },
+        error => {
+            console.error("Erreur lors de la génération de l'ID de l'objet de financement : ", error);
+        }
+    );
+	
+
+	
+
+
+
 }
-		
