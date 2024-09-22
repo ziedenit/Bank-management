@@ -1,7 +1,204 @@
-alignementResultText calculé pour l'objet  0 L'actif financé a un impact positif sur l'un des 6 objectifs environnementaux de l'UE
- alignementResultText sauvegardé pour l'objet  0 L'actif financé a un impact positif sur l'un des 6 objectifs environnementaux de l'UE
+showAlignement(index:number): void {
+	this.checkFormFieldsFormGroup();
+	this.showBlocResult=true;
+	this.extractedInitialFinancement.objetFinancement[index].firstDisconnectionOfd=false;
+	this.saveCurrentObjectValues(this.extractedInitialFinancement.objetFinancement[index]);
+	
+
+	
+	
+	if (this.clickCalulAlignObject.has(index)) {
+		const currentCountcalcul = this.clickCalulAlignObject.get(index)??0;
+		this.clickCalulAlignObject.set(index, currentCountcalcul + 1);
+	} else {
+		
+		this.clickCalulAlignObject.set(index, 1);
+	}
+
+
+	this.prepareLigneContext();
+
+			
+			this.isValid = this.sirenValidator.verifySiren(this.SirenDPE);
+			this.DpeResults = true;
+			this.elementResults = true;		
+			
+			
+			forkJoin([
+				this.engineService.alignement(this.ligneContext),
+				this.engineService.alignementXtra(this.ligneContextXtra)            
+			]).subscribe(([aligne, aligneXtra]) => {    
+				this.alignementResultText = this.alignementMapping[aligne];
+				this.alignementResult = aligne;
+				this.alignementXtraResult = aligneXtra;
+				this.alignementContext= this.xtraRepriseService.calculXtra(aligne,aligneXtra);
+				this.extractedInitialFinancement.objetFinancement[index].alignementXtraResult=this.alignementResultText ;
+				this.extractedInitialFinancement.objetFinancement[index].alignement=this.alignementContext;
+				this.saveCurrentObjectValues(this.extractedInitialFinancement.objetFinancement[index]);
+
+				
+			});
+		
+
+		
+			this.errorDpeMessage = this.checkFileDpeInserted();
+			this.errorNormeThermiqueMessage = this.checkNormeThermique();
+			this.errorDateDepotMessage = this.checkFileDateDepotInserted();
+			this.evaluatedIndex.push(index);
+			const allManuallyAddedAreEvaluated = this.manuallyAddedIndices.every(manualIndex => this.evaluatedIndex.includes(manualIndex));
+			const isManuallyAddedEmpty = this.manuallyAddedIndices.length === 0;
+			if ((index == this.newIndex) || (index == 0 && (allManuallyAddedAreEvaluated || isManuallyAddedEmpty))) {
+				this.ajoutFinancementDisabled = false;
+			}	
+			
+			console.log("financement a patcher avec resultat alignement: ",this.extractedInitialFinancement);
+}
 //
- ajouterObjetFinancement() {
+private saveCurrentObjectValues(currentObject: ObjetFinancement): void {
+		if(currentObject.alignementXtraResult!='')
+		{
+        currentObject.alignementXtraResult=this.alignementResultText;
+	    }
+		
+        if (!currentObject || !currentObject.bien) return;
+        const bien = currentObject.bien;
+		this.savePiecesJustificatives(currentObject);
+    // verification existance dpeActuel si non initilisation 
+    if (!bien.dpeActuel) {
+        bien.dpeActuel = new Dpe();
+    } 
+	//
+
+		const dpeActuel =currentObject.bien.dpeActuel;
+        bien.partLCL = this.partLcl;
+        bien.montantFinanceLCL = this.montantLclFinance;
+        bien.prixBien = this.prixAquisitionBien;
+        bien.dateDepotPc = this.dateDepot ? new Date(this.dateDepot).toISOString() : null;
+        bien.codeNormeThermique = this.getCodeFromNormeThermique(this.normeThermique); 
+        bien.dpeActuel.sirenDiagnostiqueur = this.SirenDPE;
+        bien.dpeActuel.numeroDpe = this.numeroDpeAdeme;
+		bien.etatBien=this.getCodeEtatBien(this.selectedNatBatiment)
+		console.log("this.selectedNatBatiment",this.selectedNatBatiment)
+		console.log("this.getCodeEtatBien(this.selectedNatBatiment)",this.getCodeEtatBien(this.selectedNatBatiment))
+	    bien.codeBatiment=this.getCodeEtatBatiment(this.codeBatimentSelected)
+		console.log("this.codeBatimentSelected",this.codeBatimentSelected)
+		console.log("this.getCodeEtatBatiment(this.codeBatimentSelected)",this.getCodeEtatBatiment(this.codeBatimentSelected))
+		bien.surfaceBien = this.formGroup.get('surfaceBien').value;
+		bien.dpeActuel.estimationCep = this.formGroup.get('valeurCep').value;
+		bien.dpeActuel.estimationGes = this.formGroup.get('valeurGes').value;
+		bien.numeroNomRue = this.formGroup.get('numeroNomRue').value;
+		bien.codePostal = this.formGroup.get('codePostal').value;
+		bien.nomCommune = this.formGroup.get('ville').value;
+		bien.dpeActuel.dateEtablissementDpe = this.formGroup.get('dateDiangnostique').value;
+		bien.anneeConstruction = this.formGroup.get('anneeConstruction').value;
+		bien.typeBatiment = this.formGroup.get('typeBatiment').value;
+		bien.dpeActuel.classeCep = this.formGroup.get('lettreCEP').value;
+		bien.dpeActuel.classeGes = this.formGroup.get('lettreGES').value;
+		bien.typeEnergie = this.formGroup.get('energieType').value;
+		
+		if (!currentObject.piecesJustificatives) {
+			currentObject.piecesJustificatives = [];
+		}
+		
+        // Ajout d'une pièce de type DPE ou Compromis de vente
+if (this.isDpeChecked) {
+	console.log("this.isDpeCheckedTrue")
+	console.log(this.isDpeChecked)
+    // Vérifier si une pièce de type DPE ou Compromis de vente existe déjà
+    const existingDpe = currentObject.piecesJustificatives.some(piece => piece.typePiece === 'DPE' || piece.typePiece === 'Compromis de vente');
+    
+    if (!existingDpe) {
+        currentObject.piecesJustificatives.push({
+            typePiece: this.selectedOptionJustif === "DPE" ? "DPE" : "Compromis de vente",
+            dpeActuel: this.selectedOptionJustif === "DPE",
+            numeroDpe: this.numeroDpeAdeme,
+            id: null,
+            origineCreation: '',
+            dateCreation: new Date(),
+            origineModification: '',
+            dateModification: new Date(),
+            idPiece: '',
+            referenceGed: '',
+            sousTypePiece: ''
+        });
+    }
+
+	
+
+}
+else
+
+	{
+		console.log("this.isDpeCheckedfalse")
+	    console.log(this.isDpeChecked)
+		currentObject.piecesJustificatives=currentObject.piecesJustificatives.filter(piece=>piece.typePiece!=="Document DPE")
+		currentObject.piecesJustificatives=currentObject.piecesJustificatives.filter(piece=>piece.typePiece!=="DPE")
+		currentObject.piecesJustificatives=currentObject.piecesJustificatives.filter(piece=>piece.typePiece!=="Compromis de vente")
+
+	}
+
+// Ajout d'une pièce de type Norme thermique
+if (this.isNormeThermiqueChecked) {
+    // Vérifier si une pièce de type "Norme thermique" existe déjà
+    const existingNormeThermique = currentObject.piecesJustificatives.some(piece => piece.typePiece === 'Norme thermique');
+    
+    if (!existingNormeThermique) {
+        currentObject.piecesJustificatives.push({
+            typePiece: "Norme thermique",
+            id: null,
+            origineCreation: '',
+            dateCreation: new Date(),
+            origineModification: '',
+            dateModification: new Date(),
+            idPiece: '',
+            referenceGed: '',
+            sousTypePiece: '',
+            numeroDpe: '',
+            dpeActuel: false
+        });
+    }	
+}
+else
+	{
+		currentObject.piecesJustificatives=currentObject.piecesJustificatives.filter(piece=>piece.typePiece!=="Norme thermique")
+	}
+// Ajout d'une pièce de type Permis de construire
+if (this.isDateDepotChecked) {
+    // Vérifier si une pièce de type "Permis de construire" existe déjà
+    const existingPermisDeConstruire = currentObject.piecesJustificatives.some(piece => piece.typePiece === 'Permis de construire');
+    
+    if (!existingPermisDeConstruire) {
+        currentObject.piecesJustificatives.push({
+            typePiece: "Permis de construire",
+            id: null,
+            origineCreation: '',
+            dateCreation: new Date(),
+            origineModification: '',
+            dateModification: new Date(),
+            idPiece: '',
+            referenceGed: '',
+            sousTypePiece: '',
+            numeroDpe: '',
+            dpeActuel: false
+        });
+    }
+
+	
+
+}
+else
+	{
+		currentObject.piecesJustificatives=currentObject.piecesJustificatives.filter(piece=>piece.typePiece!=="Permis de construire")
+	}
+
+	
+console.log("currentObject.piecesJustificatives")
+console.log(currentObject.piecesJustificatives)
+	
+	
+      }
+//
+  ajouterObjetFinancement() {
 	
 	
 
@@ -42,7 +239,8 @@ alignementResultText calculé pour l'objet  0 L'actif financé a un impact posit
         piecesJustificatives: [],
 		alignementXtraResult:''
     };
-
+	console.log("après changement, alignementResultText avant l'ajout de l'objet1 ", 0, this.extractedInitialFinancement.objetFinancement[0].alignementXtraResult);
+		
 
 	this.idGeneratorService.generateIdObjetFinancement().subscribe(
         idFinancement => {
@@ -80,36 +278,3 @@ alignementResultText calculé pour l'objet  0 L'actif financé a un impact posit
 
 
 }
-//
-	onBreadcrumbClick(index: number ) {
-	
-		this.saveCurrentObjectValues(this.extractedInitialFinancement.objetFinancement[this.selectedObjetIndex]);  // Sauvegarder les données de l'objet actuel
-		this.selectedObjetIndex = index;  // Mettre à jour l'index de l'objet sélectionné
-		// Restituer le texte d'alignement sauvegardé
-		console.log("après changement, alignementResultText pour l'objet ", index, this.extractedInitialFinancement.objetFinancement[index].alignementXtraResult);
-		if (this.extractedInitialFinancement.objetFinancement[index].alignementXtraResult) {
-			this.alignementResultText = this.extractedInitialFinancement.objetFinancement[index].alignementXtraResult;
-		} else {
-			this.alignementResultText = 'Aucun alignement disponible';
-		}
-		this.depExist=false;
-		if(this.clickCalulAlignObject.has(index))
-		{
-		this.showBlocResult=true;
-	    }
-
-		
-
-	this.setObjetFinancementData(this.extractedInitialFinancement.objetFinancement[index]);  // Charger les données du nouvel objet sélectionné
-	this.setupFormGroup(this.extractedInitialFinancement.objetFinancement[index].bien);  // Initialiser le formulaire avec les données du nouvel objet
-
-	
-
-	// Appliquer les règles métiers sur l'élément sélectionné
-	this.checkPiecesJustificatives(this.extractedInitialFinancement, this.selectedObjetIndex);
-	console.log("Vérification des champs montant finance LCL et part LCL : ", this.montantLclFinance, this.partLcl);
-	this.checkFormFieldsFormGroup();
-}
-//
-après changement, alignementResultText pour l'objet  0 undefined
-	c'est just lorsque on click que je perds les données alignementXtraResult
