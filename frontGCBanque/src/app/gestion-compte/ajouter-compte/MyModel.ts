@@ -1,64 +1,37 @@
-showAlignement(index:number): void {
+	onBreadcrumbClick(index: number ) {
+		this.saveCurrentObjectValues(this.extractedInitialFinancement.objetFinancement[this.selectedObjetIndex]);  // Sauvegarder les données de l'objet actuel
+		this.selectedObjetIndex = index;  // Mettre à jour l'index de l'objet sélectionné
+		
+		// Restituer le texte d'alignement sauvegardé
+		console.log("après changement, alignementResultText pour l'objet ", index, this.extractedInitialFinancement.objetFinancement[index].alignementXtraResult);
+		if (this.extractedInitialFinancement.objetFinancement[index].alignementXtraResult) {
+			this.alignementResultText = this.extractedInitialFinancement.objetFinancement[index].alignementXtraResult;
+		} 
+		this.depExist=false;
+		if(this.clickCalulAlignObject.has(index))
+		{
+		this.showBlocResult=true;
+	    }
+
+		
+
+	this.setObjetFinancementData(this.extractedInitialFinancement.objetFinancement[index]);  // Charger les données du nouvel objet sélectionné
+	this.setupFormGroup(this.extractedInitialFinancement.objetFinancement[index].bien);  // Initialiser le formulaire avec les données du nouvel objet
+
+	
+
+	// Appliquer les règles métiers sur l'élément sélectionné
+	this.checkPiecesJustificatives(this.extractedInitialFinancement, this.selectedObjetIndex);
+	console.log("Vérification des champs montant finance LCL et part LCL : ", this.montantLclFinance, this.partLcl);
 	this.checkFormFieldsFormGroup();
-	this.showBlocResult=true;
-	this.extractedInitialFinancement.objetFinancement[index].firstDisconnectionOfd=false;
-	this.saveCurrentObjectValues(this.extractedInitialFinancement.objetFinancement[index]);
-	
-
-	
-	
-	if (this.clickCalulAlignObject.has(index)) {
-		const currentCountcalcul = this.clickCalulAlignObject.get(index)??0;
-		this.clickCalulAlignObject.set(index, currentCountcalcul + 1);
-	} else {
-		
-		this.clickCalulAlignObject.set(index, 1);
-	}
-
-
-	this.prepareLigneContext();
-
-			
-			this.isValid = this.sirenValidator.verifySiren(this.SirenDPE);
-			this.DpeResults = true;
-			this.elementResults = true;		
-			
-			
-			forkJoin([
-				this.engineService.alignement(this.ligneContext),
-				this.engineService.alignementXtra(this.ligneContextXtra)            
-			]).subscribe(([aligne, aligneXtra]) => {    
-				this.alignementResultText = this.alignementMapping[aligne];
-				this.alignementResult = aligne;
-				this.alignementXtraResult = aligneXtra;
-				this.alignementContext= this.xtraRepriseService.calculXtra(aligne,aligneXtra);
-				this.extractedInitialFinancement.objetFinancement[index].alignementXtraResult=this.alignementResultText ;
-				this.extractedInitialFinancement.objetFinancement[index].alignement=this.alignementContext;
-				this.saveCurrentObjectValues(this.extractedInitialFinancement.objetFinancement[index]);
-
-				
-			});
-		
-
-		
-			this.errorDpeMessage = this.checkFileDpeInserted();
-			this.errorNormeThermiqueMessage = this.checkNormeThermique();
-			this.errorDateDepotMessage = this.checkFileDateDepotInserted();
-			this.evaluatedIndex.push(index);
-			const allManuallyAddedAreEvaluated = this.manuallyAddedIndices.every(manualIndex => this.evaluatedIndex.includes(manualIndex));
-			const isManuallyAddedEmpty = this.manuallyAddedIndices.length === 0;
-			if ((index == this.newIndex) || (index == 0 && (allManuallyAddedAreEvaluated || isManuallyAddedEmpty))) {
-				this.ajoutFinancementDisabled = false;
-			}	
-			
-			console.log("financement a patcher avec resultat alignement: ",this.extractedInitialFinancement);
 }
 //
-private saveCurrentObjectValues(currentObject: ObjetFinancement): void {
-		if(currentObject.alignementXtraResult!='')
+ private saveCurrentObjectValues(currentObject: ObjetFinancement): void {
+		if(currentObject.alignementXtraResult)
 		{
-        currentObject.alignementXtraResult=this.alignementResultText;
+       currentObject.alignementXtraResult=this.alignementResultText;
 	    }
+		
 		
         if (!currentObject || !currentObject.bien) return;
         const bien = currentObject.bien;
@@ -197,8 +170,8 @@ console.log(currentObject.piecesJustificatives)
 	
 	
       }
-//
-  ajouterObjetFinancement() {
+	//
+	ajouterObjetFinancement() {
 	
 	
 
@@ -277,4 +250,75 @@ console.log(currentObject.piecesJustificatives)
 
 
 
+}
+
+	
+
+}
+else
+	{
+		currentObject.piecesJustificatives=currentObject.piecesJustificatives.filter(piece=>piece.typePiece!=="Permis de construire")
+	}
+
+	
+console.log("currentObject.piecesJustificatives")
+console.log(currentObject.piecesJustificatives)
+	
+	
+      }
+//
+showAlignement(index:number): void {
+	this.checkFormFieldsFormGroup();
+	this.showBlocResult=true;
+	this.extractedInitialFinancement.objetFinancement[index].firstDisconnectionOfd=false;
+	this.saveCurrentObjectValues(this.extractedInitialFinancement.objetFinancement[index]);
+	
+
+	
+	
+	if (this.clickCalulAlignObject.has(index)) {
+		const currentCountcalcul = this.clickCalulAlignObject.get(index)??0;
+		this.clickCalulAlignObject.set(index, currentCountcalcul + 1);
+	} else {
+		
+		this.clickCalulAlignObject.set(index, 1);
+	}
+
+
+	this.prepareLigneContext();
+
+			
+			this.isValid = this.sirenValidator.verifySiren(this.SirenDPE);
+			this.DpeResults = true;
+			this.elementResults = true;		
+			
+			
+			forkJoin([
+				this.engineService.alignement(this.ligneContext),
+				this.engineService.alignementXtra(this.ligneContextXtra)            
+			]).subscribe(([aligne, aligneXtra]) => {    
+				this.alignementResultText = this.alignementMapping[aligne];
+				this.alignementResult = aligne;
+				this.alignementXtraResult = aligneXtra;
+				this.alignementContext= this.xtraRepriseService.calculXtra(aligne,aligneXtra);
+				this.extractedInitialFinancement.objetFinancement[index].alignementXtraResult=this.alignementResultText ;
+				this.extractedInitialFinancement.objetFinancement[index].alignement=this.alignementContext;
+				this.saveCurrentObjectValues(this.extractedInitialFinancement.objetFinancement[index]);
+
+				
+			});
+		
+
+		
+			this.errorDpeMessage = this.checkFileDpeInserted();
+			this.errorNormeThermiqueMessage = this.checkNormeThermique();
+			this.errorDateDepotMessage = this.checkFileDateDepotInserted();
+			this.evaluatedIndex.push(index);
+			const allManuallyAddedAreEvaluated = this.manuallyAddedIndices.every(manualIndex => this.evaluatedIndex.includes(manualIndex));
+			const isManuallyAddedEmpty = this.manuallyAddedIndices.length === 0;
+			if ((index == this.newIndex) || (index == 0 && (allManuallyAddedAreEvaluated || isManuallyAddedEmpty))) {
+				this.ajoutFinancementDisabled = false;
+			}	
+			
+			console.log("financement a patcher avec resultat alignement: ",this.extractedInitialFinancement);
 }
