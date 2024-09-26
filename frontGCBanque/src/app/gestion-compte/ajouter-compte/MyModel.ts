@@ -1,27 +1,20 @@
-Bonjour 
-J’ai livré en dev une première version de l'acquisition multiple (fil Ariane) 
-, je n'ai pas pu livrer sur UAT car cet environnement doit rester stable cette semaine (déjà réservé pour les tests CPPE__DPRO)
+Bonjour,
 
-Ci-dessous la revue sur le livrable : 
+J’ai livré en environnement de développement une première version de l'acquisition multiple (fil Ariane). Cependant, je n’ai pas pu déployer cette version sur l'environnement UAT, car cet environnement doit rester stable cette semaine, étant déjà réservé pour les tests CPPE_DPRO.
 
----> Ajout de plusieurs objets dans le fil ariane (post dans la base patch des données via IHM)
----> Restitution de la liste des objets sur le fil Ariane 
----> Possibilité de supprimer sur IHM un objet ajouté par le conseiller avant de poster en base 
----> Changement d'un objet a un autre via le clic sur l'objet (restitution des données et du résultat Alignement pour chaque objet en cliquant là-dessus) 
----> Calcul de l'alignement pour chaque objet du fil ariane via le bouton calculer
----> Application de toutes les règles métiers déjà utilisé pour le mono objet (contrôle dynamique des champs obligatoires basé sur le click bouton calcul uniquement ou lors d'un retour sur l'objet pour une deuxième consultation (deuxième clic)) 
+Voici les détails du livrable :
 
-Règles métiers :
+Ajout de plusieurs objets dans le fil d'Ariane (insertion en base et mise à jour des données via l'IHM).
+Restitution de la liste des objets dans le fil d'Ariane.
+Possibilité de supprimer un objet ajouté par le conseiller via l'IHM avant de l’enregistrer en base.
+Navigation d'un objet à l'autre par simple clic sur l'objet, avec restitution des données et des résultats d'alignement correspondants.
+Calcul de l'alignement pour chaque objet du fil d'Ariane via le bouton "Calculer".
+Application des règles métiers existantes pour le mono-objet (contrôle dynamique des champs obligatoires déclenché lors du calcul ou lors de la sélection d’un objet pour une deuxième consultation).
+Règles métiers appliquées :
 
----> Un conseiller peut ajouter un nouvel objet si et seulement s’il calcule l'alignement sur l'objet courant 
-(Si non le bouton ajouter un nouvel objet financement reste grisé) 
----> Possibilité de suppression d'un objet localement au niveau de l'IHM 
----> Le conseiller doit refaire le calcul après chaque modification des données via IHM (cette règle est en relation avec la règle en bas qui manque reste à valider)  
+Un conseiller peut ajouter un nouvel objet uniquement après avoir calculé l'alignement de l'objet courant. (Sinon, le bouton "Ajouter un nouvel objet financement" reste désactivé).
+Possibilité de supprimer un objet localement via l'IHM.
+Le conseiller doit recalculer l'alignement après chaque modification des données via l'IHM. (Cette règle reste en lien avec une autre règle à valider).
+Règle non incluse dans cette version :
 
-Cette version n’embarque pas la règle suivante :
-Règle de gestion manquante : imposer le calcul de l'alignement à chaque modification des données dans l'IHM (uniquement les données en relation avec les paramètres de calcul de l’alignement)
-(Merci de revoir coté métier si on peut faire autrement le contrôle car il y a un risque d'ajout de complexité et de régression)  
-Vu la complexité des règles métiers et le manque des détails sur cette fonctionnalité, on a essayé de définir les règles moi et Estelle et Sabrina.
-
-
-Merci.
+La règle de gestion qui impose le recalcul de l'alignement à chaque modification des données dans l'IHM (uniquement pour les données relatives aux paramètres de calcul de l'alignement) n'est pas encore implémentée. Merci de revoir ce point côté métier afin de valider une approche qui éviterait d'ajouter de la complexité et des risques de régression.
