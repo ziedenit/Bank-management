@@ -1,36 +1,5 @@
-package com.cl.msofd.enginerules;
+Charge et configure le conteneur Drools : Elle lit un fichier de règles défini par la propriété spring.drools.rules-file (par exemple, un fichier .drl ou une table de décision) situé dans le classpath de l'application, et utilise KieServices pour créer un KieContainer, qui contient toutes les règles prêtes à être exécutées.
 
-import org.kie.api.KieServices;
-import org.kie.api.builder.KieBuilder;
-import org.kie.api.builder.KieFileSystem;
-import org.kie.api.builder.KieModule;
-import org.kie.api.runtime.KieContainer;
-import org.kie.internal.io.ResourceFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+Expose le KieContainer comme un bean Spring : Elle expose le KieContainer en tant que bean Spring grâce à l'annotation @Bean, permettant à d'autres parties de l'application d'y accéder pour exécuter les règles.
 
-@Configuration
-public class DroolsConfig {
-
-
-    @Value("${spring.drools.rules-file}")
-    private String rulesFile;
-
-    private static final KieServices kieServices = KieServices.Factory.get();
-
-    @Bean
-    public KieContainer kieContainer() {
-        return loadKieContainer();
-    }
-
-    private KieContainer loadKieContainer() {
-        KieFileSystem kieFileSystem = kieServices.newKieFileSystem();
-        kieFileSystem.write(ResourceFactory.newClassPathResource(rulesFile));
-        KieBuilder kieBuilder = kieServices.newKieBuilder(kieFileSystem);
-        kieBuilder.buildAll();
-        KieModule kieModule = kieBuilder.getKieModule();
-        return kieServices.newKieContainer(kieModule.getReleaseId());
-    }
-
-}
+Cela permet d'intégrer le moteur de règles Drools dans une application Spring de manière automatique et fluide.
