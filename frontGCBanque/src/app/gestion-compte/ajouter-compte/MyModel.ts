@@ -1,18 +1,2 @@
-/* Styles pour l'élément sélectionné */
-.breadcrumb-item-custom.selected {
-  background-color: #0056b3; /* Bleu foncé */
-  color: white; /* Couleur du texte en blanc */
-  border-radius: 5px; /* Bordures arrondies */
-}
-<li class="breadcrumb-item-custom"
-    *ngFor="let objet of objetsFinancements; let i = index"
-    [class.selected]="selectedObjetIndex === i">
-  <a [routerLink]=""
-     queryParamsHandling="preserve"
-     (click)="onBreadcrumbClick(i)">
-    <span>Objet de financement</span>  {{ i + 1 }}
-  </a>
-  <button class="close-btn"
-          *ngIf="showDeleteIcon && manuallyAddedIndices.includes(i)"
-          (click)="removeBreadcrumbItem(i)">x</button>
-</li>
+Les tables de décision offrent une manière plus conviviale pour les non-développeurs (comme les analystes métiers) de gérer les règles. Au lieu d'écrire des règles DRL à la main, les utilisateurs peuvent définir des règles dans un tableau avec des colonnes représentant les conditions, les actions, ou les résultats. Drools convertit ensuite ces tables en règles exécutables.
+  La dépendance KIE Spring est une extension de la plateforme KIE (Knowledge Is Everything) qui permet d'intégrer facilement Drools avec le framework Spring. Elle simplifie la configuration et l'utilisation du moteur de règles Drools dans une application Spring en utilisant des fichiers de configuration Spring (XML ou annotations).
