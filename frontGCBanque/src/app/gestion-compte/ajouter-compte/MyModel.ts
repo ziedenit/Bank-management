@@ -1,2 +1,36 @@
-Les tables de décision offrent une manière plus conviviale pour les non-développeurs (comme les analystes métiers) de gérer les règles. Au lieu d'écrire des règles DRL à la main, les utilisateurs peuvent définir des règles dans un tableau avec des colonnes représentant les conditions, les actions, ou les résultats. Drools convertit ensuite ces tables en règles exécutables.
-  La dépendance KIE Spring est une extension de la plateforme KIE (Knowledge Is Everything) qui permet d'intégrer facilement Drools avec le framework Spring. Elle simplifie la configuration et l'utilisation du moteur de règles Drools dans une application Spring en utilisant des fichiers de configuration Spring (XML ou annotations).
+package com.cl.msofd.enginerules;
+
+import org.kie.api.KieServices;
+import org.kie.api.builder.KieBuilder;
+import org.kie.api.builder.KieFileSystem;
+import org.kie.api.builder.KieModule;
+import org.kie.api.runtime.KieContainer;
+import org.kie.internal.io.ResourceFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class DroolsConfig {
+
+
+    @Value("${spring.drools.rules-file}")
+    private String rulesFile;
+
+    private static final KieServices kieServices = KieServices.Factory.get();
+
+    @Bean
+    public KieContainer kieContainer() {
+        return loadKieContainer();
+    }
+
+    private KieContainer loadKieContainer() {
+        KieFileSystem kieFileSystem = kieServices.newKieFileSystem();
+        kieFileSystem.write(ResourceFactory.newClassPathResource(rulesFile));
+        KieBuilder kieBuilder = kieServices.newKieBuilder(kieFileSystem);
+        kieBuilder.buildAll();
+        KieModule kieModule = kieBuilder.getKieModule();
+        return kieServices.newKieContainer(kieModule.getReleaseId());
+    }
+
+}
