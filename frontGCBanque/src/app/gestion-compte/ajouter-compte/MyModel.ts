@@ -1,3 +1,122 @@
+
+    
+<div class="container-fluid" >
+        <div class=footer>
+        <div class="ButtonsFooter" style="display: flex; justify-content: flex-end" >
+        <button (click)="showAlignement(selectedObjetIndex)"   mat-raised-button color="primary" [disabled]="selectedType!='option1'">Calculer</button>
+         &nbsp; 
+       <button  mat-raised-button color="primary"  (click)="postContinuer()" [disabled]="postDisabled ">Continuer</button>
+      </div>
+      </div>           
+</div>
+showAlignement(index:number): void {
+	this.checkFormFieldsFormGroup();
+	this.showBlocResult=true;
+	this.extractedInitialFinancement.objetFinancement[index].firstDisconnectionOfd=false;
+	this.saveCurrentObjectValues(this.extractedInitialFinancement.objetFinancement[index]);
+	
+
+	
+	
+	if (this.clickCalulAlignObject.has(index)) {
+		const currentCountcalcul = this.clickCalulAlignObject.get(index)??0;
+		this.clickCalulAlignObject.set(index, currentCountcalcul + 1);
+	} else {
+		
+		this.clickCalulAlignObject.set(index, 1);
+	}
+
+
+	this.prepareLigneContext();
+
+			
+			this.isValid = this.sirenValidator.verifySiren(this.SirenDPE);
+			this.DpeResults = true;
+			this.elementResults = true;		
+			
+			
+			forkJoin([
+				this.engineService.alignement(this.ligneContext),
+				this.engineService.alignementXtra(this.ligneContextXtra)            
+			]).subscribe(([aligne, aligneXtra]) => {    
+				this.alignementResultText = this.alignementMapping[aligne];
+				this.alignementResult = aligne;
+				this.alignementXtraResult = aligneXtra;
+				this.alignementContext= this.xtraRepriseService.calculXtra(aligne,aligneXtra);
+				this.extractedInitialFinancement.objetFinancement[index].alignement=this.alignementContext;
+				//this.extractedInitialFinancement.objetFinancement[index].alignementXtraResult=this.alignementResultText ;
+				this.saveCurrentObjectValues(this.extractedInitialFinancement.objetFinancement[index]);
+		
+
+				
+			});
+			
+			
+		
+			this.errorDpeMessage = this.checkFileDpeInserted();
+			this.errorNormeThermiqueMessage = this.checkNormeThermique();
+			this.errorDateDepotMessage = this.checkFileDateDepotInserted();
+			this.evaluatedIndex.push(index);
+			const allManuallyAddedAreEvaluated = this.manuallyAddedIndices.every(manualIndex => this.evaluatedIndex.includes(manualIndex));
+			const isManuallyAddedEmpty = this.manuallyAddedIndices.length === 0;
+			if ((index == this.newIndex) || (index == 0 && (allManuallyAddedAreEvaluated || isManuallyAddedEmpty))) {
+				this.ajoutFinancementDisabled = false;
+			}	
+			
+			console.log("objet financement apres calcul: ", index,this.extractedInitialFinancement.objetFinancement[index]);
+			
+			
+}
+
+
+onBreadcrumbClick(index: number ) {
+		this.errorDpeMessage=null;
+		this.errorNormeThermiqueMessage=null;
+		this.errorDateDepotMessage=null;
+					
+		console.log("this.extractedInitialFinancement.objetFinancement[index] on click sur l'objet index", index,this.extractedInitialFinancement.objetFinancement[index])
+		this.saveCurrentObjectValues(this.extractedInitialFinancement.objetFinancement[this.selectedObjetIndex]);  // Sauvegarder les données de l'objet actuel
+		
+		this.selectedObjetIndex = index;  // Mettre à jour l'index de l'objet sélectionné
+		
+			// Restituer le texte d'alignement sauvegardé en base
+			if (this.extractedInitialFinancement.objetFinancement[index] && this.extractedInitialFinancement.objetFinancement[index].alignement 
+				&& this.extractedInitialFinancement.objetFinancement[index].alignement.topAlignement!=null&&this.extractedInitialFinancement.objetFinancement[index].alignement.xtra275TopAlignement
+				!=null) {
+					this.showBlocResult=true;
+				this.alignementResultText = this.alignementMappingReprise[this.extractedInitialFinancement.objetFinancement[index].alignement.topAlignement][this.extractedInitialFinancement.objetFinancement[index].alignement.xtra275TopAlignement]
+				
+			}
+            if (this.extractedInitialFinancement.objetFinancement[index].alignement.topAlignement==null && this.extractedInitialFinancement.objetFinancement[index].alignement.xtra275TopAlignement==null) {
+				this.showBlocResult=false;		
+			}
+
+			
+				
+			
+		this.depExist=false;
+		
+	    
+
+		
+
+	this.setObjetFinancementData(this.extractedInitialFinancement.objetFinancement[index]);  // Charger les données du nouvel objet sélectionné
+	this.setupFormGroup(this.extractedInitialFinancement.objetFinancement[index].bien);  // Initialiser le formulaire avec les données du nouvel objet
+
+	
+
+	// Appliquer les règles métiers sur l'élément sélectionné
+	this.checkPiecesJustificatif(this.extractedInitialFinancement, this.selectedObjetIndex);
+	console.log("Vérification des champs montant finance LCL et part LCL : ", this.montantLclFinance, this.partLcl);
+	this.checkFormFieldsFormGroup();
+    // verification changement des champs ( parametre calcul alignement)
+	
+
+
+
+}
+
+
 <div  class="container-fluid">
   <div class="row">
     <div class="col-lg-12">
