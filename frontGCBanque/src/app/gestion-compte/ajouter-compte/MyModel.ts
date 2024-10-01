@@ -5,14 +5,15 @@ export class VotreComponent implements OnInit {
   postDisabled: boolean = true;
   showBlocResult: boolean = false;
   showPopup: boolean = false;
-  popupShownForIndex: Set<number> = new Set();  // Pour garder la trace des objets avec le pop-up déjà affiché
+  popupShownForIndex: Set<number> = new Set();
   selectedObjetIndex: number = 0;
-  selectedType: string = '';  // Gérer le type de l'objet sélectionné
-  extractedInitialFinancement: any = {};  // Votre structure de financement
+  selectedType: string = '';
+  extractedInitialFinancement: any = {};
   clickCalulAlignObject: Map<number, number> = new Map();
   alignementResultText: string = '';
   alignementContext: any;
   isFieldsDisabled: boolean = false;
+  private formValueChangesSubscription: any;  // Pour gérer l'abonnement
 
   constructor(private fb: FormBuilder, private engineService: EngineService) { }
 
@@ -34,10 +35,57 @@ export class VotreComponent implements OnInit {
       valeurGes: ['']
     });
 
-    // Détection de tout changement dans le formulaire
-    this.formGroup.valueChanges.subscribe(() => {
+    // Au démarrage, pas de détection de changement
+    this.unsubscribeFormValueChanges();
+  }
+
+  // Méthode pour désabonner de la détection des changements
+  unsubscribeFormValueChanges() {
+    if (this.formValueChangesSubscription) {
+      this.formValueChangesSubscription.unsubscribe();
+    }
+  }
+
+  // Appelée lors de la consultation d'un objet via onBread
+  onBread(index: number) {
+    this.selectedObjetIndex = index;
+
+    // Recharger les valeurs de l'objet consulté dans le formulaire
+    this.loadObjectValues(this.extractedInitialFinancement.objetFinancement[index]);
+
+    // Désabonner toute détection de changements précédente
+    this.unsubscribeFormValueChanges();
+
+    // Activer la détection des changements uniquement lors de la consultation
+    this.formValueChangesSubscription = this.formGroup.valueChanges.subscribe(() => {
       this.disableContinuerButton();
     });
+
+    // Réinitialiser l'état du bouton Continuer
+    this.postDisabled = true;
+  }
+
+  loadObjectValues(currentObject: any) {
+    // Logique pour charger les valeurs de l'objet dans le formulaire
+    this.formGroup.patchValue({
+      numeroNomRue: currentObject.numeroNomRue || '',
+      codePostal: currentObject.codePostal || '',
+      ville: currentObject.ville || '',
+      dateDiangnostique: currentObject.dateDiangnostique || '',
+      dateFinValidite: currentObject.dateFinValidite || '',
+      anneeConstruction: currentObject.anneeConstruction || '',
+      typeBatiment: currentObject.typeBatiment || '',
+      surfaceBien: currentObject.surfaceBien || '',
+      energieType: currentObject.energieType || '',
+      lettreCEP: currentObject.lettreCEP || '',
+      valeurCep: currentObject.valeurCep || '',
+      lettreGES: currentObject.lettreGES || '',
+      valeurGes: currentObject.valeurGes || ''
+    });
+
+    // Charger également les champs en dehors du formGroup si nécessaire (comme normeThermique)
+    this.normeThermique = currentObject.normeThermique || '';
+    this.dateDepot = currentObject.dateDepot || '';
   }
 
   disableContinuerButton() {
@@ -56,7 +104,6 @@ export class VotreComponent implements OnInit {
     this.postDisabled = false;
   }
 
-  // Méthode pour afficher le calcul d'alignement
   showAlignement(index: number): void {
     this.checkFormFieldsFormGroup();
     this.showBlocResult = true;
@@ -91,14 +138,6 @@ export class VotreComponent implements OnInit {
     this.errorDpeMessage = this.checkFileDpeInserted();
     this.errorNormeThermiqueMessage = this.checkNormeThermique();
     this.errorDateDepotMessage = this.checkFileDateDepotInserted();
-  }
-
-  // Méthode pour afficher le pop-up une seule fois par objet
-  showPopupOnceForObject() {
-    if (this.showPopup) {
-      alert('Pop-up de notification pour cet objet');
-      this.showPopup = false;
-    }
   }
 
   // Méthode déclenchée par un clic sur "Continuer"
