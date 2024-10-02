@@ -79,7 +79,42 @@ export class JustificatifsComponent {
     }
 
 }
-//
+
+
+// ci haut le ts du composant fils 
+// ci bas le bloc justif qui recoit les output du composant parent 
+<!-- bloc justificatif -->
+<app-justificatifs
+  [hideFieldForm]="hideFieldForm"
+  [dateDepot]="dateDepot"
+  [numeroDpeAdeme]="numeroDpeAdeme"
+  [normeThermique]="normeThermique"
+  [isDpeChecked]="isDpeChecked"
+  [selectedOptionJustif]="selectedOptionJustif"
+  
+ 
+  [isDateDepotChecked]="isDateDepotChecked"
+  [isNormeThermiqueChecked]="isNormeThermiqueChecked"
+  (isDateDepotCheckedChange)="isDateDepotChecked = $event"
+  (isDpeCheckedChange)="isDpeChecked = $event"
+  (isNormeThermiqueCheckedChange)="isNormeThermiqueChecked = $event"
+  (selectedOptionJustifChange)="onSelectedOptionJustifChange($event)"
+  (postDisabledChange)="handlePostDisabledChange($event)" 
+(alertDisplayedChange)="handleAlertDisplayedChange($event)">
+</app-justificatifs>
+	//
+ handlePostDisabledChange(postDisabled: boolean) {
+			this.postDisabled = postDisabled;
+			console.log('postDisabled a changé:', postDisabled);
+		  }
+		
+		  handleAlertDisplayedChange(alertDisplayed: boolean) {
+			this.alertDisplayed = alertDisplayed;
+			console.log('alertDisplayed a changé:', alertDisplayed);
+		  } 
+}
+la les deux méthode 
+en bas le composant fils
 <div class="container-fluid">
     <div class="justificatifs" *ngIf="hideFieldForm == false">
       <div class="blocJust">
@@ -127,203 +162,5 @@ export class JustificatifsComponent {
   
   
   
-  // j'ai ce omposant fils ci dessus
-et j'ai dans mon composant parent ca
-
-<app-type-objet-financement 
- [typeObjetFinancement]="typeObjetFinancement"
- [hideFieldForm]="hideFieldForm" 
- (selectedFamilleObjet)="onFamilleSelected($event)" 
- (selectedObjetFinancement)="onObjetFinancementSelected($event)" 
-(postDisabledChange)="handlePostDisabledChange($event)" 
-(alertDisplayedChange)="handleAlertDisplayedChange($event)">
-</app-type-objet-financement> 
+  mon seul probleme est que le postDisabled marque bien lorsque je change d'un objet a un autre en decochant dans tous les objets mais meme en changenant d'objet en cliquant sur la méthode onBread mais alertDisplayed ne s'affiche pas si je clique sur autre objet 
 	
-	onBreadcrumbClick(index: number ) {
-		this.resetAlertDisplay();
-		this.errorDpeMessage=null;
-		this.errorNormeThermiqueMessage=null;
-		this.errorDateDepotMessage=null;
-					
-		console.log("this.extractedInitialFinancement.objetFinancement[index] on click sur l'objet index", index,this.extractedInitialFinancement.objetFinancement[index])
-		this.saveCurrentObjectValues(this.extractedInitialFinancement.objetFinancement[this.selectedObjetIndex]);  // Sauvegarder les données de l'objet actuel
-		
-		this.selectedObjetIndex = index;  // Mettre à jour l'index de l'objet sélectionné
-		
-			// Restituer le texte d'alignement sauvegardé en base
-			if (this.extractedInitialFinancement.objetFinancement[index] && this.extractedInitialFinancement.objetFinancement[index].alignement 
-				&& this.extractedInitialFinancement.objetFinancement[index].alignement.topAlignement!=null&&this.extractedInitialFinancement.objetFinancement[index].alignement.xtra275TopAlignement
-				!=null) {
-					this.showBlocResult=true;
-				this.alignementResultText = this.alignementMappingReprise[this.extractedInitialFinancement.objetFinancement[index].alignement.topAlignement][this.extractedInitialFinancement.objetFinancement[index].alignement.xtra275TopAlignement]
-				
-			}
-            if (this.extractedInitialFinancement.objetFinancement[index].alignement.topAlignement==null && this.extractedInitialFinancement.objetFinancement[index].alignement.xtra275TopAlignement==null) {
-				this.showBlocResult=false;		
-			}
-
-			
-				
-			
-		this.depExist=false;
-		
-
-
-
-   
-
-		
-
-	this.setObjetFinancementData(this.extractedInitialFinancement.objetFinancement[index]);  // Charger les données du nouvel objet sélectionné
-	this.setupFormGroup(this.extractedInitialFinancement.objetFinancement[index].bien);  // Initialiser le formulaire avec les données du nouvel objet
-
-	
-
-	// Appliquer les règles métiers sur l'élément sélectionné
-	this.checkPiecesJustificatif(this.extractedInitialFinancement, this.selectedObjetIndex);
-	console.log("Vérification des champs montant finance LCL et part LCL : ", this.montantLclFinance, this.partLcl);
-	this.checkFormFieldsFormGroup();
-
-	
- // Forcer le recalcul d'alignement en cas de changement d'un 
-
- this.formGroup.get('lettreCEP').valueChanges.subscribe(() => {
-	this.recalculerAlignment();
-  });
-  this.formGroup.get('valeurCep').valueChanges.subscribe(() => {
-	this.recalculerAlignment();
-  });
-  this.formGroup.get('anneeConstruction').valueChanges.subscribe(() => {
-	this.recalculerAlignment();
-  });
-
-
-}
- handlePostDisabledChange(postDisabled: boolean) {
-			this.postDisabled = postDisabled;
-			console.log('postDisabled a changé:', postDisabled);
-		  }
-		
-		  handleAlertDisplayedChange(alertDisplayed: boolean) {
-			this.alertDisplayed = alertDisplayed;
-			console.log('alertDisplayed a changé:', alertDisplayed);
-		  } 
-
-ngOnInit(): void {
-
-
-    this.id = this.route.snapshot.queryParams["idFinancement"];
-    this.Url_Retour_Base64 = this.route.snapshot.queryParams["urlRetour"];
-    if (this.Url_Retour_Base64) {
-		this.Url_Retour_Utf8 = atob(this.Url_Retour_Base64);
-	}
-	else {
-		console.warn("Url_Retour_Base64 est falsy. Impossible de le convertir en Utf8.");
-	}
-	if (!this.id ) {
-		console.log("hello pas d'id ")
-		this.router.navigate(['/page-erreur'], { queryParams: { urlRetour: this.Url_Retour_Utf8 } });
-		return;
-	  }
-
-	  this.financementService.getFinancementbyId(this.id).pipe (
-		catchError(err => {
-			console.error('Erreur lors de la récupération du financement:', err);
-			this.router.navigate(['/page-erreur'], { queryParams: { urlRetour: this.Url_Retour_Utf8 } });
-			return of(null);  
-		  })
-	).subscribe(responseFinancement => {
-		this.extractedInitialFinancement = responseFinancement;
-		console.log("le financement récupéré de la BDD est le suivant:",responseFinancement )	
-        this.setFinancementData(responseFinancement);
-        this.setObjetFinancementData(responseFinancement.objetFinancement[0]);
-         this.checkRequiredFields(responseFinancement,0);
-		this.checkPiecesJustificatif(responseFinancement,0);
-        this.setupFormGroup(responseFinancement.objetFinancement[0].bien);
-		if(responseFinancement.firstDisconnectionOfd==false)
-		{
-		this.checkFormFieldsFormGroup();
-		}
-		
-	this.formGroup.get('lettreCEP').valueChanges.subscribe(() => {
-		this.recalculerAlignment();
-	  });
-	  this.formGroup.get('valeurCep').valueChanges.subscribe(() => {
-		this.recalculerAlignment();
-	  });
-	  this.formGroup.get('anneeConstruction').valueChanges.subscribe(() => {
-		this.recalculerAlignment();
-	  });
-		  
-    });
-
-	showAlignement(index:number): void {
-	this.resetAlertDisplay();
-	this.postDisabled=false;
-	this.checkFormFieldsFormGroup();
-	this.showBlocResult=true;
-	this.extractedInitialFinancement.objetFinancement[index].firstDisconnectionOfd=false;
-	this.saveCurrentObjectValues(this.extractedInitialFinancement.objetFinancement[index]);
-	
-
-	
-	
-	if (this.clickCalulAlignObject.has(index)) {
-		const currentCountcalcul = this.clickCalulAlignObject.get(index)??0;
-		this.clickCalulAlignObject.set(index, currentCountcalcul + 1);
-	} else {
-		
-		this.clickCalulAlignObject.set(index, 1);
-	}
-
-
-	this.prepareLigneContext();
-
-			
-			this.isValid = this.sirenValidator.verifySiren(this.SirenDPE);
-			this.DpeResults = true;
-			this.elementResults = true;		
-			
-			
-			forkJoin([
-				this.engineService.alignement(this.ligneContext),
-				this.engineService.alignementXtra(this.ligneContextXtra)            
-			]).subscribe(([aligne, aligneXtra]) => {    
-				this.alignementResultText = this.alignementMapping[aligne];
-				this.alignementResult = aligne;
-				this.alignementXtraResult = aligneXtra;
-				this.alignementContext= this.xtraRepriseService.calculXtra(aligne,aligneXtra);
-				this.extractedInitialFinancement.objetFinancement[index].alignement=this.alignementContext;
-				//this.extractedInitialFinancement.objetFinancement[index].alignementXtraResult=this.alignementResultText ;
-				this.saveCurrentObjectValues(this.extractedInitialFinancement.objetFinancement[index]);
-		
-
-				
-			});
-			
-			
-		
-			this.errorDpeMessage = this.checkFileDpeInserted();
-			this.errorNormeThermiqueMessage = this.checkNormeThermique();
-			this.errorDateDepotMessage = this.checkFileDateDepotInserted();
-			this.evaluatedIndex.push(index);
-			const allManuallyAddedAreEvaluated = this.manuallyAddedIndices.every(manualIndex => this.evaluatedIndex.includes(manualIndex));
-			const isManuallyAddedEmpty = this.manuallyAddedIndices.length === 0;
-			if ((index == this.newIndex) || (index == 0 && (allManuallyAddedAreEvaluated || isManuallyAddedEmpty))) {
-				this.ajoutFinancementDisabled = false;
-			}	
-			
-			console.log("objet financement apres calcul: ", index,this.extractedInitialFinancement.objetFinancement[index]);
-			
-			
-}
-<div class="container-fluid" >
-        <div class=footer>
-        <div class="ButtonsFooter" style="display: flex; justify-content: flex-end" >
-        <button (click)="showAlignement(selectedObjetIndex)"   mat-raised-button color="primary" [disabled]="selectedType!='option1'">Calculer</button>
-         &nbsp; 
-       <button  mat-raised-button color="primary"  (click)="postContinuer()" [disabled]="postDisabled ">Continuer</button>
-      </div>
-      </div>           
-</div>
-	je dois passer les valeurs postDisabled  alertDisplayed quand je coche ou decoche une valeur des ngmodel dans le parent actuellement sur le premier objet j'ai le message alerte si je coche mais le button ne grise pas postContinuer comme ci postDisabled ne passe pas convenablement du composant fils vers le parent 
