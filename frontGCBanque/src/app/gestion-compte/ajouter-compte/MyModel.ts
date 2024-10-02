@@ -1,54 +1,60 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+	onBreadcrumbClick(index: number ) {
+		this.resetAlertDisplay();
+		this.errorDpeMessage=null;
+		this.errorNormeThermiqueMessage=null;
+		this.errorDateDepotMessage=null;
+					
+		console.log("this.extractedInitialFinancement.objetFinancement[index] on click sur l'objet index", index,this.extractedInitialFinancement.objetFinancement[index])
+		this.saveCurrentObjectValues(this.extractedInitialFinancement.objetFinancement[this.selectedObjetIndex]);  // Sauvegarder les données de l'objet actuel
+		
+		this.selectedObjetIndex = index;  // Mettre à jour l'index de l'objet sélectionné
+		
+			// Restituer le texte d'alignement sauvegardé en base
+			if (this.extractedInitialFinancement.objetFinancement[index] && this.extractedInitialFinancement.objetFinancement[index].alignement 
+				&& this.extractedInitialFinancement.objetFinancement[index].alignement.topAlignement!=null&&this.extractedInitialFinancement.objetFinancement[index].alignement.xtra275TopAlignement
+				!=null) {
+					this.showBlocResult=true;
+				this.alignementResultText = this.alignementMappingReprise[this.extractedInitialFinancement.objetFinancement[index].alignement.topAlignement][this.extractedInitialFinancement.objetFinancement[index].alignement.xtra275TopAlignement]
+				
+			}
+            if (this.extractedInitialFinancement.objetFinancement[index].alignement.topAlignement==null && this.extractedInitialFinancement.objetFinancement[index].alignement.xtra275TopAlignement==null) {
+				this.showBlocResult=false;		
+			}
 
-@Component({
-  selector: 'app-votre-composant',
-  templateUrl: './votre-composant.component.html',
-  styleUrls: ['./votre-composant.component.css']
-})
-export class VotreComposant {
-  
-  @Output() postDisabledChange: EventEmitter<boolean> = new EventEmitter<boolean>();
-  @Output() alertDisplayedChange: EventEmitter<boolean> = new EventEmitter<boolean>();
+			
+				
+			
+		this.depExist=false;
+		
 
-  postDisabled: boolean = false;
-  alertDisplayed: boolean = false;
 
-  recalculerAlignment() {
-    this.postDisabled = true;
-    this.postDisabledChange.emit(this.postDisabled); // Émettre la nouvelle valeur de postDisabled
 
-    if (!this.alertDisplayed) {
-      alert("Merci de calculer l'alignement suite à ce changement.");
-      this.alertDisplayed = true;
-      this.alertDisplayedChange.emit(this.alertDisplayed); // Émettre la nouvelle valeur de alertDisplayed
-    }
-  }
-}
-//
-<!-- Exemple dans le template du composant parent -->
-<app-votre-composant (postDisabledChange)="handlePostDisabledChange($event)" 
-                     (alertDisplayedChange)="handleAlertDisplayedChange($event)">
-</app-votre-composant>
-//
-export class ParentComposant {
+   
 
-  postDisabled: boolean;
-  alertDisplayed: boolean;
+		
 
-  handlePostDisabledChange(postDisabled: boolean) {
-    this.postDisabled = postDisabled;
-    console.log('postDisabled a changé:', postDisabled);
-  }
-
-  handleAlertDisplayedChange(alertDisplayed: boolean) {
-    this.alertDisplayed = alertDisplayed;
-    console.log('alertDisplayed a changé:', alertDisplayed);
-  }
-}
-//
-<!-- Exemple dans le template du composant parent -->
-<app-votre-composant (postDisabledChange)="handlePostDisabledChange($event)" 
-                     (alertDisplayedChange)="handleAlertDisplayedChange($event)">
-</app-votre-composant>
+	this.setObjetFinancementData(this.extractedInitialFinancement.objetFinancement[index]);  // Charger les données du nouvel objet sélectionné
+	this.setupFormGroup(this.extractedInitialFinancement.objetFinancement[index].bien);  // Initialiser le formulaire avec les données du nouvel objet
 
 	
+
+	// Appliquer les règles métiers sur l'élément sélectionné
+	this.checkPiecesJustificatif(this.extractedInitialFinancement, this.selectedObjetIndex);
+	console.log("Vérification des champs montant finance LCL et part LCL : ", this.montantLclFinance, this.partLcl);
+	this.checkFormFieldsFormGroup();
+
+	
+ // Forcer le recalcul d'alignement en cas de changement d'un 
+
+ this.formGroup.get('lettreCEP').valueChanges.subscribe(() => {
+	this.recalculerAlignment();
+  });
+  this.formGroup.get('valeurCep').valueChanges.subscribe(() => {
+	this.recalculerAlignment();
+  });
+  this.formGroup.get('anneeConstruction').valueChanges.subscribe(() => {
+	this.recalculerAlignment();
+  });
+
+
+}
