@@ -45,4 +45,10 @@ export class ParentComposant {
     console.log('alertDisplayed a changé:', alertDisplayed);
   }
 }
+//
+<!-- Exemple dans le template du composant parent -->
+<app-votre-composant (postDisabledChange)="handlePostDisabledChange($event)" 
+                     (alertDisplayedChange)="handleAlertDisplayedChange($event)">
+</app-votre-composant>
+
 	
