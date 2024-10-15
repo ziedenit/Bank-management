@@ -1,6 +1,10 @@
-this.formGroup = this.fb.group({
-    // ... autres champs
-    lettreCEP: [this.dpeAdeme['Etiquette_DPE'] ? this.dpeAdeme['Etiquette_DPE'] : this.dpeAdeme['classe_consommation_energie'] ? this.dpeAdeme['classe_consommation_energie'] : 'option0'],
-    lettreGES: [this.dpeAdeme['Etiquette_GES'] ? this.dpeAdeme['Etiquette_GES'] : this.dpeAdeme['classe_estimation_ges'] ? this.dpeAdeme['classe_estimation_ges'] : 'option0'],
-    // ... autres champs
-});
+ // Abonnement aux changements de valeur des champs
+    this.formGroup.get('lettreCEP').valueChanges.subscribe((value) => {
+      console.log('lettreCEP changed:', value); // Ajoutez un log pour déboguer
+      this.hideFieldCEP = !value || value === 'option0';
+    });
+
+    this.formGroup.get('lettreGES').valueChanges.subscribe((value) => {
+      console.log('lettreGES changed:', value); // Ajoutez un log pour déboguer
+      this.hideFieldGES = !value || value === 'option0';
+    });
