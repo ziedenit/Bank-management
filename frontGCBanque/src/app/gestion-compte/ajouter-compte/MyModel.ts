@@ -3,35 +3,38 @@
   margin-top: 50px;
 }
 
-h1 {
-  display: inline-block;
-  font-size: 4vw; /* Taille réactive basée sur la largeur de l'écran */
-  white-space: nowrap; /* Empêche le texte de passer à la ligne */
-  overflow: hidden; /* Cache le débordement */
-  text-overflow: ellipsis; /* Ajoute "..." si le texte est trop long */
+.header {
+  display: flex;
+  align-items: center; /* Centre le contenu verticalement */
+  justify-content: space-between; /* Espace entre le logo et le titre */
+  flex-wrap: wrap; /* Permet au titre de passer à la ligne si nécessaire */
 }
 
-h2, h3 {
-  text-align: left;
+.header-title h1 {
+  font-size: 4vw; /* Ajuste la taille du titre en fonction de l'écran */
+  white-space: nowrap; /* Empêche le retour à la ligne */
+  overflow: hidden; /* Cache le texte qui dépasse */
+  text-overflow: ellipsis; /* Affiche "..." si le texte dépasse */
+  max-width: 100%; /* Le titre ne dépassera pas la largeur de son conteneur */
+  box-sizing: border-box; /* Inclut le padding et la bordure dans la largeur */
 }
 
-.check {
-  height: 30px;
+.header-logo img {
+  max-width: 100%; /* Empêche le logo de déborder */
 }
 
-/* Ajustements pour les petits écrans */
 @media (max-width: 768px) {
-  h1 {
-    font-size: 6vw; /* Réduit la taille de la police sur les écrans plus petits */
-  }
-  
-  .container-starter {
-    margin-left: 20px; /* Réduit la marge pour de petits écrans */
+  .header-title h1 {
+    font-size: 6vw; /* Réduit la taille du titre sur les tablettes */
   }
 }
 
 @media (max-width: 480px) {
-  h1 {
-    font-size: 8vw; /* Encore plus petite taille pour smartphones */
+  .header-title h1 {
+    font-size: 8vw; /* Encore plus petit pour les smartphones */
   }
+}
+///
+.header-title {
+  max-width: 80%; /* Limite l'espace disponible pour le titre */
 }
