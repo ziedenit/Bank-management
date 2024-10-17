@@ -3,47 +3,35 @@
   margin-top: 50px;
 }
 
-h2, h3{
+h1 {
+  display: inline-block;
+  font-size: 4vw; /* Taille réactive basée sur la largeur de l'écran */
+  white-space: nowrap; /* Empêche le texte de passer à la ligne */
+  overflow: hidden; /* Cache le débordement */
+  text-overflow: ellipsis; /* Ajoute "..." si le texte est trop long */
+}
 
+h2, h3 {
   text-align: left;
 }
 
-h1{
+.check {
+  height: 30px;
+}
 
-  display: inline-block;
+/* Ajustements pour les petits écrans */
+@media (max-width: 768px) {
+  h1 {
+    font-size: 6vw; /* Réduit la taille de la police sur les écrans plus petits */
+  }
   
+  .container-starter {
+    margin-left: 20px; /* Réduit la marge pour de petits écrans */
+  }
 }
 
-.check{
- height: 30px;
+@media (max-width: 480px) {
+  h1 {
+    font-size: 8vw; /* Encore plus petite taille pour smartphones */
+  }
 }
-
-//
-
-<div class="header">
-	<div class="row main">
-		<div class="col-2">
-			<div class="header-logo">
-				<img src="assets/images/logo-lcl.png" alt="Logo LCL">
-			</div>
-		</div>
-		<div class="col-8">
-			<div class="header-title">
-				<h1>{{title}}</h1>
-			</div>
-		</div>
-	
-	</div>
-</div>
-
-<app-oidc (userInfoEmitter)="connectedHandler($event)"></app-oidc>
-
-<div class="container-starter" *ngIf="connected && !errorOIDC">
-
-	</div>
-
-<div *ngIf="connected && !errorOIDC">
-	<router-outlet></router-outlet>
-</div>
-
-j'ai un probleme avec le {{title}} qui deborde si je reduit l'ecran au min qui n'est pas responsive comme je le rends responsive 
