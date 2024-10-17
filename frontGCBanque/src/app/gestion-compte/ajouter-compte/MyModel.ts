@@ -1,40 +1,48 @@
-.container-starter {
+
+<div class="header">
+	<div class="row main">
+		<div class="col-2">
+			<div class="header-logo">
+				<img src="assets/images/logo-lcl.png" alt="Logo LCL">
+			</div>
+		</div>
+		<div class="col-8">
+			<div class="header-title">
+				<h1>{{title}}</h1>
+			</div>
+		</div>
+	
+	</div>
+</div>
+
+<app-oidc (userInfoEmitter)="connectedHandler($event)"></app-oidc>
+
+<div class="container-starter" *ngIf="connected && !errorOIDC">
+
+	</div>
+
+<div *ngIf="connected && !errorOIDC">
+	<router-outlet></router-outlet>
+</div>
+
+//
+  .container-starter {
   margin-left: 50px;
   margin-top: 50px;
 }
 
-.header {
-  display: flex;
-  align-items: center; /* Centre le contenu verticalement */
-  justify-content: space-between; /* Espace entre le logo et le titre */
-  flex-wrap: wrap; /* Permet au titre de passer à la ligne si nécessaire */
+h2, h3{
+
+  text-align: left;
 }
 
-.header-title h1 {
-  font-size: 4vw; /* Ajuste la taille du titre en fonction de l'écran */
-  white-space: nowrap; /* Empêche le retour à la ligne */
-  overflow: hidden; /* Cache le texte qui dépasse */
-  text-overflow: ellipsis; /* Affiche "..." si le texte dépasse */
-  max-width: 100%; /* Le titre ne dépassera pas la largeur de son conteneur */
-  box-sizing: border-box; /* Inclut le padding et la bordure dans la largeur */
+h1{
+
+  display: inline-block;
+  
 }
 
-.header-logo img {
-  max-width: 100%; /* Empêche le logo de déborder */
+.check{
+ height: 30px;
 }
 
-@media (max-width: 768px) {
-  .header-title h1 {
-    font-size: 6vw; /* Réduit la taille du titre sur les tablettes */
-  }
-}
-
-@media (max-width: 480px) {
-  .header-title h1 {
-    font-size: 8vw; /* Encore plus petit pour les smartphones */
-  }
-}
-///
-.header-title {
-  max-width: 80%; /* Limite l'espace disponible pour le titre */
-}
