@@ -1,54 +1,49 @@
-/* Conteneur principal pour le démarrage */
 .container-starter {
   margin-left: 50px;
   margin-top: 50px;
 }
 
-/* Titres h2 et h3 restent inchangés */
-h2, h3 {
+h2, h3{
+
   text-align: left;
 }
 
-/* Titres h1 : modification pour la responsivité */
-h1 {
-  display: inline-block; /* Conserver inline pour l'effet initial */
-  font-size: 2.5rem; /* Taille par défaut */
-  white-space: nowrap; /* Empêcher le débordement du texte */
-  overflow: hidden; /* Masquer les débordements */
-  text-overflow: ellipsis; /* Ajouter des points de suspension si le texte déborde */
-  max-width: 100%; /* Limiter la largeur pour éviter le débordement */
-  text-align: center; /* Centrer le texte */
-  transition: font-size 0.3s ease; /* Douce transition des tailles */
+h1{
+
+  display: inline-block;
+  
 }
 
-@media (max-width: 1200px) {
-  h1 {
-    font-size: 2rem; /* Diminuer la taille sur grand écran */
-  }
+.check{
+ height: 30px;
 }
 
-@media (max-width: 992px) {
-  h1 {
-    font-size: 1.8rem; /* Taille réduite pour les tablettes */
-  }
-}
-
-@media (max-width: 768px) {
-  h1 {
-    font-size: 1.5rem; /* Taille réduite pour les petits écrans */
-    white-space: normal; /* Autoriser le texte à passer sur plusieurs lignes */
-  }
-}
-
-@media (max-width: 576px) {
-  h1 {
-    font-size: 1.2rem; /* Encore plus petit pour les écrans mobiles */
-    white-space: normal; /* Texte sur plusieurs lignes si nécessaire */
-  }
-}
-
-/* Ajustement pour les checkbox */
-.check {
-  height: 30px;
-}
 //
+
+<div class="header">
+	<div class="row main">
+		<div class="col-2">
+			<div class="header-logo">
+				<img src="assets/images/logo-lcl.png" alt="Logo LCL">
+			</div>
+		</div>
+		<div class="col-8">
+			<div class="header-title">
+				<h1>{{title}}</h1>
+			</div>
+		</div>
+	
+	</div>
+</div>
+
+<app-oidc (userInfoEmitter)="connectedHandler($event)"></app-oidc>
+
+<div class="container-starter" *ngIf="connected && !errorOIDC">
+
+	</div>
+
+<div *ngIf="connected && !errorOIDC">
+	<router-outlet></router-outlet>
+</div>
+
+j'ai un probleme avec le {{title}} qui deborde si je reduit l'ecran au min qui n'est pas responsive comme je le rends responsive 
