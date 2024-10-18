@@ -1,10 +1,52 @@
-argocd.env: found 1 matching artifact files and directories 
-WARNING: Uploading artifacts as "dotenv" to coordinator... POST https://scm.saas.cagip.group.gca/api/v4/jobs/59397476/artifacts: 400 Bad Request (Invalid Format)  id=59397476 responseStatus=400 Bad Request status=400 token=64_np6bW
-WARNING: Retrying...                                context=artifacts-uploader error=invalid argument
-WARNING: Uploading artifacts as "dotenv" to coordinator... POST https://scm.saas.cagip.group.gca/api/v4/jobs/59397476/artifacts: 400 Bad Request (Invalid Format)  id=59397476 responseStatus=400 Bad Request status=400 token=64_np6bW
-WARNING: Retrying...                                context=artifacts-uploader error=invalid argument
-WARNING: Uploading artifacts as "dotenv" to coordinator... POST https://scm.saas.cagip.group.gca/api/v4/jobs/59397476/artifacts: 400 Bad Request (Invalid Format)  id=59397476 responseStatus=400 Bad Request status=400 token=64_np6bW
-FATAL: invalid argument                            
-Cleaning up project directory and file based variables
-00:01
-ERROR: Job failed: exit code 1
+
+<div class="header">
+	<div class="row main">
+		<div class="col-2">
+			<div class="header-logo">
+				<img src="assets/images/logo-lcl.png" alt="Logo LCL">
+			</div>
+		</div>
+		<div class="col-8">
+			<div class="header-title">
+				<h1>{{title}}</h1>
+			</div>
+		</div>
+	
+	</div>
+</div>
+
+<app-oidc (userInfoEmitter)="connectedHandler($event)"></app-oidc>
+
+<div class="container-starter" *ngIf="connected && !errorOIDC">
+
+	</div>
+
+<div *ngIf="connected && !errorOIDC">
+	<router-outlet></router-outlet>
+</div>
+
+//
+
+
+  .container-starter {
+  margin-left: 50px;
+  margin-top: 50px;
+}
+
+h2, h3{
+
+  text-align: left;
+}
+
+h1{
+
+  text-align: left;
+  display: inline-flex;
+
+  
+}
+
+.check{
+ height: 30px;
+}
+  
