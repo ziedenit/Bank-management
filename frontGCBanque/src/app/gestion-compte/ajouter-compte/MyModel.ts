@@ -12,9 +12,6 @@ spec:
     - namespaceSelector:
         matchLabels:
           name: reper-04833-metier-uat
-  policyTypes:
-    - Egress
-  egress:
     - to:
         - ipBlock:
             cidr: 10.0.0.0/8
@@ -25,3 +22,6 @@ spec:
           port: 3128
         - protocol: TCP
           port: 8080
+
+Running a few seconds ago (Mon Oct 21 2024 17:20:29 GMT+0200)
+one or more objects failed to apply, reason: NetworkPolicy.networking.k8s.io "allow-msofd-to-msperson-uat" is invalid: spec.egress[0].to[1]: Required value: must specify a
