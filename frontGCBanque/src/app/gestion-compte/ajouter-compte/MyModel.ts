@@ -1,20 +1,27 @@
-
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   name: allow-msofd-to-msperson
-  namespace: msofd  # Namespace msofd qui initie la connexion sortante
+  namespace: ofd-05092-metier-uat  
 spec:
-  podSelector: {}  # Applique à tous les pods dans msofd (ou utilise des labels pour spécifier certains pods)
+  podSelector: {}  
   policyTypes:
-  - Egress  # On configure le trafic sortant
+    - Egress 
   egress:
   - to:
     - namespaceSelector:
         matchLabels:
-          name: msperson  # Permet uniquement les connexions vers le namespace msperson
-    ports:
-    - protocol: TCP
-      port: 80  # Si l'API getperson est exposée sur HTTP (port à ajuster selon l'API)
-    - protocol: TCP
-      port: 443  # Si l'API est exposée sur HTTPS
+          name: reper-04833-metier-uat
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+        - ipBlock:
+            cidr: 10.0.0.0/8
+      ports:
+        - protocol: TCP
+          port: 27017
+        - protocol: TCP
+          port: 3128
+        - protocol: TCP
+          port: 8080
