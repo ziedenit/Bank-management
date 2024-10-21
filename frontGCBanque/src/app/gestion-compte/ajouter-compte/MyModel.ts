@@ -1,23 +1,20 @@
-# Si tu as d'autres NetworkPolicies, elles devraient être ici.
 
-# Ajoute cette nouvelle NetworkPolicy pour autoriser les flux du namespace msperson
----
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: allow-msperson-to-msofd
-  namespace: msofd  # Le namespace où la règle sera appliquée
+  name: allow-msofd-to-msperson
+  namespace: msofd  # Namespace msofd qui initie la connexion sortante
 spec:
-  podSelector: {}  # Applique la règle à tous les pods de msofd (ou configure des labels pour limiter à certains pods)
+  podSelector: {}  # Applique à tous les pods dans msofd (ou utilise des labels pour spécifier certains pods)
   policyTypes:
-  - Ingress  # Trafic entrant
-  ingress:
-  - from:
+  - Egress  # On configure le trafic sortant
+  egress:
+  - to:
     - namespaceSelector:
         matchLabels:
-          name: msperson  # Autorise uniquement le trafic provenant du namespace msperson
+          name: msperson  # Permet uniquement les connexions vers le namespace msperson
     ports:
     - protocol: TCP
-      port: 80  # HTTP (ou ajuste selon tes besoins)
+      port: 80  # Si l'API getperson est exposée sur HTTP (port à ajuster selon l'API)
     - protocol: TCP
-      port: 443  # HTTPS
+      port: 443  # Si l'API est exposée sur HTTPS
