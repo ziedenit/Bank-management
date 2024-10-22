@@ -1,27 +1,61 @@
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  name: allow-msofd-to-msperson
-  namespace: ofd-05092-metier-uat  
-spec:
-  podSelector: {}  
-  policyTypes:
-    - Egress 
-  egress:
-  - to:
-    - namespaceSelector:
-        matchLabels:
-          name: reper-04833-metier-uat
-    - to:
-        - ipBlock:
-            cidr: 10.0.0.0/8
-      ports:
-        - protocol: TCP
-          port: 27017
-        - protocol: TCP
-          port: 3128
-        - protocol: TCP
-          port: 8080
 
-Running a few seconds ago (Mon Oct 21 2024 17:20:29 GMT+0200)
-one or more objects failed to apply, reason: NetworkPolicy.networking.k8s.io "allow-msofd-to-msperson-uat" is invalid: spec.egress[0].to[1]: Required value: must specify a
+<div class="header">
+	<div class="container-fluid mb-4">
+	<div class="row">
+		<div class="col-2">
+		 	<div class="header-logo">
+			<img src="assets/images/logo-lcl.png" alt="Logo LCL">
+		 	</div>
+		</div>
+	
+	  
+	
+		<div class="col-2">
+			<div class="header-title">
+			<h1>{{title}}</h1>
+			</div>
+		</div>
+	</div>
+</div>
+</div>
+
+
+<app-oidc (userInfoEmitter)="connectedHandler($event)"></app-oidc>
+
+<div class="container-starter" *ngIf="connected && !errorOIDC">
+
+	</div>
+
+<div *ngIf="connected && !errorOIDC">
+	<router-outlet></router-outlet>
+</div>
+<div class="header">
+	<div class="container-fluid mb-4">
+	<div class="row">
+		<div class="col-2">
+		 	<div class="header-logo">
+			<img src="assets/images/logo-lcl.png" alt="Logo LCL">
+		 	</div>
+		</div>
+	
+	  
+	
+		<div class="col-2">
+			<div class="header-title">
+			<h1>{{title}}</h1>
+			</div>
+		</div>
+	</div>
+</div>
+</div>
+
+
+<app-oidc (userInfoEmitter)="connectedHandler($event)"></app-oidc>
+
+<div class="container-starter" *ngIf="connected && !errorOIDC">
+
+	</div>
+
+<div *ngIf="connected && !errorOIDC">
+	<router-outlet></router-outlet>
+</div>
